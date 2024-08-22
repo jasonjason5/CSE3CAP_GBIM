@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>9f41380f-7085-4fef-ac57-814fe3a9ce98</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>CSE3CAP_GBIM.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CSE3CAP_GBIM.py" />
+    <Compile Include="Main.py" />
+    <Compile Include="FrameLoop.py" />
+    <Compile Include="Functions.py" />
+    <Compile Include="MPRecognition.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
