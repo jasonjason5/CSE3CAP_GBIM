@@ -11,54 +11,54 @@ from PIL import Image
 from PIL import ImageTk
 import _tkinter as tk
 import MPRecognition
-
+import numpy as np
+import math
 
 class GestureVision:
     
     def __init__(self,root,window,affirmation,model_data): ## Initilises all MP and CV variables and objects to be operated on
+        
         self.frameCapture = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.mpHands = mp.solutions.hands
         self.mpDrawing = mp.solutions.drawing_utils
         self.mpHandObject = self.mpHands.Hands()
         
         ##MPRecognition REFERENCES
+        
         self.model_data = model_data
         self.recognizer = MPRecognition.MPRecognizer(self.model_data)
-        self.gestureBuffer = [None]*5
-        
+        self.gesture = "none"
 
         ## UI REFERENCES ##
        
         self.root = root 
         self.window = window
         self.affirmation = affirmation
-
         
-    ##Needs MPObject param
-    def updateFrame(self): ## This might need a reference to the UI Root, not too sure - same problem as listed at top
+    def updateFrame(self):
         success, frame = self.frameCapture.read()
         if success:
             frameRGB = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB) ## OpenCV takes images in BGR format, this converts them into the proper RGB format for display and processing
             results = self.mpHandObject.process(frameRGB)
-        
+            
             gestureFrame = Image.fromarray(frameRGB)
 
             ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
-            self.gestureBuffer = self.recognizer.recognizeGesture(gestureFrame,results)
+            self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
 
             ##DEBUG##
-            if(self.gestureBuffer is not None):
-                self.affirmation.config(text=self.gestureBuffer[0])
+            self.affirmation.config(text=self.gesture)
             ##DEBUG##
             
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
             displayFrame = ImageTk.PhotoImage(image = resizedFrame)
        
-       ## return it to the tkinter widget in which we want to display it
+            ## return it to the tkinter widget in which we want to display it
        
             self.window.image = displayFrame
             self.window.config(image=displayFrame)
             self.root.after(20,self.updateFrame)
+            
         else:
             return
         
@@ -67,7 +67,6 @@ class GestureVision:
         return
     
     def callFunction(self,MPObject): ## This method will be called to check which function to call based on the contents of the buffer
-
         return
     
     def displayGesture(self): ## Method to display affirmative gesture feedback (Similar to what is currently under DEBUG)
