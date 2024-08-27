@@ -6,6 +6,7 @@ from PIL import Image
 import numpy as np
 import math
 import statistics
+from google.protobuf.json_format import MessageToDict
 
 class MPRecognizer:
     
@@ -20,7 +21,7 @@ class MPRecognizer:
         
         self.confidence = 0.6
         self.buffer = ["none"]*5
-    
+        
     def recognizeGesture(self,frame,lmdata):
         
         processingFrame = mp.Image(image_format = mp.ImageFormat.SRGB,data = np.asarray(frame))
@@ -55,7 +56,7 @@ class MPRecognizer:
 
     def cleanupLandmarkValueGenerator(self,landmark_data):
         h1 = landmark_data.multi_hand_landmarks[0]
-        
+
         pinkyXYZ = [None]*3
         ringXYZ = [None]*3
         middleXYZ = [None]*3
@@ -66,11 +67,15 @@ class MPRecognizer:
         pinkyXYZ[0] = h1.landmark[20].x; pinkyXYZ[1] = h1.landmark[20].y; pinkyXYZ[2] = h1.landmark[20].z
         ringXYZ[0] = h1.landmark[16].x; ringXYZ[1] = h1.landmark[16].y; ringXYZ[2] = h1.landmark[16].z
         middleXYZ[0] = h1.landmark[12].x; middleXYZ[1] = h1.landmark[12].y; middleXYZ[2] = h1.landmark[12].z
+        #foreXYZ
+        #thumbXYZ
         rootXYZ[0] = h1.landmark[0].x; rootXYZ[1] = h1.landmark[0].y; rootXYZ[2] = h1.landmark[0].z
                 
         pinkyDistance = math.sqrt((pinkyXYZ[0] - rootXYZ[0])**2 + (pinkyXYZ[1] - rootXYZ[1])**2)
         ringDistance = math.sqrt((middleXYZ[0] - rootXYZ[0])**2 + (middleXYZ[1] - rootXYZ[1])**2)
         middleDistance = math.sqrt((middleXYZ[0] - rootXYZ[0])**2 + (middleXYZ[1] - rootXYZ[1])**2)        
+        #foreDistance
+        #thumbDistance
         
         return pinkyDistance,ringDistance,middleDistance   
             
@@ -79,15 +84,13 @@ class MPRecognizer:
 ## when it detects help and goind "No, there's only one hand, so it's obviously not help - its open". Apply that across the whole spectrum
         
     def gestureCleanup(self,landmark_data):
-        
-        pinkyDistance,ringDistance,middleDistance = self.cleanupLandmarkValueGenerator(landmark_data)
         gesture = "none"
-        if(self.bufferWeighter('rotate') > self.confidence):
-                if(pinkyDistance < 0.2 and ringDistance < 0.2 and middleDistance < 0.2):
-                    gesture = "rotate"
-                    ## This is interesting because now we have the option of calling the function either from here, because now we know what function we're doing - or from Frameloop. Will probably do it from
-                    ## Frameloop to avoid getting too deep in the callback sauce
+        if(landmark_data.multi_hand_landmarks):
+            ### SINGLE HANDED GESTURES ###
+            if(len(landmark_data.multi_hand_landmarks) == 1):
+                pinkyDistance,ringDistance,middleDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
+                if(self.bufferWeighter('rotate') > self.confidence):
+                        if(pinkyDistance < 0.2 and ringDistance < 0.2 and middleDistance < 0.2):
+                            gesture = "rotate"
+            ### MULTI HANDDED GESTURES ###
         return gesture
-            
-
-
