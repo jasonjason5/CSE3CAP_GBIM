@@ -3,7 +3,6 @@
 ## Not too sure how python hands passing objects, whether they're copied and passed by value or passed by reference and can be edited from within the caller.
 ## Will need to investigate when things are up and running to see.
 
-from logging import root
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -11,20 +10,28 @@ from mediapipe.tasks.python import vision
 from PIL import Image
 from PIL import ImageTk
 import _tkinter as tk
+import MPRecognition
 
 
 class GestureVision:
     
-    def __init__(self,root,window): ## Initilises all MP and CV variables and objects to be operated on
+    def __init__(self,root,window,affirmation,model_data): ## Initilises all MP and CV variables and objects to be operated on
         self.frameCapture = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.mpHands = mp.solutions.hands
         self.mpDrawing = mp.solutions.drawing_utils
         self.mpHandObject = self.mpHands.Hands()
         
+        ##MPRecognition REFERENCES
+        self.model_data = model_data
+        self.recognizer = MPRecognition.MPRecognizer(self.model_data)
+        self.gestureBuffer = [None]*5
+        
+
         ## UI REFERENCES ##
        
         self.root = root 
         self.window = window
+        self.affirmation = affirmation
 
         
     ##Needs MPObject param
@@ -36,7 +43,13 @@ class GestureVision:
         
             gestureFrame = Image.fromarray(frameRGB)
 
-        ## MPObject.recognizeGesture(gestureFrame) ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
+            ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
+            self.gestureBuffer = self.recognizer.recognizeGesture(gestureFrame,results)
+
+            ##DEBUG##
+            if(self.gestureBuffer is not None):
+                self.affirmation.config(text=self.gestureBuffer[0])
+            ##DEBUG##
             
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
             displayFrame = ImageTk.PhotoImage(image = resizedFrame)
@@ -55,6 +68,9 @@ class GestureVision:
     
     def callFunction(self,MPObject): ## This method will be called to check which function to call based on the contents of the buffer
 
+        return
+    
+    def displayGesture(self): ## Method to display affirmative gesture feedback (Similar to what is currently under DEBUG)
         return
         
         

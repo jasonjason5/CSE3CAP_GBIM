@@ -20,12 +20,18 @@ root.geometry("1280x720")
 deviceCamera = tk.Label(master=root)
 deviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
 
+detectedGesture = tk.Label(master=root,height=5,width=200,bg='black',fg='white',text="Gesture")
+detectedGesture.place(relx=0.5,rely=0.1,anchor='center')
+
 ## TEST UI
 
 
 ## TEST MATERIAL ##
+model_path = 'gesture_recognizer.task'
+with open(model_path,'rb') as file:
+    model_data = file.read()
 
-looper = FrameLoop.GestureVision(root,deviceCamera) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
+looper = FrameLoop.GestureVision(root,deviceCamera,detectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
 
 def startCamera():
     looper.updateFrame()
