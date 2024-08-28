@@ -21,15 +21,33 @@ def startCamera():
 ## Static UI ##
 global uiRoot;
 
+# Minimum size of window
+min_width = 320
+min_height = 320
+
 uiRoot = tk.Tk()
 uiRoot.title("Gesture Based Image Manipulation")
 uiRoot.geometry("1280x720")
+uiRoot.minsize(min_width, min_height)
+#uiRoot.attributes('-alpha',0.5)
 
+# Root frame, holds all other frames
 uiRootFrame = tk.Frame(master=uiRoot,bg= Style.workspaceBackground)
 uiRootFrame.place(relheight=1, relwidth=1)
 
-uiDeviceCamera = tk.Label(master=uiRoot,bg= Style.workspaceBackground)
-uiDeviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
+# master frame, Holds the camera frame, menu frame, and current gesture frame
+uiMasterFrame = tk.Frame(master=uiRootFrame, bg=Style.workspaceBackground)
+uiMasterFrame.pack(side=tk.BOTTOM, expand=False, fill=tk.BOTH)
+
+uiMasterFrame.columnconfigure(0, weight = 4)
+uiMasterFrame.columnconfigure(1, weight = 1)
+
+uiMasterFrame.rowconfigure(0, weight = 1)
+uiMasterFrame.rowconfigure(1, weight = 2)
+
+# menu frame, holds the gesture help, open file, action history, gesture function list
+uiMenuFrame = tk.Frame(master=uiMasterFrame, bg=Style.popupBackground)
+uiMenuFrame.grid(column=0, row=1, sticky=tk.S)
 
 uiDetectedGesture = tk.Label(master=uiRoot,height=5,width=200,bg='black',fg=Style.whiteText,text="Gesture")
 uiDetectedGesture.place(relx=0.5,rely=0.1,anchor='center')
@@ -48,34 +66,48 @@ uiStartButton.place(relx=0.5,rely=0.7,anchor='center')
 
 ## Splash Start UI ##
 
+
+
 ## Pre import UI ##
 
-uiPreimportFrame = tk.Frame(master=uiRootFrame,height=219, bg=Style.popupBackground)
-uiPreimportFrame.place(relx=.5, rely=.8,relheight=1, relwidth=1, anchor='n')
-
-uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Open File")
-uiPreimportOpenFileBtn.place(relx=0.5, rely= 0.1, anchor='center')
+uiPreimportFrame = tk.Frame(master=uiMenuFrame)
+uiPreimportFrame.pack(side=tk.LEFT, expand=True)
+#uiPreimportFrame.columnconfigure(0, weight=1)
+#uiPreimportFrame.rowconfigure(0, weight=1)
 
 uiPreimportOpenFileLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Open File")
-uiPreimportOpenFileLbl.place(relx=0.1, rely= 0.1, anchor='w')
+uiPreimportOpenFileLbl.grid(column=0, row=0, sticky=tk.SW, ipadx=30, ipady=30)
 
 uiPreimportOpenConfirmLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Confirm")
-uiPreimportOpenConfirmLbl.place(relx=0.2, rely= 0.1, anchor='w')
+uiPreimportOpenConfirmLbl.grid(column=1, row=0, sticky=tk.SW, ipadx=30, ipady=30)
+
+uiPreimportOpenOrLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="OR")
+uiPreimportOpenOrLbl.grid(column=2, row=0, sticky=tk.SW, ipadx=30, ipady=30)
+
+uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Open File")
+uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.SW, ipadx=30, ipady=30)
+
+#.pack(side=tk.LEFT, expand=False, ipadx=20, ipady=20
 
 ## Pre import UI ##
 
 ## Help UI #
-uiHelpFrame = tk.Frame(master=uiRootFrame,height=219, bg=Style.popupBackground)
-uiHelpFrame.place(relx=.5, rely=.8,relheight=1, relwidth=1, anchor='n')
+uiHelpFrame = tk.Frame(master=uiMenuFrame, bg=Style.popupBackground)
+uiHelpFrame.pack(side=tk.LEFT, expand=True)
 
-uiHelpBtn = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Help")
-uiHelpBtn.place(relx=0.7, rely= 0.2, anchor='e')
+uiHelpLbl = tk.Label(master=uiHelpFrame,bg=Style.gestures,fg=Style.blackText,text="Help")
+uiHelpLbl.pack(side=tk.TOP, expand=False, ipadx=40, ipady=20)
 
-uiHelpLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Help")
-uiHelpLbl.place(relx=0.7, rely= 0.1, anchor='e')
+uiHelpBtn = tk.Button(master=uiHelpFrame ,bg=Style.gestures,fg=Style.blackText,text="Help")
+uiHelpBtn.pack(side=tk.TOP, expand=False, ipadx=40, ipady=20)
 
 # Help UI #
 
+## Camera UI ##
+
+uiDeviceCamera = tk.Label(master=uiMasterFrame,bg= Style.workspaceBackground)
+uiDeviceCamera.grid(column=1, row=0, rowspan= 2, sticky=tk.E)
+#uiDeviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
 
 ## TEST MATERIAL ##
 model_path = 'gesture_recognizer.task'
