@@ -19,7 +19,7 @@ class MPRecognizer:
         self.options = vision.GestureRecognizerOptions(base_options=python.BaseOptions(model_asset_buffer = self.model_data)) # Model Data can't be passed directly for some reason
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
         
-        self.confidence = 0.6
+        self.confidence = 0.4 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness
         self.buffer = ["none"]*5
         
     def recognizeGesture(self,frame,lmdata):
@@ -34,6 +34,7 @@ class MPRecognizer:
                 gestureID = [category.category_name for category in detectedGesture]
                 self.buffer.pop(4)
                 self.buffer.insert(0,gestureID[0])
+                print(self.buffer)
                 outGesture = self.gestureCleanup(lmdata)
             
             return outGesture
@@ -67,30 +68,48 @@ class MPRecognizer:
         pinkyXYZ[0] = h1.landmark[20].x; pinkyXYZ[1] = h1.landmark[20].y; pinkyXYZ[2] = h1.landmark[20].z
         ringXYZ[0] = h1.landmark[16].x; ringXYZ[1] = h1.landmark[16].y; ringXYZ[2] = h1.landmark[16].z
         middleXYZ[0] = h1.landmark[12].x; middleXYZ[1] = h1.landmark[12].y; middleXYZ[2] = h1.landmark[12].z
-        #foreXYZ
-        #thumbXYZ
+        foreXYZ[0] = h1.landmark[8].x; foreXYZ[1] = h1.landmark[8].y; foreXYZ[2] = h1.landmark[8].z;
+        thumbXYZ[0] = h1.landmark[4].x; thumbXYZ[1] = h1.landmark[4].y; thumbXYZ[2] = h1.landmark[4].z;
         rootXYZ[0] = h1.landmark[0].x; rootXYZ[1] = h1.landmark[0].y; rootXYZ[2] = h1.landmark[0].z
                 
         pinkyDistance = math.sqrt((pinkyXYZ[0] - rootXYZ[0])**2 + (pinkyXYZ[1] - rootXYZ[1])**2)
-        ringDistance = math.sqrt((middleXYZ[0] - rootXYZ[0])**2 + (middleXYZ[1] - rootXYZ[1])**2)
+        ringDistance = math.sqrt((ringXYZ[0] - rootXYZ[0])**2 + (ringXYZ[1] - rootXYZ[1])**2)
         middleDistance = math.sqrt((middleXYZ[0] - rootXYZ[0])**2 + (middleXYZ[1] - rootXYZ[1])**2)        
-        #foreDistance
-        #thumbDistance
+        foreDistance = math.sqrt((foreXYZ[0] - rootXYZ[0])**2 + (foreXYZ[1] - rootXYZ[1])**2)
+        thumbDistance = math.sqrt((thumbXYZ[0] - rootXYZ[0])**2 + (thumbXYZ[1] - rootXYZ[1])**2)
         
-        return pinkyDistance,ringDistance,middleDistance   
+        return pinkyDistance,ringDistance,middleDistance, foreDistance,thumbDistance ## This could possibly be returned as an array   
             
-## In order to clean up some of the recognition before we spit the buffer out to FL, we call this function. Plan is to mix recognition alongside
-## A series of hardcoded, landmark based conditions - E.g it gets confused between help/open currently. we can fix that by manually going in
-## when it detects help and goind "No, there's only one hand, so it's obviously not help - its open". Apply that across the whole spectrum
+## An example of how this works: The method recognizeGesture() is called from FL. It is called 5 consecutive times over 5 input frames, filling the buffer of the module
+## object in FL. Lets say the buffer gets filled [X,Y,X,Y,X] - 3 Xs, 2Ys. Mediapipe knows its either X or Y, but is unsure. Since X is present 3 times (i.e 60% of the buffer)
+## X has surpassed the confidence value of 0.6. It gets passed into the cleanup. For this example, let's say that the gesture we actually gave was Y. The frame containing X
+## Would then be checked against the values in cleanup - if we gave a thumbs up, perhaps pinky, ring, middle and fore distances from root (wrist) should be ~= 0.
+## Since we actually gave Y, these values will be at a mismatch, and the gesture won't result in a false positive.
         
     def gestureCleanup(self,landmark_data):
         gesture = "none"
         if(landmark_data.multi_hand_landmarks):
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
-                pinkyDistance,ringDistance,middleDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
+               
+                pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
+                print(pinkyDistance,ringDistance,middleDistance)
+                # Could probably be a switch/case but it doesn't particularly matter
+                
                 if(self.bufferWeighter('rotate') > self.confidence):
-                        if(pinkyDistance < 0.2 and ringDistance < 0.2 and middleDistance < 0.2):
-                            gesture = "rotate"
+                    if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance < 0.25):
+                        gesture = "rotate"
+                elif(self.bufferWeighter('resize') > self.confidence):
+                    if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance > 0.25): # This is the prime example of the work this does. This makes rotate and resize distinct by comparing middleDistance
+                        gesture = "resize"
+                elif(self.bufferWeighter('crop') > self.confidence):
+                    if(pinkyDistance < 0.25 and ringDistance < 0.25):
+                        gesture = "crop"
+                elif(self.bufferWeighter('translate') > self.confidence):
+                    if(pinkyDistance < 0.2 and thumbDistance < 0.3):
+                        gesture = "translate"
+               
+                    
+           
             ### MULTI HANDDED GESTURES ###
         return gesture

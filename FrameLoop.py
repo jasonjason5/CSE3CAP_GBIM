@@ -16,7 +16,7 @@ import math
 
 class GestureVision:
     
-    def __init__(self,root,window,affirmation,model_data): ## Initilises all MP and CV variables and objects to be operated on
+    def __init__(self,root,window,affirmation,model_data): ## Initialises all MP and CV variables and objects to be operated on
         
         self.frameCapture = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.mpHands = mp.solutions.hands
@@ -66,7 +66,7 @@ class GestureVision:
     def drawLandmarks(self): ## Draws hand landmarks. Good debugging tool but unnecessary to do all the time. Could add as boolean option
         return
     
-    def callFunction(self,MPObject): ## This method will be called to check which function to call based on the contents of the buffer
+    def callFunction(self,gesture,results): ## This method will be called to check which function to call based on the contents of the buffer
         return
     
     def displayGesture(self): ## Method to display affirmative gesture feedback (Similar to what is currently under DEBUG)

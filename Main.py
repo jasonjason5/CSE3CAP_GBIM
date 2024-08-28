@@ -32,6 +32,7 @@ with open(model_path,'rb') as file:
     model_data = file.read()
 
 looper = FrameLoop.GestureVision(root,deviceCamera,detectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
+# functions = Functions.editFunctions(reference to image, reference to canvas etc.)
 
 def startCamera():
     looper.updateFrame()
