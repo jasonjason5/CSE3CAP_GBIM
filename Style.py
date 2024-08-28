@@ -1,0 +1,6 @@
+gestures = "#D9D9D9"
+windowBorder = "#303030"
+popupBackground = "#656565"
+whiteText = "#DEDEDE"
+blackText = "#222222"
+workspaceBackground = "#464646"
