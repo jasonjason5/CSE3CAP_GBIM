@@ -24,14 +24,14 @@ min_width = 320
 min_height = 320
 
 #max size of window
-max_width = 1920
-max_height = 1080
+#max_width = 1920
+#max_height = 1080
 
 uiRoot = tk.Tk()
 uiRoot.title("Gesture Based Image Manipulation")
 uiRoot.geometry("1280x720")
 uiRoot.minsize(min_width, min_height)
-uiRoot.maxsize(max_width, max_height)
+#uiRoot.maxsize(max_width, max_height)
 uiRoot.configure(background=Style.workspaceBackground)
 uiRoot.rowconfigure(0, weight = 3)
 uiRoot.rowconfigure(1, weight = 1)
