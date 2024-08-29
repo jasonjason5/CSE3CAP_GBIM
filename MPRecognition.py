@@ -8,6 +8,8 @@ import math
 import statistics
 from google.protobuf.json_format import MessageToDict
 
+gesture = "none" # This is literally the only value that needs to be returned god bless.
+
 class MPRecognizer:
     
     def __init__(self,model_data):
@@ -30,7 +32,7 @@ class MPRecognizer:
         self.thumbXYZ = [None]*3
         self.rootXYZ = [None]*3
 
-
+        
 
     def recognizeGesture(self,frame,lmdata):
         
@@ -90,7 +92,8 @@ class MPRecognizer:
 ## Since we actually gave Y, these values will be at a mismatch, and the gesture won't result in a false positive.
         
     def gestureCleanup(self,landmark_data):
-        gesture = "none"
+        #gesture = "none"
+        global gesture 
         if(landmark_data.multi_hand_landmarks):
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
