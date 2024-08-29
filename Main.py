@@ -19,9 +19,6 @@ def startCamera():
     looper.updateFrame()
 
 
-## Static UI ##
-global uiRoot;
-
 # Minimum size of window
 min_width = 320
 min_height = 320

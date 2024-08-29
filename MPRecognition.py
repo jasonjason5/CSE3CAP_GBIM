@@ -22,6 +22,16 @@ class MPRecognizer:
         self.confidence = 0.4 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness
         self.buffer = ["none"]*5
         
+        ## Having these here stops redefinition everytime cleanup is called
+        self.pinkyXYZ = [None]*3
+        self.ringXYZ = [None]*3
+        self.middleXYZ = [None]*3
+        self.foreXYZ = [None]*3
+        self.thumbXYZ = [None]*3
+        self.rootXYZ = [None]*3
+
+
+
     def recognizeGesture(self,frame,lmdata):
         
         processingFrame = mp.Image(image_format = mp.ImageFormat.SRGB,data = np.asarray(frame))
@@ -34,7 +44,7 @@ class MPRecognizer:
                 gestureID = [category.category_name for category in detectedGesture]
                 self.buffer.pop(4)
                 self.buffer.insert(0,gestureID[0])
-                print(self.buffer)
+                #print(self.buffer)
                 outGesture = self.gestureCleanup(lmdata)
             
             return outGesture
@@ -57,26 +67,19 @@ class MPRecognizer:
 
     def cleanupLandmarkValueGenerator(self,landmark_data):
         h1 = landmark_data.multi_hand_landmarks[0]
-
-        pinkyXYZ = [None]*3
-        ringXYZ = [None]*3
-        middleXYZ = [None]*3
-        foreXYZ = [None]*3
-        thumbXYZ = [None]*3
-        rootXYZ = [None]*3
                 
-        pinkyXYZ[0] = h1.landmark[20].x; pinkyXYZ[1] = h1.landmark[20].y; pinkyXYZ[2] = h1.landmark[20].z
-        ringXYZ[0] = h1.landmark[16].x; ringXYZ[1] = h1.landmark[16].y; ringXYZ[2] = h1.landmark[16].z
-        middleXYZ[0] = h1.landmark[12].x; middleXYZ[1] = h1.landmark[12].y; middleXYZ[2] = h1.landmark[12].z
-        foreXYZ[0] = h1.landmark[8].x; foreXYZ[1] = h1.landmark[8].y; foreXYZ[2] = h1.landmark[8].z;
-        thumbXYZ[0] = h1.landmark[4].x; thumbXYZ[1] = h1.landmark[4].y; thumbXYZ[2] = h1.landmark[4].z;
-        rootXYZ[0] = h1.landmark[0].x; rootXYZ[1] = h1.landmark[0].y; rootXYZ[2] = h1.landmark[0].z
+        self.pinkyXYZ[0] = h1.landmark[20].x; self.pinkyXYZ[1] = h1.landmark[20].y; self.pinkyXYZ[2] = h1.landmark[20].z
+        self.ringXYZ[0] = h1.landmark[16].x; self.ringXYZ[1] = h1.landmark[16].y; self.ringXYZ[2] = h1.landmark[16].z
+        self.middleXYZ[0] = h1.landmark[12].x; self.middleXYZ[1] = h1.landmark[12].y; self.middleXYZ[2] = h1.landmark[12].z
+        self.foreXYZ[0] = h1.landmark[8].x; self.foreXYZ[1] = h1.landmark[8].y; self.foreXYZ[2] = h1.landmark[8].z;
+        self.thumbXYZ[0] = h1.landmark[4].x; self.thumbXYZ[1] = h1.landmark[4].y; self.thumbXYZ[2] = h1.landmark[4].z;
+        self.rootXYZ[0] = h1.landmark[0].x; self.rootXYZ[1] = h1.landmark[0].y; self.rootXYZ[2] = h1.landmark[0].z
                 
-        pinkyDistance = math.sqrt((pinkyXYZ[0] - rootXYZ[0])**2 + (pinkyXYZ[1] - rootXYZ[1])**2)
-        ringDistance = math.sqrt((ringXYZ[0] - rootXYZ[0])**2 + (ringXYZ[1] - rootXYZ[1])**2)
-        middleDistance = math.sqrt((middleXYZ[0] - rootXYZ[0])**2 + (middleXYZ[1] - rootXYZ[1])**2)        
-        foreDistance = math.sqrt((foreXYZ[0] - rootXYZ[0])**2 + (foreXYZ[1] - rootXYZ[1])**2)
-        thumbDistance = math.sqrt((thumbXYZ[0] - rootXYZ[0])**2 + (thumbXYZ[1] - rootXYZ[1])**2)
+        pinkyDistance = math.sqrt((self.pinkyXYZ[0] - self.rootXYZ[0])**2 + (self.pinkyXYZ[1] - self.rootXYZ[1])**2)
+        ringDistance = math.sqrt((self.ringXYZ[0] - self.rootXYZ[0])**2 + (self.ringXYZ[1] - self.rootXYZ[1])**2)
+        middleDistance = math.sqrt((self.middleXYZ[0] - self.rootXYZ[0])**2 + (self.middleXYZ[1] - self.rootXYZ[1])**2)        
+        foreDistance = math.sqrt((self.foreXYZ[0] - self.rootXYZ[0])**2 + (self.foreXYZ[1] - self.rootXYZ[1])**2)
+        thumbDistance = math.sqrt((self.thumbXYZ[0] - self.rootXYZ[0])**2 + (self.thumbXYZ[1] - self.rootXYZ[1])**2)
         
         return pinkyDistance,ringDistance,middleDistance, foreDistance,thumbDistance ## This could possibly be returned as an array   
             
@@ -93,7 +96,7 @@ class MPRecognizer:
             if(len(landmark_data.multi_hand_landmarks) == 1):
                
                 pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
-                print(pinkyDistance,ringDistance,middleDistance)
+                #print(pinkyDistance,ringDistance,middleDistance)
                 # Could probably be a switch/case but it doesn't particularly matter
                 
                 if(self.bufferWeighter('rotate') > self.confidence):

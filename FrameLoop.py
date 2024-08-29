@@ -13,6 +13,7 @@ import _tkinter as tk
 import MPRecognition
 import numpy as np
 import math
+import multiprocessing
 
 class GestureVision:
     
@@ -35,6 +36,9 @@ class GestureVision:
         self.window = window
         self.affirmation = affirmation
         
+        ## Optimisations ##
+        self.runProcessing = 0
+        
     def updateFrame(self):
         success, frame = self.frameCapture.read()
         if success:
@@ -42,9 +46,15 @@ class GestureVision:
             results = self.mpHandObject.process(frameRGB)
             
             gestureFrame = Image.fromarray(frameRGB)
-
+ 
             ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
-            self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
+            if(self.runProcessing == 0):
+                self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
+                self.runProcessing += 1
+            elif(self.runProcessing < 3):
+                self.runProcessing += 1
+            else:
+                self.runProcessing = 0
 
             ##DEBUG##
             self.affirmation.config(text=self.gesture)
@@ -57,7 +67,7 @@ class GestureVision:
        
             self.window.image = displayFrame
             self.window.config(image=displayFrame)
-            self.root.after(20,self.updateFrame)
+            self.root.after(1,self.updateFrame)
             
         else:
             return
