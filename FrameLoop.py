@@ -13,7 +13,7 @@ import _tkinter as tk
 import MPRecognition
 import numpy as np
 import math
-import multiprocessing
+from threading import Thread
 
 class GestureVision:
     
@@ -28,7 +28,7 @@ class GestureVision:
         
         self.model_data = model_data
         self.recognizer = MPRecognition.MPRecognizer(self.model_data)
-        self.gesture = "none"
+        self.gesture = None
 
         ## UI REFERENCES ##
        
@@ -48,8 +48,19 @@ class GestureVision:
             gestureFrame = Image.fromarray(frameRGB)
  
             ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
+
+
+
+
+            ######################################OPTIMISATIONS#################################################
+            ## Comment out the if else chain to make the recognizer process every single frame
+            ## Comment out gThread and comment back in the commented out line to run the old version. NOTE: You must change self.affirmation.config(text=MPRecognition to =self.gesture).
+
             if(self.runProcessing == 0):
-                self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
+                gThread = Thread(target = self.recognizer.recognizeGesture,args = [gestureFrame,results])
+                gThread.daemon = True
+                gThread.start()
+                #self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
                 self.runProcessing += 1
             elif(self.runProcessing < 3):
                 self.runProcessing += 1
@@ -57,8 +68,12 @@ class GestureVision:
                 self.runProcessing = 0
 
             ##DEBUG##
-            self.affirmation.config(text=self.gesture)
+            self.affirmation.config(text=MPRecognition.gesture)
             ##DEBUG##
+
+           #######################################OPTIMISATIONS####################################################
+            
+        
             
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
             displayFrame = ImageTk.PhotoImage(image = resizedFrame)
