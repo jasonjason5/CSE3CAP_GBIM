@@ -4,6 +4,9 @@ import FrameLoop
 import Functions
 import Style
 import tkinter as tk
+from PIL import Image, ImageTk
+from tkinter import filedialog
+
 
 
 
@@ -40,8 +43,8 @@ uiRoot.columnconfigure(0, weight = 1)
 uiRoot.columnconfigure(1, weight = 1)
 uiRoot.columnconfigure(2, weight = 1)
 
-uiRenderFrame = tk.Frame(master=uiRoot, bg= 'red')
-uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=300)
+uiRenderFrame = tk.Canvas(master=uiRoot, bg= Style.workspaceBackground)
+uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=100)
 
 
 uiMasterFrame = tk.Frame(master=uiRoot, bg= Style.workspaceBackground)
@@ -95,6 +98,24 @@ uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame,bg=Style.gestures,fg=
 uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.SW, ipadx=30, ipady=30)
 
 ## Pre import UI ##
+
+def open_image():
+    file_path = filedialog.askopenfilename(
+        filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")],
+        title="Select an Image File"
+    )
+    
+    if file_path:
+        img = Image.open(file_path)
+        img = img.resize((1280, 720), Image.ANTIALIAS)
+        img_tk = ImageTk.PhotoImage(img)
+        
+        uiRenderFrame.delete("all")
+        uiRenderFrame.create_image(0, 0, anchor=tk.NW, image=img_tk)
+        uiRenderFrame.image = img_tk 
+
+uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame, bg=Style.gestures, fg=Style.blackText, text="Open File", command=open_image)
+uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.SW, ipadx=30, ipady=30)
 
 ## Help UI #
 uiHelpFrame = tk.Frame(master=uiMenuFrame, bg=Style.popupBackground)
