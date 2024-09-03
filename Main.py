@@ -107,7 +107,11 @@ def open_image():
     
     if file_path:
         img = Image.open(file_path)
-        img = img.resize((1280, 720), Image.ANTIALIAS)
+
+        canvas_width = uiRenderFrame.winfo_width()
+        canvas_height = uiRenderFrame.winfo_height()
+
+        img = img.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
         img_tk = ImageTk.PhotoImage(img)
         
         uiRenderFrame.delete("all")
