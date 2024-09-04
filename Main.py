@@ -3,6 +3,7 @@ import MPRecognition
 import FrameLoop
 import Functions
 import Style
+import customtkinter as CTk
 import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
@@ -13,9 +14,42 @@ from tkinter import filedialog
 ## Instead of using a different class to create the UI, it will be easier (both logistically and layout-wise) to just write the UI in here.
 ## Get rid of all the testing stuff when you're ready to put the UI down. This was just a test to see if I could get things passing properly between class modules.
 
+class ImageLoader:
+    def __init__(self, label, image_path, ui_type):
+        self.label = label
+        self.image_path = image_path
+        self.ui_type = ui_type
+        self.load_image()
+
+    def load_image(self):
+        # Open the image file
+        image = Image.open(self.image_path)
+        #resize the image
+        if self.ui_type == "Preimport":
+            image = image.resize((150, 150), Image.Resampling.LANCZOS)
+        if self.ui_type == "Help":
+            image = image.resize((100, 100), Image.Resampling.LANCZOS) 
+        if self.ui_type == "Or":
+            image = image.resize((50, 20), Image.Resampling.LANCZOS)  
+        self.tk_image = ImageTk.PhotoImage(image)
+        # Set the image on the label
+        self.label.config(image=self.tk_image)
+        # Keep a reference to the image to prevent garbage collection
+        self.label.image = self.tk_image
+
+
+def LoadImages():
+    ImageLoader(uiPreimportOpenFileLbl,'C:/Users/Latrobe/Project/CSE3CAP_GBIM/Ui_Images/Openfile.jpg',"Preimport")
+    ImageLoader(uiPreimportOpenConfirmLbl ,'C:/Users/Latrobe/Project/CSE3CAP_GBIM/Ui_Images/Confirm.jpg',"Preimport")
+    ImageLoader(uiPreimportOpenOrLbl,'C:/Users/Latrobe/Project/CSE3CAP_GBIM/Ui_Images/Or.jpg',"Help")
+    ImageLoader(uiHelpLbl,'C:/Users/Latrobe/Project/CSE3CAP_GBIM/Ui_Images/Help.jpg',"Help")
+    ImageLoader(uiHelpOrLbl,'C:/Users/Latrobe/Project/CSE3CAP_GBIM/Ui_Images/HelpOr.jpg',"Or")
+   
 def killStartFrame():
     uiStartFrame.destroy()
-    uiMasterFrame.grid(column=0, row=1,ipadx=1280, sticky=tk.S)
+    uiMasterFrame.grid(column=0, row=1,ipadx=1280, sticky=CTk.S)
+    uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=100)
+    LoadImages()
 
 def startCamera():
     killStartFrame()
@@ -30,7 +64,7 @@ min_height = 320
 #max_width = 1920
 #max_height = 1080
 
-uiRoot = tk.Tk()
+uiRoot = CTk.CTk()
 uiRoot.title("Gesture Based Image Manipulation")
 uiRoot.geometry("1280x720")
 uiRoot.minsize(min_width, min_height)
@@ -47,8 +81,9 @@ uiRenderFrame = tk.Canvas(master=uiRoot, bg= Style.workspaceBackground)
 uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=100)
 
 
-uiMasterFrame = tk.Frame(master=uiRoot, bg= Style.workspaceBackground)
-uiMasterFrame.grid(column=0, columnspan= 3,row=2,ipadx=1280, sticky=tk.S)
+
+uiMasterFrame =CTk.CTkFrame(master=uiRoot, fg_color= Style.workspaceBackground)
+uiMasterFrame.grid(column=0, columnspan= 3,row=2,ipadx=1280, sticky=CTk.S)
 uiMasterFrame.columnconfigure(0, weight = 1)
 uiMasterFrame.columnconfigure(1, weight = 1)
 uiMasterFrame.columnconfigure(2, weight = 1)
@@ -57,27 +92,29 @@ uiMasterFrame.rowconfigure(0, weight = 1)
 uiMasterFrame.rowconfigure(1, weight = 2)
 
 
-uiDetectedGestureFrame =tk.Frame(master=uiMasterFrame, bg='black')
-uiDetectedGestureFrame.grid(column=2, row=0, sticky=tk.S)
-uiDetectedGesture = tk.Label(master=uiDetectedGestureFrame,bg='black',fg=Style.whiteText,text="Gesture")
-uiDetectedGesture.grid(column=0, row=0, sticky=tk.SW, ipadx=400, ipady=40)
+uiDetectedGestureFrame =CTk.CTkFrame(master=uiMasterFrame, fg_color=Style.gestures)
+uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
+uiDetectedGestureText = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 100)
+uiDetectedGestureText.grid(column=0, row=0)
+uiDetectedGesture = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Gesture",corner_radius= 100)
+uiDetectedGesture.grid(column=1, row=0 )
 
 # menu frame, holds the gesture help, open file, action history, gesture function list
-uiMenuFrame = tk.Frame(master=uiMasterFrame, bg=Style.popupBackground)
-uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=tk.EW)
+uiMenuFrame = CTk.CTkFrame(master=uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= "black",) 
+uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.EW, ipadx=20, ipady=20)
 
 
 ## Static UI ##
 
 ## Splash Start UI ##
 
-uiStartFrame = tk.Frame(master=uiRoot, height=100,width=500, bg=Style.popupBackground)
+uiStartFrame = CTk.CTkFrame(master=uiRoot, height=100,width=500, fg_color=Style.popupBackground, border_color = "black")
 uiStartFrame.place(relx=0.5,rely=0.5,anchor='center')
 
-uiStartWelcome = tk.Label(master=uiStartFrame,bg=Style.popupBackground, fg=Style.whiteText,text="Welcome to [Application Name]!")
+uiStartWelcome = CTk.CTkLabel(master=uiStartFrame,fg_color=Style.popupBackground, text_color=Style.whiteText,text="Welcome to [Application Name]!")
 uiStartWelcome.place(relx=0.5,rely=0.3,anchor='center')
 
-uiStartButton = tk.Button(master=uiStartFrame,text="Start Device Camera", bg=Style.gestures, fg=Style.blackText, command = startCamera)
+uiStartButton = CTk.CTkButton(master=uiStartFrame,text="Start Device Camera", fg_color=Style.gestures, text_color=Style.blackText, command = startCamera)
 uiStartButton.place(relx=0.5,rely=0.7,anchor='center')
 
 ## Splash Start UI ##
@@ -86,16 +123,17 @@ uiStartButton.place(relx=0.5,rely=0.7,anchor='center')
 
 ## Pre import UI ##
 
-uiPreimportFrame = tk.Frame(master=uiMenuFrame, bg=Style.popupBackground)
-uiPreimportFrame.pack(side=tk.LEFT, expand=False)
-uiPreimportOpenFileLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Open File")
-uiPreimportOpenFileLbl.grid(column=0, row=0, sticky=tk.SW, ipadx=30, ipady=30)
-uiPreimportOpenConfirmLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Confirm")
-uiPreimportOpenConfirmLbl.grid(column=1, row=0, sticky=tk.SW, ipadx=30, ipady=30)
-uiPreimportOpenOrLbl = tk.Label(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="OR")
-uiPreimportOpenOrLbl.grid(column=2, row=0, sticky=tk.SW, ipadx=30, ipady=30)
-uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame,bg=Style.gestures,fg=Style.blackText,text="Open File")
-uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.SW, ipadx=30, ipady=30)
+uiPreimportFrame = CTk.CTkFrame(master=uiMenuFrame, fg_color="transparent")
+uiPreimportFrame.pack(side=CTk.LEFT, expand=False)
+
+uiPreimportOpenFileLbl = tk.Label(master=uiPreimportFrame, bg= Style.popupBackground)
+uiPreimportOpenFileLbl.grid(column=0, row=0,ipadx=20, ipady=20)
+
+uiPreimportOpenConfirmLbl = tk.Label(master=uiPreimportFrame, bg= Style.popupBackground)
+uiPreimportOpenConfirmLbl.grid(column=1, row=0, ipadx=20, ipady=20)
+
+uiPreimportOpenOrLbl = tk.Label(master=uiPreimportFrame, bg= Style.popupBackground)
+uiPreimportOpenOrLbl.grid(column=2, row=0,ipadx=20, ipady=20)
 
 ## Pre import UI ##
 
@@ -116,28 +154,38 @@ def open_image():
         
         uiRenderFrame.delete("all")
         uiRenderFrame.create_image(0, 0, anchor=tk.NW, image=img_tk)
-        uiRenderFrame.image = img_tk 
+        uiRenderFrame.image = img_tk
+        #show detected gesture
+        uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
 
-uiPreimportOpenFileBtn = tk.Button(master=uiPreimportFrame, bg=Style.gestures, fg=Style.blackText, text="Open File", command=open_image)
-uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.SW, ipadx=30, ipady=30)
+
+uiPreimportOpenFileBtn = CTk.CTkButton(master=uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", command=open_image,corner_radius=20, width= 60, height= 30)
+uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
 
 ## Help UI #
-uiHelpFrame = tk.Frame(master=uiMenuFrame, bg=Style.popupBackground)
-uiHelpFrame.pack(side=tk.RIGHT, expand=False)
-uiHelpLbl = tk.Label(master=uiHelpFrame,bg=Style.gestures,fg=Style.blackText,text="Help")
-uiHelpLbl.grid(column=0, row=0, sticky=tk.SW, ipadx=30, ipady=20)
-uiHelpBtn = tk.Button(master=uiHelpFrame ,bg=Style.gestures,fg=Style.blackText,text="Help")
-uiHelpBtn.grid(column=0, row=1, sticky=tk.SW, ipadx=30, ipady=20)
+uiHelpFrame = CTk.CTkFrame(master=uiMenuFrame, fg_color=Style.popupBackground)
+uiHelpFrame.pack(side=CTk.RIGHT, expand=False)
+
+uiHelpLbl = tk.Label(master=uiHelpFrame, borderwidth= 0,bg= Style.popupBackground)
+uiHelpLbl.grid(column=0, row=0, ipadx=5, ipady=5)
+
+uiHelpOrLbl = tk.Label(master=uiHelpFrame, borderwidth= 0, bg= Style.popupBackground)
+uiHelpOrLbl.grid(column=0, row=1 ,ipadx=5, ipady=5)
+
+uiHelpBtn = CTk.CTkButton(master=uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", corner_radius=20, width= 60, height= 30)
+uiHelpBtn.grid(column=0, row=2)
 
 # Help UI #
 
 ## Camera UI ##
 
-uiDeviceCamera = tk.Label(master=uiMasterFrame,bg= Style.popupBackground)
-uiDeviceCamera.grid(column=3, row=0, rowspan= 2, sticky=tk.EW)
+uiDeviceCamera = tk.Label(master=uiMasterFrame,bg= Style.workspaceBackground)
+uiDeviceCamera.grid(column=3, row=0, rowspan= 2, sticky=tk.S)
 #uiDeviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
 
 uiMasterFrame.grid_forget()
+uiRenderFrame.grid_forget()
+uiDetectedGestureFrame.grid_forget()
 
 ## TEST MATERIAL ##
 model_path = 'gesture_recognizer.task'
