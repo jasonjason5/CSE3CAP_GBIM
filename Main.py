@@ -161,6 +161,14 @@ def open_image():
 uiPreimportOpenFileBtn = CTk.CTkButton(master=uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", command=open_image,corner_radius=20, width= 60, height= 30)
 uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
 
+
+# Action history Gui
+
+uiHistoryFrame = CTk.CTkFrame(master=uiMenuFrame, fg_color=Style.popupBackground)
+uiHistoryFrame.pack(side=CTk.RIGHT, expand=False)
+
+
+
 ## Help UI #
 uiHelpFrame = CTk.CTkFrame(master=uiMenuFrame, fg_color=Style.popupBackground)
 uiHelpFrame.pack(side=CTk.RIGHT, expand=False)
