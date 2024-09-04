@@ -14,13 +14,16 @@ from tkinter import filedialog
 
 ## Instead of using a different class to create the UI, it will be easier (both logistically and layout-wise) to just write the UI in here.
 ## Get rid of all the testing stuff when you're ready to put the UI down. This was just a test to see if I could get things passing properly between class modules.
-class ToplevelWindow(CTk.CTkToplevel):
+class HelpWindow(CTk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.geometry("400x300")
-        self.label = CTk.CTkLabel(self, text="ToplevelWindow")
+        self.label = CTk.CTkLabel(self, text="Help Window")
         self.label.pack(padx=20, pady=20)
         self.attributes("-topmost", True)
+    def set_title(self, title):
+        self.title(title)
+        
 
 
 class ImageLoader:
@@ -195,11 +198,15 @@ class App(CTk.CTk):
 
         uiActionHistory = ActionHistory(master=uiHistoryFrame, width=200, height=5,label_text="Action History", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
         uiActionHistory.grid(row=0, column=0, padx=5, pady=5)
+        
+        # add test item to the Action history
         current_dir = os.path.dirname(os.path.abspath(__file__))
-                # Open the image file
         image = CTk.CTkImage(Image.open(os.path.join(current_dir, "Ui_Images", "HelpOr.jpg")))
         uiActionHistory.add_item(item = "test", image=image)
 
+        # Function list
+
+        # uiFunctionFrame = CTk.CTk
 
 
         ## Help UI #
@@ -212,7 +219,7 @@ class App(CTk.CTk):
         uiHelpOrLbl = CTk.CTkLabel(master=uiHelpFrame, bg_color= "transparent",text = "")
         uiHelpOrLbl.grid(column=0, row=1 ,padx=5, pady=5)
 
-        uiHelpBtn = CTk.CTkButton(master=uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command = self.open_toplevel)
+        uiHelpBtn = CTk.CTkButton(master=uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(uiDetectedGesture.cget("text")))
         uiHelpBtn.grid(column=0, row=2)
 
         # Help UI #
@@ -239,12 +246,20 @@ class App(CTk.CTk):
 
         looper = FrameLoop.GestureVision(self,uiDeviceCamera,uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         # functions = Functions.editFunctions(reference to image, reference to canvas etc.)
-        
-    def open_toplevel(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = ToplevelWindow(self)  # create window if its None or destroyed
+    def open_help(self ,affirmation):
+        if affirmation is None:
+            affirmation = "Help"
+        else:
+            affirmation = affirmation + ": Help"
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():      
+            self.toplevel_window = HelpWindow(self)  # create window if its None or destroyed
+            self.toplevel_window.set_title(title = affirmation) 
         else:
             self.toplevel_window.focus()  # if window exists focus it
+            self.toplevel_window.set_title(title= affirmation) 
+    
+    def set_help_title(self, affirmation):
+        self.toplevel_window.set_title(title=affirmation) 
 
 ## TEST MATERIAL ##
 
