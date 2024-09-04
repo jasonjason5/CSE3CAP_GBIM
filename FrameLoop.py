@@ -8,6 +8,7 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from PIL import Image
+import customtkinter as CTk
 from PIL import ImageTk
 import _tkinter as tk
 import MPRecognition
@@ -76,12 +77,12 @@ class GestureVision:
         
             
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
-            displayFrame = ImageTk.PhotoImage(image = resizedFrame)
+            displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
        
             ## return it to the tkinter widget in which we want to display it
        
             self.window.image = displayFrame
-            self.window.config(image=displayFrame)
+            self.window.configure(image=displayFrame)
             self.root.after(1,self.updateFrame)
             
         else:
