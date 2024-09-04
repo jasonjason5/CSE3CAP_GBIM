@@ -69,21 +69,20 @@ uiRoot.title("Gesture Based Image Manipulation")
 uiRoot.geometry("1280x720")
 uiRoot.minsize(min_width, min_height)
 #uiRoot.maxsize(max_width, max_height)
-uiRoot.configure(background=Style.workspaceBackground)
+uiRoot.configure(bg_color=Style.workspaceBackground,fg_color= Style.workspaceBackground)
 uiRoot.rowconfigure(0, weight = 3)
 uiRoot.rowconfigure(1, weight = 1)
-uiRoot.rowconfigure(2, weight = 1)
 uiRoot.columnconfigure(0, weight = 1)
 uiRoot.columnconfigure(1, weight = 1)
 uiRoot.columnconfigure(2, weight = 1)
 
-uiRenderFrame = tk.Canvas(master=uiRoot, bg= Style.workspaceBackground)
-uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=100)
+uiRenderFrame = tk.Canvas(master=uiRoot, bg= Style.workspaceBackground, bd=0,highlightthickness=0, relief='ridge')
+uiRenderFrame.grid(column=1, row=0)
 
 
 
-uiMasterFrame =CTk.CTkFrame(master=uiRoot, fg_color= Style.workspaceBackground)
-uiMasterFrame.grid(column=0, columnspan= 3,row=2,ipadx=1280, sticky=CTk.S)
+uiMasterFrame =CTk.CTkFrame(master=uiRoot, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
+uiMasterFrame.grid(column=0, columnspan= 3,row=1)
 uiMasterFrame.columnconfigure(0, weight = 1)
 uiMasterFrame.columnconfigure(1, weight = 1)
 uiMasterFrame.columnconfigure(2, weight = 1)
@@ -92,7 +91,7 @@ uiMasterFrame.rowconfigure(0, weight = 1)
 uiMasterFrame.rowconfigure(1, weight = 2)
 
 
-uiDetectedGestureFrame =CTk.CTkFrame(master=uiMasterFrame, fg_color=Style.gestures)
+uiDetectedGestureFrame =CTk.CTkFrame(master=uiMasterFrame)
 uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
 uiDetectedGestureText = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 100)
 uiDetectedGestureText.grid(column=0, row=0)
@@ -179,7 +178,7 @@ uiHelpBtn.grid(column=0, row=2)
 
 ## Camera UI ##
 
-uiDeviceCamera = tk.Label(master=uiMasterFrame,bg= Style.workspaceBackground)
+uiDeviceCamera = tk.Label(master=uiMasterFrame,bg= Style.workspaceBackground, fg= Style.workspaceBackground)
 uiDeviceCamera.grid(column=3, row=0, rowspan= 2, sticky=tk.S)
 #uiDeviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
 
