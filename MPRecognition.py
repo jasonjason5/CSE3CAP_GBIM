@@ -93,13 +93,14 @@ class MPRecognizer:
         
     def gestureCleanup(self,landmark_data):
         #gesture = "none"
+        #print(self.buffer)
         global gesture 
         if(landmark_data.multi_hand_landmarks):
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
                
                 pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
-                #print(pinkyDistance,ringDistance,middleDistance)
+               # print(foreDistance, middleDistance)
                 # Could probably be a switch/case but it doesn't particularly matter
                 
                 if(self.bufferWeighter('rotate') > self.confidence):
@@ -114,8 +115,30 @@ class MPRecognizer:
                 elif(self.bufferWeighter('translate') > self.confidence):
                     if(pinkyDistance < 0.2 and thumbDistance < 0.3):
                         gesture = "translate"
-               
+                elif(self.bufferWeighter('contrast') > self.confidence): # These two detect quite well and differentiate from one another when detected. Any hardcoding would have to deal with absolute coordinates not relative, but it seems unnecessary when its working as well as it is.
+                        gesture= "contrast"
+                elif(self.bufferWeighter('brightness') > self.confidence):
+                        gesture= "brightness"
+                elif(self.bufferWeighter('pointer') > self.confidence):
+                    if(foreDistance > 0.2 and middleDistance < 0.25):
+                        gesture= "pointer"
+                elif(self.bufferWeighter('pen') > self.confidence):
+                    if(foreDistance > 0.2 and middleDistance > 0.2):
+                        gesture = "pen"    
+
+                elif(self.buffer[0] == 'close' and (self.buffer[4] == 'help' or self.buffer[3] == 'help' or self.buffer[2] == 'help')): # Definitely a better way to do this check
+                     gesture = "save file"
+                elif(self.buffer[0] == 'help' and (self.buffer[4] == 'close' or self.buffer[3] == 'close' or self.buffer[2] == 'close')): # Definitely a better way to do this check
+                     gesture = "open file"
                     
+                elif(self.bufferWeighter('help') > self.confidence):
+                    gesture = "open hand"
+                elif(self.bufferWeighter('close') > self.confidence):
+                    gesture = "closed hand"   
            
             ### MULTI HANDDED GESTURES ###
+            elif(len(landmark_data.multi_hand_landmarks) == 2):
+                if(self.bufferWeighter('help') > self.confidence):
+                    gesture = "help"
+       
         return gesture

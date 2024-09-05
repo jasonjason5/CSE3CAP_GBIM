@@ -69,6 +69,7 @@ class GestureVision:
                 self.runProcessing = 0
 
             ##DEBUG##
+            print(MPRecognition.gesture)
             self.affirmation.configure(text=MPRecognition.gesture)
             ##DEBUG##
 
