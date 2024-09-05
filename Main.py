@@ -4,6 +4,7 @@ import FrameLoop
 import Functions
 import os
 import Style
+from Gestures import Gesture
 import customtkinter as CTk
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -17,13 +18,66 @@ from tkinter import filedialog
 class HelpWindow(CTk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.geometry("400x300")
-        self.label = CTk.CTkLabel(self, text="Help Window")
-        self.label.pack(padx=20, pady=20)
+        self.geometry("375x400")
+        uiFont = CTk.CTkFont(family='Inter', size=14) 
+        #self.maxsize(max_width, max_height)
+        self.configure(bg_color=Style.workspaceBackground,fg_color= Style.workspaceBackground)
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        self.uiHelpFrame = CTk.CTkFrame(master=self,fg_color=Style.popupBackground, border_color = Style.windowBorder)
+        self.uiHelpFrame.grid(row=0, column=0, ipadx=10, ipady=10, sticky=CTk.E+ CTk.W +CTk.N + CTk.S)
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.uiHelpFrame.rowconfigure(0, weight=1)
+        self.uiHelpFrame.rowconfigure(1, weight=1)
+        self.uiHelpFrame.columnconfigure(0, weight=2)
+        self.uiHelpFrame.columnconfigure(1, weight=1)
+
+        self.uiHelpImageFrame = CTk.CTkFrame(master=self.uiHelpFrame, fg_color=Style.workspaceBackground, border_color = Style.windowBorder, border_width= 3)
+        self.uiHelpImageFrame.grid(row=0, column=0, columnspan = 2, sticky=CTk.E+ CTk.W +CTk.N + CTk.S, padx = 20, pady = 20)
+        self.uiHelpImageFrame.rowconfigure(0, weight=1)
+        self.uiHelpImageFrame.columnconfigure(0, weight=1)
+
+        self.uiHelpImage = CTk.CTkLabel(master=self.uiHelpImageFrame, bg_color="transparent", text = "")
+        self.uiHelpImage.grid(column=0, row=0)
+        
+        self.uiHelpMessage = CTk.CTkLabel(master=self.uiHelpFrame, text="Help Window", justify="left", wraplength=200, font=uiFont)
+        self.uiHelpMessage.grid(column=0, row=1,sticky=CTk.N)
+        
+        self.uiHelpExit = CTk.CTkLabel(master=self.uiHelpFrame, bg_color="transparent", text="")
+        self.uiHelpExit.grid(column=1, row=1,sticky=CTk.S)
+
+        image = Image.open(os.path.join(self.current_dir, "Ui_Images", "Exit.jpg"))
+        #resize the image
+        tk_image = CTk.CTkImage(image, size= (100,100))
+        # Set the image on the label
+        self.uiHelpExit.configure(image=tk_image)
+        # Keep a reference to the image to prevent garbage collection
+        self.uiHelpExit.image = tk_image       
         self.attributes("-topmost", True)
     def set_title(self, title):
         self.title(title)
-        
+
+    def set_help_text(self,gesture):
+        enumGesture = Gesture.string_to_enum(gesture)
+        help = Gesture.gesture_help(enumGesture)
+        self.uiHelpMessage.configure(text=help)
+
+    def set_help_image(self,gesture):
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        enumGesture = Gesture.string_to_enum(gesture)
+        help_image_path = Gesture.gesture_image(enumGesture)
+        # Open the image file
+        helpimage = Image.open(os.path.join(self.current_dir, "Ui_Images", help_image_path))
+        #resize the image
+        tk_help_image = CTk.CTkImage(helpimage, size= (320,220))
+        # Set the image on the label
+        self.uiHelpImage.configure(image=tk_help_image)
+        # Keep a reference to the image to prevent garbage collection
+        self.uiHelpImage.image = tk_help_image
+
 
 
 class ImageLoader:
@@ -247,16 +301,21 @@ class App(CTk.CTk):
         looper = FrameLoop.GestureVision(self,uiDeviceCamera,uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         # functions = Functions.editFunctions(reference to image, reference to canvas etc.)
     def open_help(self ,affirmation):
-        if affirmation is None:
-            affirmation = "Help"
-        else:
-            affirmation = affirmation + ": Help"
+        if affirmation == "none":
+            affirmation = "help"          
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():      
             self.toplevel_window = HelpWindow(self)  # create window if its None or destroyed
-            self.toplevel_window.set_title(title = affirmation) 
+            self.toplevel_window.set_help_text( gesture= affirmation)
+            self.toplevel_window.set_help_image( gesture= affirmation)
+            affirmation = affirmation + ": Help"
+            self.toplevel_window.set_title(title = affirmation)          
         else:
             self.toplevel_window.focus()  # if window exists focus it
+            self.toplevel_window.set_help_text( gesture= affirmation)
+            self.toplevel_window.set_help_image( gesture= affirmation)
+            affirmation = affirmation + ": Help"
             self.toplevel_window.set_title(title= affirmation) 
+            
     
     def set_help_title(self, affirmation):
         self.toplevel_window.set_title(title=affirmation) 
