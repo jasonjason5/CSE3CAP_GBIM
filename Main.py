@@ -50,6 +50,8 @@ class HelpWindow(CTk.CTkToplevel):
         #self.uiHelpImage = CTk.CTkLabel(master=self.uiHelpImageFrame, bg_color="transparent", text = "")
         #self.uiHelpImage.grid(column=0, row=0)
         
+        self.uiHelpImage = None
+
         # Set up the help label and place it in frame
         self.uiHelpMessage = CTk.CTkLabel(master=self.uiHelpFrame, text="Help Window", justify="left", wraplength=200, font=uiFont)
         self.uiHelpMessage.grid(column=0, row=1,sticky=CTk.N)
@@ -94,32 +96,33 @@ class GIFLabel(CTk.CTkLabel):
     def __init__(self, master, image_path, **kwargs):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Open the image file
-        self._gif_image = Image.open(os.path.join(current_dir, image_path))
+        self.gif_image = Image.open(os.path.join(current_dir, image_path))
         # set the size of the label to the same as the GIF image
-        #kwargs.setdefault("width", self._gif_image.width)
-        #kwargs.setdefault("height", self._gif_image.height)
+        #kwargs.setdefault("width", self.gif_image.width)
+        #kwargs.setdefault("height", self.gif_image.height)
         #set to what we want
         kwargs.setdefault("width", 320)
         kwargs.setdefault("height", 220)
         # don't show the text initially
         kwargs.setdefault("text", "")
         # delay for the after loop
-        self._duration = kwargs.pop("duration", None) or self._gif_image.info["duration"]
+        self._duration = kwargs.pop("duration", None) or self.gif_image.info["duration"]
         super().__init__(master, **kwargs)
         # load all the frames
         self._frames = []
-        for i in range(self._gif_image.n_frames):
-            self._gif_image.seek(i)
+        for i in range(self.gif_image.n_frames):
+            self.gif_image.seek(i)
             #set to gif actual size
-            #self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(self["width"], self["height"])))
+            #self._frames.append(CTk.CTkImage(self.gif_image.copy(), size=(self["width"], self["height"])))
             #set to what we want
-            self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(320, 220)))
+            self._frames.append(CTk.CTkImage(self.gif_image.copy(), size=(320, 220)))
         # start animation
         self._animate()
 
     def _animate(self, idx=0):
         self.configure(image=self._frames[idx])
         self.after(self._duration, self._animate, (idx+1)%len(self._frames))
+
 
 # This class loads images into the label passed to it.
 class ImageLoader:
@@ -171,13 +174,13 @@ class App(CTk.CTk):
         
         def killStartFrame():
             uiStartFrame.destroy()
-            uiMasterFrame.grid(column=0, row=1,ipadx=1280, sticky=CTk.S)
-            uiRenderFrame.grid(column=0,columnspan= 3, row=0, ipadx=1280, ipady=100)
+            uiMasterFrame.grid(column=0, row=1, columnspan= 3, sticky=CTk.EW + CTk.S)            
+            uiRenderFrame1.grid(column=0, row=0, rowspan=2, columnspan= 3, sticky=tk.NSEW)
             LoadImages()
 
         def startCamera():
             killStartFrame()
-            looper.updateFrame()
+            self.after(0, looper.updateFrame())
 
                 # Minimum size of window
         min_width = 320
@@ -197,14 +200,14 @@ class App(CTk.CTk):
         self.columnconfigure(0, weight = 1)
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
-
-        uiRenderFrame = tk.Canvas(master=self, bg= Style.workspaceBackground, bd=0,highlightthickness=0, relief='ridge')
-        uiRenderFrame.grid(column=1, row=0)
-
+        
+        uiRenderFrame1 = CTk.CTkFrame(master=self, fg_color= "red", bg_color= Style.workspaceBackground)
+        
+      
 
 
         uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
-        uiMasterFrame.grid(column=0, columnspan= 3,row=1)
+        uiMasterFrame.grid(column=0, columnspan= 3,row=1 ,sticky=CTk.EW + CTk.S)
         uiMasterFrame.columnconfigure(0, weight = 4)
         uiMasterFrame.columnconfigure(1, weight = 4)
         uiMasterFrame.columnconfigure(2, weight = 4)
@@ -267,20 +270,31 @@ class App(CTk.CTk):
             if file_path:
                 img = Image.open(file_path)
 
-                canvas_width = uiRenderFrame.winfo_width()
-                canvas_height = uiRenderFrame.winfo_height()
-
+                #canvas_width = uiRenderFrame.winfo_width()
+                #canvas_height = uiRenderFrame.winfo_height()
+                canvas_width = int((self.winfo_width() / 2))
+                canvas_height = int((self.winfo_height() / 2))
+                print("Height:" + str(self.winfo_height()) + "Width:" + str(self.winfo_width()))
                 img = img.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+
+                
                 img_tk = ImageTk.PhotoImage(img)
                 
+                uiRenderFrame = tk.Canvas(master=uiRenderFrame1, width=canvas_width, height=canvas_height, bg= Style.workspaceBackground, bd=0,highlightthickness=0)
                 uiRenderFrame.delete("all")
                 uiRenderFrame.create_image(0, 0, anchor=tk.NW, image=img_tk)
+                uiRenderFrame.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
+                uiRenderFrame.bind("<Configure>", handle_resize)
                 uiRenderFrame.image = img_tk
+                
+                #uiRenderFrame.grid(column=1, row=0, columnspan= 3, sticky=tk.W)
                 #show detected gesture
                 uiPreimportFrame.pack_forget()
                 uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
                 uiHistoryFrame.pack(side=CTk.LEFT, expand=False)
-                
+        def handle_resize(event):
+            # Your code to adjust canvas size goes here
+                print(f"Window resized: {event.width}x{event.height}")  
 
 
         uiPreimportOpenFileBtn = CTk.CTkButton(master=uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=open_image,corner_radius=20, width= 60, height= 30)
@@ -329,12 +343,18 @@ class App(CTk.CTk):
 
         #Hide frames
         uiMasterFrame.grid_forget()
-        uiRenderFrame.grid_forget()
+  
+
         uiDetectedGestureFrame.grid_forget()
         uiHistoryFrame.pack_forget()  
 
         looper = FrameLoop.GestureVision(self,uiDeviceCamera,uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         # functions = Functions.editFunctions(reference to image, reference to canvas etc.)
+
+        #test
+        
+       
+
     def open_help(self ,affirmation):
         if affirmation == "none":
             affirmation = "help"          
@@ -350,6 +370,7 @@ class App(CTk.CTk):
             self.toplevel_window.set_help_image( gesture= affirmation)
             affirmation = affirmation + ": Help"
             self.toplevel_window.set_title(title= affirmation) 
+        
             
     
     def set_help_title(self, affirmation):

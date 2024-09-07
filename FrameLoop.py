@@ -16,6 +16,7 @@ import numpy as np
 import math
 from threading import Thread
 
+
 class GestureVision:
     
     def __init__(self,root,window,affirmation,model_data): ## Initialises all MP and CV variables and objects to be operated on
@@ -30,7 +31,7 @@ class GestureVision:
         self.model_data = model_data
         self.recognizer = MPRecognition.MPRecognizer(self.model_data)
         self.gesture = None
-
+        self.last_gesture = None
         ## UI REFERENCES ##
        
         self.root = root 
@@ -68,9 +69,13 @@ class GestureVision:
             else:
                 self.runProcessing = 0
 
-            ##DEBUG##
-            print(MPRecognition.gesture)
-            self.affirmation.configure(text=MPRecognition.gesture)
+            if self.last_gesture != MPRecognition.gesture:
+                ##DEBUG##
+                print(MPRecognition.gesture)
+                self.affirmation.configure(text=MPRecognition.gesture)
+                #store the gesture to reference in next loop
+                self.last_gesture = MPRecognition.gesture
+                      
             ##DEBUG##
 
            #######################################OPTIMISATIONS####################################################
@@ -84,7 +89,8 @@ class GestureVision:
        
             self.window.image = displayFrame
             self.window.configure(image=displayFrame)
-            self.root.after(1,self.updateFrame)
+            self.root.after(100,self.updateFrame)
+
             
         else:
             return
