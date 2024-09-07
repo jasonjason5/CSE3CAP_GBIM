@@ -201,7 +201,7 @@ class App(CTk.CTk):
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
         
-        uiRenderFrame1 = CTk.CTkFrame(master=self, fg_color= "red", bg_color= Style.workspaceBackground)
+        uiRenderFrame1 = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
         
       
 
@@ -294,7 +294,7 @@ class App(CTk.CTk):
                 uiHistoryFrame.pack(side=CTk.LEFT, expand=False)
         def handle_resize(event):
             # Your code to adjust canvas size goes here
-                print(f"Window resized: {event.width}x{event.height}")  
+                print(f"Canvas (uiRenderFrame) resized: {event.width}x{event.height}")  
 
 
         uiPreimportOpenFileBtn = CTk.CTkButton(master=uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=open_image,corner_radius=20, width= 60, height= 30)
