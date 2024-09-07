@@ -10,76 +10,107 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
 
-
-
-
-## Instead of using a different class to create the UI, it will be easier (both logistically and layout-wise) to just write the UI in here.
-## Get rid of all the testing stuff when you're ready to put the UI down. This was just a test to see if I could get things passing properly between class modules.
+# Class for the Help Window.
 class HelpWindow(CTk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Window settings
         self.geometry("375x400")
+        # Move the font elsewhere?
         uiFont = CTk.CTkFont(family='Inter', size=14) 
-        #self.maxsize(max_width, max_height)
         self.configure(bg_color=Style.workspaceBackground,fg_color= Style.workspaceBackground)
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
 
+        # Set up the frame to hold everthing in the window
         self.uiHelpFrame = CTk.CTkFrame(master=self,fg_color=Style.popupBackground, border_color = Style.windowBorder)
         self.uiHelpFrame.grid(row=0, column=0, ipadx=10, ipady=10, sticky=CTk.E+ CTk.W +CTk.N + CTk.S)
 
+        # Configure the grid for the window
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
+        # Configure the grid for the frame
         self.uiHelpFrame.rowconfigure(0, weight=1)
         self.uiHelpFrame.rowconfigure(1, weight=1)
         self.uiHelpFrame.columnconfigure(0, weight=2)
         self.uiHelpFrame.columnconfigure(1, weight=1)
 
+        # Set up the help image frame (to keep it centered and north)
         self.uiHelpImageFrame = CTk.CTkFrame(master=self.uiHelpFrame, fg_color=Style.workspaceBackground, border_color = Style.windowBorder, border_width= 3)
         self.uiHelpImageFrame.grid(row=0, column=0, columnspan = 2, sticky=CTk.E+ CTk.W +CTk.N + CTk.S, padx = 20, pady = 20)
         self.uiHelpImageFrame.rowconfigure(0, weight=1)
         self.uiHelpImageFrame.columnconfigure(0, weight=1)
 
-        self.uiHelpImage = CTk.CTkLabel(master=self.uiHelpImageFrame, bg_color="transparent", text = "")
-        self.uiHelpImage.grid(column=0, row=0)
+        # Set up the image and place in frame
+        #self.uiHelpImage = CTk.CTkLabel(master=self.uiHelpImageFrame, bg_color="transparent", text = "")
+        #self.uiHelpImage.grid(column=0, row=0)
         
+        # Set up the help label and place it in frame
         self.uiHelpMessage = CTk.CTkLabel(master=self.uiHelpFrame, text="Help Window", justify="left", wraplength=200, font=uiFont)
         self.uiHelpMessage.grid(column=0, row=1,sticky=CTk.N)
         
+        # Set up exit label to hold exit image
         self.uiHelpExit = CTk.CTkLabel(master=self.uiHelpFrame, bg_color="transparent", text="")
         self.uiHelpExit.grid(column=1, row=1,sticky=CTk.S)
 
-        image = Image.open(os.path.join(self.current_dir, "Ui_Images", "Exit.jpg"))
-        #resize the image
-        tk_image = CTk.CTkImage(image, size= (100,100))
-        # Set the image on the label
-        self.uiHelpExit.configure(image=tk_image)
-        # Keep a reference to the image to prevent garbage collection
-        self.uiHelpExit.image = tk_image       
+        # Load the exit image
+        ImageLoader(self.uiHelpExit, "Ui_Images\Exit.jpg",(100,100))
+
+        # Set the window to be at the front of everything 
         self.attributes("-topmost", True)
+
+    # This function sets the title of the help window
     def set_title(self, title):
         self.title(title)
 
+    # This function sets the help text for the specified gesture
     def set_help_text(self,gesture):
+        # Get the Gesture Enum object from the string value
         enumGesture = Gesture.string_to_enum(gesture)
+        # Get the help message for the specific Gesture
         help = Gesture.gesture_help(enumGesture)
+        # Set the help message to the value above
         self.uiHelpMessage.configure(text=help)
 
+    # This function sets the help image for the specified gesture
     def set_help_image(self,gesture):
-        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Get the Gesture Enum object from the string value
         enumGesture = Gesture.string_to_enum(gesture)
+        # Get the image name for the specific Gesture
         help_image_path = Gesture.gesture_image(enumGesture)
+        # Load the image into the label        
+        #ImageLoader(self.uiHelpImage, help_image_path,(320,220))
+        self.uiHelpImage = GIFLabel(master=self.uiHelpImageFrame,image_path=help_image_path ,bg_color="transparent", text = "")
+        self.uiHelpImage.grid(column=0, row=0)
+        #label = GIFLabel(app, "any.gif")
+        #label.pack()
+
+class GIFLabel(CTk.CTkLabel):
+    def __init__(self, master, image_path, **kwargs):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
         # Open the image file
-        helpimage = Image.open(os.path.join(self.current_dir, "Ui_Images", help_image_path))
-        #resize the image
-        tk_help_image = CTk.CTkImage(helpimage, size= (320,220))
-        # Set the image on the label
-        self.uiHelpImage.configure(image=tk_help_image)
-        # Keep a reference to the image to prevent garbage collection
-        self.uiHelpImage.image = tk_help_image
+        self._gif_image = Image.open(os.path.join(current_dir, image_path))
+        # set the size of the label to the same as the GIF image
+        kwargs.setdefault("width", self._gif_image.width)
+        kwargs.setdefault("height", self._gif_image.height)
+        # don't show the text initially
+        kwargs.setdefault("text", "")
+        # delay for the after loop
+        self._duration = kwargs.pop("duration", None) or self._gif_image.info["duration"]
+        super().__init__(master, **kwargs)
+        # load all the frames
+        self._frames = []
+        for i in range(self._gif_image.n_frames):
+            self._gif_image.seek(i)
+            self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(self["width"], self["height"])))
+        # start animation
+        self._animate()
 
+    def _animate(self, idx=0):
+        self.configure(image=self._frames[idx])
+        self.after(self._duration, self._animate, (idx+1)%len(self._frames))
 
-
+# This class loads images into the label passed to it.
 class ImageLoader:
     def __init__(self, label, image_path, ui_size):
         self.label = label
@@ -90,14 +121,14 @@ class ImageLoader:
     def load_image(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Open the image file
-        image = Image.open(os.path.join(current_dir, "Ui_Images", self.image_path))
-        #resize the image
+        image = Image.open(os.path.join(current_dir, self.image_path))
+        # Resize the image
         self.tk_image = CTk.CTkImage(image, size= (self.ui_size))
         # Set the image on the label
         self.label.configure(image=self.tk_image)
         # Keep a reference to the image to prevent garbage collection
         self.label.image = self.tk_image
-
+# 
 class ActionHistory(CTk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
@@ -115,17 +146,17 @@ class ActionHistory(CTk.CTkScrollableFrame):
                 label.destroy()
                 self.label_list.remove(label)
                 return
-            
+# Main App Class         
 class App(CTk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         def LoadImages():   
-            ImageLoader(uiPreimportOpenFileLbl,'Openfile.jpg',(150,150))
-            ImageLoader(uiPreimportOpenConfirmLbl ,'Confirm.jpg',(150,150))
-            ImageLoader(uiPreimportOpenOrLbl,'Or.jpg',(60,100))
-            ImageLoader(uiHelpLbl,'Help.jpg',(100,100))
-            ImageLoader(uiHelpOrLbl,'HelpOr.jpg',(50,20))
+            ImageLoader(uiPreimportOpenFileLbl,'Ui_Images\Openfile.jpg',(150,150))
+            ImageLoader(uiPreimportOpenConfirmLbl ,'Ui_Images\Confirm.jpg',(150,150))
+            ImageLoader(uiPreimportOpenOrLbl,'Ui_Images\Or.jpg',(60,100))
+            ImageLoader(uiHelpLbl,'Ui_Images\Help.jpg',(100,100))
+            ImageLoader(uiHelpOrLbl,'Ui_Images\HelpOr.jpg',(50,20))
         
         def killStartFrame():
             uiStartFrame.destroy()

@@ -3,6 +3,7 @@ from enum import Enum
 class Gesture(Enum):
         ROTATE = "Rotate"
         CROP = "Crop"
+        RESIZE = "Resize"
         TRANSLATE = "Translate"
         CONTRAST = "Contrast"
         BRIGHTNESS = "Brightness"
@@ -18,6 +19,7 @@ class Gesture(Enum):
             gestureHelp = {
                     Gesture.ROTATE: "This is the help text for rotate",
                     Gesture.CROP: "This is the help text for Crop, Crop crop crop",
+                    Gesture.RESIZE: "This is the help text for RESIZE",
                     Gesture.TRANSLATE :"Translate Help text",
                     Gesture.CONTRAST :"Contrast Help text contrast",
                     Gesture.BRIGHTNESS: "This is the help text for brightness, blah blah brightness",
@@ -33,19 +35,20 @@ class Gesture(Enum):
             return gestureHelp[cls]
         def gesture_image(cls):
             gestureImage = {
-                    Gesture.ROTATE: "Crop.jpg",
-                    Gesture.CROP: "Crop.jpg",
-                    Gesture.TRANSLATE :"Crop.jpg",
-                    Gesture.CONTRAST :"Crop.jpg",
-                    Gesture.BRIGHTNESS: "Crop.jpg",
-                    Gesture.POINTER: "Crop.jpg",
-                    Gesture.PEN: "Crop.jpg",
-                    Gesture.CLOSE: "Crop.jpg",
-                    Gesture.SAVEFILE: "Crop.jpg",
-                    Gesture.OPENFILE: "Crop.jpg",
-                    Gesture.OPENHAND: "Crop.jpg",
-                    Gesture.CLOSEDHAND: "Crop.jpg",
-                    Gesture.HELP: "Confirm.jpg"
+                    Gesture.ROTATE: "Resources\Rotate.gif",
+                    Gesture.CROP: "Resources\Crop.gif",
+                    Gesture.RESIZE: "Resources\Resize.gif",
+                    Gesture.TRANSLATE :"Resources\Translate.gif",
+                    Gesture.CONTRAST :"Resources\Contrast.gif",
+                    Gesture.BRIGHTNESS: "Resources\Brightness.gif",
+                    Gesture.POINTER: "Resources\Pointer.gif",
+                    Gesture.PEN: "Resources\Pen.gif",
+                    Gesture.CLOSE: "Resources\Brightness.gif",
+                    Gesture.SAVEFILE: "Resources\Save.gif",
+                    Gesture.OPENFILE: "Resources\Open.gif",
+                    Gesture.OPENHAND: "Resources\Brightness.gif",
+                    Gesture.CLOSEDHAND: "Resources\Brightness.gif",
+                    Gesture.HELP: "Resources\Help.gif"
             }
             return gestureImage[cls]
         def string_to_enum(string):
