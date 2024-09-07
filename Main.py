@@ -10,6 +10,11 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
 
+ ## TEST MATERIAL ##
+model_path = 'gesture_recognizer.task'
+with open(model_path,'rb') as file:
+    model_data = file.read()
+
 # Class for the Help Window.
 class HelpWindow(CTk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -326,14 +331,7 @@ class App(CTk.CTk):
         uiMasterFrame.grid_forget()
         uiRenderFrame.grid_forget()
         uiDetectedGestureFrame.grid_forget()
-        uiHistoryFrame.pack_forget()
-        
-        
-    
-        ## TEST MATERIAL ##
-        model_path = 'gesture_recognizer.task'
-        with open(model_path,'rb') as file:
-            model_data = file.read()
+        uiHistoryFrame.pack_forget()  
 
         looper = FrameLoop.GestureVision(self,uiDeviceCamera,uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         # functions = Functions.editFunctions(reference to image, reference to canvas etc.)
