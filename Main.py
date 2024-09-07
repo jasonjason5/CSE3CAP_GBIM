@@ -91,8 +91,11 @@ class GIFLabel(CTk.CTkLabel):
         # Open the image file
         self._gif_image = Image.open(os.path.join(current_dir, image_path))
         # set the size of the label to the same as the GIF image
-        kwargs.setdefault("width", self._gif_image.width)
-        kwargs.setdefault("height", self._gif_image.height)
+        #kwargs.setdefault("width", self._gif_image.width)
+        #kwargs.setdefault("height", self._gif_image.height)
+        #set to what we want
+        kwargs.setdefault("width", 320)
+        kwargs.setdefault("height", 220)
         # don't show the text initially
         kwargs.setdefault("text", "")
         # delay for the after loop
@@ -102,7 +105,10 @@ class GIFLabel(CTk.CTkLabel):
         self._frames = []
         for i in range(self._gif_image.n_frames):
             self._gif_image.seek(i)
-            self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(self["width"], self["height"])))
+            #set to gif actual size
+            #self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(self["width"], self["height"])))
+            #set to what we want
+            self._frames.append(CTk.CTkImage(self._gif_image.copy(), size=(320, 220)))
         # start animation
         self._animate()
 
