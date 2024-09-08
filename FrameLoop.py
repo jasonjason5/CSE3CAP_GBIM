@@ -15,6 +15,7 @@ import MPRecognition
 import numpy as np
 import math
 from threading import Thread
+import time
 
 
 class GestureVision:
@@ -40,10 +41,13 @@ class GestureVision:
         
         ## Optimisations ##
         self.runProcessing = 0
+        self.start_time = None
+        self.end_time = None
         
     def updateFrame(self):
         success, frame = self.frameCapture.read()
         if success:
+            self.end_timer()
             frameRGB = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB) ## OpenCV takes images in BGR format, this converts them into the proper RGB format for display and processing
             results = self.mpHandObject.process(frameRGB)
             
@@ -69,10 +73,13 @@ class GestureVision:
             else:
                 self.runProcessing = 0
 
+            
+
             if self.last_gesture != MPRecognition.gesture:
                 ##DEBUG##
                 print(MPRecognition.gesture)
-                self.affirmation.configure(text=MPRecognition.gesture)
+                #self.affirmation.configure(text=MPRecognition.gesture)
+                self.affirmation.set(MPRecognition.gesture)
                 #store the gesture to reference in next loop
                 self.last_gesture = MPRecognition.gesture
                       
@@ -89,6 +96,12 @@ class GestureVision:
        
             self.window.image = displayFrame
             self.window.configure(image=displayFrame)
+
+            self.start_timer()
+            
+            # if after set to 1 takes about  0.07 seconds to loop - UI Choppy
+            # if after set to 100 takes about 0.1 seconds to loop - UI much more reponsive
+            # The above is likely varied on the PC running it 
             self.root.after(100,self.updateFrame)
 
             
@@ -104,5 +117,15 @@ class GestureVision:
     
     def displayGesture(self): ## Method to display affirmative gesture feedback (Similar to what is currently under DEBUG)
         return
-        
-        
+    
+    def start_timer(self): ## Method to count how long a loop takes to run
+        self.start_time = time.time()
+        return 
+    
+    def end_timer(self): ## Method to count how long a loop takes to run
+        if self.start_time is None:
+            return  
+        self.end_time = time.time()
+        elapsed_time = self.end_time - self.start_time
+        print(f"Time taken for the loop to run: {elapsed_time} seconds")
+        return 

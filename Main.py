@@ -182,6 +182,10 @@ class App(CTk.CTk):
             killStartFrame()
             self.after(0, looper.updateFrame())
 
+        def handle_gesture_changed(var, index, mode):
+            # Your code to adjust canvas size goes here
+                print("Gesture (detectedGestureString.get()) Changed: " + detectedGestureString.get()) 
+
                 # Minimum size of window
         min_width = 320
         min_height = 320
@@ -201,11 +205,10 @@ class App(CTk.CTk):
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
         
+        # frame for the rendering canvas
         uiRenderFrame1 = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
         
-      
-
-
+        # frame that holds all of the bottom of the UI
         uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
         uiMasterFrame.grid(column=0, columnspan= 3,row=1 ,sticky=CTk.EW + CTk.S)
         uiMasterFrame.columnconfigure(0, weight = 4)
@@ -215,12 +218,14 @@ class App(CTk.CTk):
         uiMasterFrame.rowconfigure(0, weight = 1)
         uiMasterFrame.rowconfigure(1, weight = 2)
 
-
+        # Detected gesture UI
         uiDetectedGestureFrame =CTk.CTkFrame(master=uiMasterFrame)
         uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
         uiDetectedGestureText = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 50, font=uiFont)
         uiDetectedGestureText.grid(column=0, row=0)
-        uiDetectedGesture = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Gesture",corner_radius= 50, font=uiFont)
+        detectedGestureString = CTk.StringVar(value= "Gesture")
+        detectedGestureString.trace_add("write", handle_gesture_changed)
+        uiDetectedGesture = CTk.CTkLabel(master=uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,textvariable=detectedGestureString,corner_radius= 50, font=uiFont)
         uiDetectedGesture.grid(column=1, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
@@ -295,6 +300,7 @@ class App(CTk.CTk):
         def handle_resize(event):
             # Your code to adjust canvas size goes here
                 print(f"Canvas (uiRenderFrame) resized: {event.width}x{event.height}")  
+        
 
 
         uiPreimportOpenFileBtn = CTk.CTkButton(master=uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=open_image,corner_radius=20, width= 60, height= 30)
@@ -329,7 +335,7 @@ class App(CTk.CTk):
         uiHelpOrLbl = CTk.CTkLabel(master=uiHelpFrame, bg_color= "transparent",text = "")
         uiHelpOrLbl.grid(column=0, row=1 ,padx=5, pady=5)
 
-        uiHelpBtn = CTk.CTkButton(master=uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(uiDetectedGesture.cget("text")))
+        uiHelpBtn = CTk.CTkButton(master=uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(detectedGestureString.get()))
         uiHelpBtn.grid(column=0, row=2)
 
         # Help UI #
@@ -348,7 +354,7 @@ class App(CTk.CTk):
         uiDetectedGestureFrame.grid_forget()
         uiHistoryFrame.pack_forget()  
 
-        looper = FrameLoop.GestureVision(self,uiDeviceCamera,uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
+        looper = FrameLoop.GestureVision(self,uiDeviceCamera,detectedGestureString,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         # functions = Functions.editFunctions(reference to image, reference to canvas etc.)
 
         #test
