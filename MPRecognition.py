@@ -126,6 +126,11 @@ class MPRecognizer:
                 elif(self.bufferWeighter('pen') > self.confidence):
                     if(foreDistance > 0.2 and middleDistance > 0.2):
                         gesture = "pen"    
+                elif(self.bufferWeighter('undo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
+                    gesture = "undo"
+                elif(self.bufferWeighter('redo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
+                    gesture = "redo"
+
 
                 elif(self.buffer[0] == 'close' and (self.buffer[4] == 'help' or self.buffer[3] == 'help' or self.buffer[2] == 'help')): # Definitely a better way to do this check
                      gesture = "save file"

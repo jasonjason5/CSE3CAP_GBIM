@@ -9,6 +9,7 @@ import customtkinter as CTk
 import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
+import math
 
  ## TEST MATERIAL ##
 model_path = 'gesture_recognizer.task'
@@ -327,23 +328,23 @@ class App(CTk.CTk):
         if file_path:
             img = Image.open(file_path)
 
-            #canvas_width = uiRenderFrame.winfo_width()
-            #canvas_height = uiRenderFrame.winfo_height()
-            canvas_width = int((self.winfo_width() / 2))
-            canvas_height = int((self.winfo_height() / 2))
+            canvas_width = int((self.uiRenderFrame1.winfo_width()))
+            canvas_height = int((self.uiRenderFrame1.winfo_height()))
             print("Height:" + str(self.winfo_height()) + "Width:" + str(self.winfo_width()))
-            img = img.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+            
+            img = self.resizeImport(img,canvas_width,canvas_height)
 
                 
             img_tk = ImageTk.PhotoImage(img)
                 
-            self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= "red", bd=0,highlightthickness=0)
+            self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= "red", bd=0,highlightthickness=0) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
             self.uiRenderFrame.delete("all")
-            self.uiRenderFrame.create_image(0, 0, anchor=tk.NW, image=img_tk)
-            self.uiRenderFrame.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
+            self.uiRenderFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
             self.uiRenderFrame.bind("<Configure>", self.handle_resize)
             ### Changing this for later
-            editingImage = self.uiRenderFrame.create_image(canvas_width,canvas_height,anchor='center',image=img_tk)
+            
+            editingImage = self.uiRenderFrame.create_image(canvas_width/2,canvas_height/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
+            self.uiRenderFrame.imgref = img_tk
                 
             #uiRenderFrame.grid(column=1, row=0, columnspan= 3, sticky=tk.W)
             #show detected gesture
@@ -354,6 +355,23 @@ class App(CTk.CTk):
             ## Creates Function objects
             editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame)
             self.looper.setEditor(editor)
+
+    def resizeImport(self,img,canvas_width,canvas_height): ## Resizes the image to better fit the current canvas size
+
+        image_width, image_height = img.size
+        
+        resizerWidth = image_width/canvas_width
+        resizerHeight = image_height/canvas_height
+
+        if(resizerHeight or resizerWidth > 1):
+
+            resizer = 1 / max(resizerHeight,resizerWidth)
+        else:
+            resizer = min(resizerHeight,resizerWidth)
+            
+        print(resizer)
+        img = img.resize((math.floor(resizer*image_width), math.floor(resizer*image_height)), Image.Resampling.LANCZOS)
+        return img
 
     def handle_resize(event): ## This is showing an error since the reshuffle, potentially to do with passing in self
         # Your code to adjust canvas size goes here
