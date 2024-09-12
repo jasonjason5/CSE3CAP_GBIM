@@ -1,9 +1,5 @@
-## PUT OPENCV FRAME UPDATE LOGIC IN HERE ##
-
-## Not too sure how python hands passing objects, whether they're copied and passed by value or passed by reference and can be edited from within the caller.
-## Will need to investigate when things are up and running to see.
-
 import cv2
+from cv2.cuda import setBufferPoolConfig
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -32,7 +28,6 @@ class GestureVision:
         self.model_data = model_data
         self.recognizer = MPRecognition.MPRecognizer(self.model_data)
         self.gesture = None
-        self.last_gesture = None
         ## UI REFERENCES ##
        
         self.root = root 
@@ -44,50 +39,42 @@ class GestureVision:
         self.start_time = None
         self.end_time = None
         
+        ## Editing ##
+        self.opened = False # For making sure you cant open an image on an open image
+        self.prevEdit = "none"
+        self.cropMode = False
+        self.boolBuffer = ["none"]*5
+        
     def updateFrame(self):
         success, frame = self.frameCapture.read()
         if success:
-            self.end_timer()
+            #self.end_timer()
             frameRGB = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB) ## OpenCV takes images in BGR format, this converts them into the proper RGB format for display and processing
             results = self.mpHandObject.process(frameRGB)
             
             gestureFrame = Image.fromarray(frameRGB)
- 
-            ## MPObject will be a globally defined MPRecognizer object declared within the main ui loop
 
-
-
-
-            ######################################OPTIMISATIONS#################################################
-            ## Comment out the if else chain to make the recognizer process every single frame
-            ## Comment out gThread and comment back in the commented out line to run the old version. NOTE: You must change self.affirmation.config(text=MPRecognition to =self.gesture).
-
-            if(self.runProcessing == 0):
-                gThread = Thread(target = self.recognizer.recognizeGesture,args = [gestureFrame,results])
-                gThread.daemon = True
-                gThread.start()
-                #self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
-                self.runProcessing += 1
-            elif(self.runProcessing < 3):
-                self.runProcessing += 1
+            if(results.multi_hand_landmarks):
+                if(self.runProcessing == 0):
+                    gThread = Thread(target = self.recognizer.recognizeGesture,args = [gestureFrame,results])
+                    gThread.daemon = True
+                    gThread.start()
+                    #self.gesture = self.recognizer.recognizeGesture(gestureFrame,results)
+                    self.runProcessing += 1
+                elif(self.runProcessing < 3):
+                    self.runProcessing += 1
+                else:
+                    self.runProcessing = 0
             else:
-                self.runProcessing = 0
+                MPRecognition.gesture = "none"
 
-            
-
-            if self.last_gesture != MPRecognition.gesture:
-                ##DEBUG##
-                print(MPRecognition.gesture)
-                #self.affirmation.configure(text=MPRecognition.gesture)
+            if(self.cropMode == False): ## Crop mode indicator
                 self.affirmation.set(MPRecognition.gesture)
-                #store the gesture to reference in next loop
-                self.last_gesture = MPRecognition.gesture
-                      
-            ##DEBUG##
+            else:
+                self.affirmation.set("crop")
 
-           #######################################OPTIMISATIONS####################################################
-            
-        
+
+            self.callFunction(MPRecognition.gesture,results)
             
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
             displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
@@ -96,36 +83,100 @@ class GestureVision:
        
             self.window.image = displayFrame
             self.window.configure(image=displayFrame)
-
-            self.start_timer()
+            self.root.after(1,self.updateFrame)  
             
             # if after set to 1 takes about  0.07 seconds to loop - UI Choppy
             # if after set to 100 takes about 0.1 seconds to loop - UI much more reponsive
             # The above is likely varied on the PC running it 
-            self.root.after(100,self.updateFrame)
+            
 
             
         else:
             return
         
       
+
+    def setEditor(self,editor):
+        self.editor = editor
+
+        
     def drawLandmarks(self): ## Draws hand landmarks. Good debugging tool but unnecessary to do all the time. Could add as boolean option
         return
     
     def callFunction(self,gesture,results): ## This method will be called to check which function to call based on the contents of the buffer
-        return
+        
+        if(gesture == "resize"):
+            if(self.cropMode == True):
+                self.editor.crop(results)
+                self.prevEdit = "cropsize"
+            
+            elif(self.cropMode == False):
+                self.editor.resize(results)
+                self.prevEdit = "resize"
+        
+        elif(gesture == "translate" and self.cropMode == False):
+            self.editor.translate(results)
+            self.prevEdit = "translate"
+        
+        elif(gesture == "crop"):
+            
+            if(self.cropMode == False and self.prevEdit != "cropexit"): #If you didnt just exit crop
+                self.cropMode = True
+                self.prevEdit = "cropenter"
+            
+            elif(self.cropMode == True and self.prevEdit != "cropenter"): # You were in crop mode but you didnt just literally enter into it. Will need to change how this behaves when gestures other than resize are given
+                print("EXITING")
+                self.cropMode = False
+                self.prevEdit = "cropexit"
+
+        elif(gesture == "rotate" and self.cropMode == False):
+            self.editor.rotate(results)
+            self.prevEdit = "rotate"
+        
+       
+           
+            
+            
+            
+            
+            
+            
+            
+        elif(gesture == "open file" and self.opened == False): # This can be done here as opposed to functions in order to avoid unnecessary passing of info
+            self.opened == True
+            MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
+            self.recognizer.clear_Buffer()
+            self.root.open_file()
+            
+        elif(gesture == "help"): # Ditto as above
+            MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
+            self.recognizer.clear_Buffer()
+            self.root.open_help(self.prevEdit)
+            
+        
+        elif(self.prevEdit != "none"):
+            self.editor.set_start()
     
-    def displayGesture(self): ## Method to display affirmative gesture feedback (Similar to what is currently under DEBUG)
-        return
+
+
+
+
+
+
+
+
+
+
+
+
+   # def start_timer(self): ## Method to count how long a loop takes to run
+     #   self.start_time = time.time()
+     #   return 
     
-    def start_timer(self): ## Method to count how long a loop takes to run
-        self.start_time = time.time()
-        return 
-    
-    def end_timer(self): ## Method to count how long a loop takes to run
-        if self.start_time is None:
-            return  
-        self.end_time = time.time()
-        elapsed_time = self.end_time - self.start_time
-        print(f"Time taken for the loop to run: {elapsed_time} seconds")
-        return 
+    #def end_timer(self): ## Method to count how long a loop takes to run
+    #    if self.start_time is None:
+      #      return  
+      #  self.end_time = time.time()
+      #  elapsed_time = self.end_time - self.start_time
+      #  print(f"Time taken for the loop to run: {elapsed_time} seconds")
+      #  return 

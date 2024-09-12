@@ -32,7 +32,8 @@ class MPRecognizer:
         self.thumbXYZ = [None]*3
         self.rootXYZ = [None]*3
 
-        
+    def clear_Buffer(self):
+        self.buffer = ["none"] * 5
 
     def recognizeGesture(self,frame,lmdata):
         
