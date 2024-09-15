@@ -14,6 +14,7 @@ class editFunctions:
         self.start_pos = canvas.coords(self.canvas_image)
         self.start_rot = 0
 
+        self.update_image = self.image # We need to actually update the image reference with the modifications, otherwise the modifications will not reflect in the saved file that operates from this reference
         self.update_width = self.start_width
         self.update_height = self.start_height
         self.update_rot = self.start_rot
@@ -30,7 +31,7 @@ class editFunctions:
         if self.is_locked:
             return
 
-        if not self.start_results:
+        if self.start_results is None:
             self.start_results = results
 
         start_point = self._get_landmark(self.start_results, 8)
@@ -52,6 +53,9 @@ class editFunctions:
 
             resized_image = self.image.resize((math.floor(resize_width), math.floor(resize_height)), Image.Resampling.LANCZOS)
             resized_out = ImageTk.PhotoImage(resized_image)
+            
+            self.update_image = resized_image
+            
             self.canvas.itemconfig(self.canvas_image, image=resized_out)
             self.canvas.imgref = resized_out
 
@@ -65,13 +69,13 @@ class editFunctions:
         current_point = self._get_landmark(results, 8)
 
         if current_point:
-            self.canvas.moveto(self.canvas_image, current_point.x * 1280, current_point.y * 720)
+            self.canvas.moveto(self.canvas_image, current_point.x * 1280, current_point.y * 720) ## This will need to be adjusted based on canvas size. we need to pass canvas size into functiosn
 
     def rotate(self, results):
         if self.is_locked:
             return
 
-        if not self.start_results:
+        if self.start_results is None:
             self.start_results = results
 
         start_point = self._get_landmark(self.start_results, 8)
@@ -86,51 +90,41 @@ class editFunctions:
             self.update_rot = self.start_rot + out_rot
 
             rotated_image = self.image.rotate(self.start_rot + out_rot)
-            rotated_out = ImageTk.PhotoImage(rotated_image)
+            rez_rot_image = rotated_image.resize((math.floor(self.start_width),math.floor(self.start_height)),Image.Resampling.LANCZOS) ## Avoids the rotated image becoming massive for some reason 
+            rotated_out = ImageTk.PhotoImage(rez_rot_image)
+            
+            
+            self.update_image = rez_rot_image
+            
             self.canvas.itemconfig(self.canvas_image, image=rotated_out)
-            self.canvas.imgred = rotated_out
+            self.canvas.imgref = rotated_out
 
             # Check if the landmark has been held for 5 seconds
             if self.rotation_start_time is not None and time.time() - self.rotation_start_time >= 5:
                 self.is_locked = True
             elif self.rotation_start_time is None:
-                self.rotation_start_time = time.time()
+                self.rotation_start_time = time.time() ## This needs to be changed a bit so that it rotates on the canvas not the image itself
 
-    def scale(self, results):
-        """Scales the image based on the distance between thumb and index finger."""
-        if self.startResults is None:
-            self.startResults = results
-            # Get initial points
-            thumb_start = self.startResults.multi_hand_landmarks[0].landmark[4]  # Thumb tip
-            index_start = self.startResults.multi_hand_landmarks[0].landmark[8]  # Index finger tip
-            self.startDistance = self.get_distance(thumb_start, index_start)
+    def crop(self, results):
+        print("cropping")
+        return
 
-        if results.multi_hand_landmarks is not None:
-            thumb_current = results.multi_hand_landmarks[0].landmark[4]  # Thumb tip
-            index_current = results.multi_hand_landmarks[0].landmark[8]  # Index finger tip
-            currentDistance = self.get_distance(thumb_current, index_current)
-
-            # Calculate scaling factor
-            scaleFactor = currentDistance / self.startDistance
-
-            # Calculate new dimensions
-            newWidth = self.startWidth * scaleFactor
-            newHeight = self.startHeight * scaleFactor
-
-            # Update image with new dimensions
-            resizedImage = self.image.resize((int(newWidth), int(newHeight)), Image.Resampling.LANCZOS)
-            resizedOut = ImageTk.PhotoImage(resizedImage)
-            self.canvas.itemconfig(self.canvasImage, image=resizedOut)
-            self.canvas.imgref = resizedOut
-
+    def pen(self,results):
+        return
+    def brightness(self, results):
+        return
+    def contrast(self,results):
+        return
+    
+    def save_file(self):
+        self.image.save("SavedImage.png")
+        
+    
     def set_start(self):
         self.start_results = None  # Resetting start position of gesture coordinates
+        self.image = self.update_image
         self.start_width = self.update_width
         self.start_height = self.update_height
         self.start_rot = self.update_rot
         self.rotation_start_time = None  # Reset rotation start time
         self.is_locked = False
-
-    def crop(self, results):
-        print("cropping")
-        return

@@ -1,4 +1,5 @@
 ## PUT UI AND MODULE CALL LOGIC IN HERE ##
+from turtle import window_height
 import MPRecognition
 import FrameLoop
 import Functions
@@ -8,7 +9,7 @@ from Gestures import Gesture
 import customtkinter as CTk
 import tkinter as tk
 from PIL import Image, ImageTk
-from tkinter import filedialog
+from tkinter import W, Canvas, filedialog
 import math
 
  ## TEST MATERIAL ##
@@ -152,7 +153,8 @@ class ActionHistory(CTk.CTkScrollableFrame):
     def add_item(self, item, image=None):
         label = CTk.CTkLabel(self, text=item, image=image, compound="left", padx=5, anchor="w")
         label.grid(row=len(self.label_list), column=0, pady=(0, 10), sticky="w")
-        self.label_list.append(label)
+        self.label_list.insert(0,label) # from a list to FIFO
+
 
     def remove_item(self, item):
         for label in zip(self.label_list):
@@ -160,6 +162,10 @@ class ActionHistory(CTk.CTkScrollableFrame):
                 label.destroy()
                 self.label_list.remove(label)
                 return
+    
+    def check_top(self): #Returns topmost element
+        return self.label_list[0]
+    
 # Main App Class         
 class App(CTk.CTk):
     def __init__(self, *args, **kwargs):
@@ -173,7 +179,7 @@ class App(CTk.CTk):
         #max_height = 1080
         self.toplevel_window = None
         self.title("Gesture Based Image Manipulation")
-        self.geometry("1280x720")
+        self.geometry("1280x900")
         self.minsize(min_width, min_height)
         uiFont = CTk.CTkFont(family='Inter', size=24) 
         #self.maxsize(max_width, max_height)
@@ -202,9 +208,8 @@ class App(CTk.CTk):
         self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
         self.uiDetectedGestureText = CTk.CTkLabel(master=self.uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 50, font=uiFont)
         self.uiDetectedGestureText.grid(column=0, row=0)
-        self.detectedGestureString = CTk.StringVar(value= "Gesture")
-        #self.detectedGestureString.trace_add("write", self.handle_gesture_changed)
-        self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,textvariable=self.detectedGestureString,corner_radius= 50, font=uiFont)
+        # Removed detected gesture string, frameloop now operates directly on this widget. Fixed widget height / width to avoid changes when text updates
+        self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, height = 30, width=200, fg_color=Style.gestures,text_color=Style.blackText,text="Gesture",corner_radius= 50, font=uiFont)
         self.uiDetectedGesture.grid(column=1, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
@@ -293,7 +298,7 @@ class App(CTk.CTk):
         self.uiPreimportOpenFileBtn = CTk.CTkButton(master=self.uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=self.open_image,corner_radius=20, width= 60, height= 30)
         self.uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
 
-        self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.detectedGestureString,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
+        self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
 
     def LoadImages(self):   
         ImageLoader(self.uiPreimportOpenFileLbl,'Ui_Images\Openfile.jpg',(150,150))
@@ -312,7 +317,7 @@ class App(CTk.CTk):
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
 
-    def handle_gesture_changed(var, index, mode):
+    def handle_gesture_changed(self,var, index, mode):
         # Your code to adjust canvas size goes here
             #print("Gesture (detectedGestureString.get()) Changed: " + detectedGestureString.get()) 
             return
@@ -337,7 +342,7 @@ class App(CTk.CTk):
                 
             img_tk = ImageTk.PhotoImage(img)
                 
-            self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= "red", bd=0,highlightthickness=0) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
+            self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= Style.workspaceBackground, bd=0,highlightthickness=0) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
             self.uiRenderFrame.delete("all")
             self.uiRenderFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
             self.uiRenderFrame.bind("<Configure>", self.handle_resize)
@@ -355,25 +360,52 @@ class App(CTk.CTk):
             ## Creates Function objects
             editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame)
             self.looper.setEditor(editor)
+            self.looper.setHistory(self.uiActionHistory)
 
-    def resizeImport(self,img,canvas_width,canvas_height): ## Resizes the image to better fit the current canvas size
+    def resizeImport(self,img,canvas_width,canvas_height): 
+        ## Resizes the image to better fit the current canvas size
+        ## This also creates a padding box around the image to solve the scenario where rotation cuts sections of the image off.
 
         image_width, image_height = img.size
-        
         resizerWidth = image_width/canvas_width
         resizerHeight = image_height/canvas_height
 
-        if(resizerHeight or resizerWidth > 1):
+        if(resizerHeight > 1 or resizerWidth > 1):
 
             resizer = 1 / max(resizerHeight,resizerWidth)
         else:
-            resizer = min(resizerHeight,resizerWidth)
-            
-        print(resizer)
-        img = img.resize((math.floor(resizer*image_width), math.floor(resizer*image_height)), Image.Resampling.LANCZOS)
-        return img
+            resizer = 1
+           
+        resOutWidth = math.floor(resizer*image_width)
+        resOutHeight = math.floor(resizer*image_height)
+        img = img.resize((resOutWidth, resOutHeight), Image.Resampling.LANCZOS)
+        
+        padDim = math.ceil(math.sqrt(resOutHeight**2 + resOutWidth **2))
+        padBox = Image.new(mode="RGBA",size = (padDim,padDim)) # color=(153,153,153,255) ## This fixes the rotation, problem, but any image output by this program will input back in with a larger padding onto of whatever was originally added
+        # in saying that, this is sort of a problem that photoshop / photopea etc. also have. Like if you create a bigger canvas and then rotate your image, the output image will be the size of the canvas,
+        # and then when you put that new image back in, its pulled in as one layer, it isnt as if you can separate out the original image from the padding. So its not a problem we have to solve.
+        
+        padBoxWidth, padBoxHeight = padBox.size
 
-    def handle_resize(event): ## This is showing an error since the reshuffle, potentially to do with passing in self
+        offset = ((padBoxWidth - resOutWidth) // 2, (padBoxHeight - resOutHeight) // 2)
+        
+        padBox.paste(img,offset)
+
+        return padBox
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    def handle_resize(self,event): ## This is showing an error since the reshuffle, potentially to do with passing in self
         # Your code to adjust canvas size goes here
             print(f"Canvas (uiRenderFrame) resized: {event.width}x{event.height}")  
         

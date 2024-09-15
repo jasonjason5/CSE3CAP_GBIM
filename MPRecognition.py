@@ -103,9 +103,9 @@ class MPRecognizer:
                 pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
                # print(foreDistance, middleDistance)
                 # Could probably be a switch/case but it doesn't particularly matter
-                
+                #print(foreDistance)
                 if(self.bufferWeighter('rotate') > self.confidence):
-                    if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance < 0.25):
+                    if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance < 0.25 and foreDistance > 0.45):
                         gesture = "rotate"
                 elif(self.bufferWeighter('resize') > self.confidence):
                     if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance > 0.25): # This is the prime example of the work this does. This makes rotate and resize distinct by comparing middleDistance
@@ -141,6 +141,8 @@ class MPRecognizer:
                     gesture = "open hand"
                 elif(self.bufferWeighter('close') > self.confidence):
                     gesture = "closed hand"   
+                else:
+                    gesture = "none"
            
             ### MULTI HANDDED GESTURES ###
             elif(len(landmark_data.multi_hand_landmarks) == 2):
