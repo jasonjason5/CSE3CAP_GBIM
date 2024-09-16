@@ -1,7 +1,9 @@
+from re import T
 from PIL import ImageTk, Image
 import math
 import numpy as np
 import time
+
 
 class editFunctions:
     def __init__(self, image: ImageTk, canvas_image, canvas):
@@ -21,6 +23,11 @@ class editFunctions:
         self.start_results = None
         self.rotation_start_time = None
         self.is_locked = False
+        
+
+        self.historyDoAdd = ["crop","rotate","brightness","contrast","resize"]
+        self.imageHistory = []
+        self.imageHistory.insert(0,self.image)
 
     def _get_landmark(self, results, index):
         if results.multi_hand_landmarks:
@@ -90,7 +97,7 @@ class editFunctions:
             self.update_rot = self.start_rot + out_rot
 
             rotated_image = self.image.rotate(self.start_rot + out_rot)
-            rez_rot_image = rotated_image.resize((math.floor(self.start_width),math.floor(self.start_height)),Image.Resampling.LANCZOS) ## Avoids the rotated image becoming massive for some reason 
+            rez_rot_image = rotated_image.resize((math.floor(self.start_width),math.floor(self.start_height))) ## Avoids the rotated image becoming massive for some reason 
             rotated_out = ImageTk.PhotoImage(rez_rot_image)
             
             
@@ -98,7 +105,7 @@ class editFunctions:
             
             self.canvas.itemconfig(self.canvas_image, image=rotated_out)
             self.canvas.imgref = rotated_out
-
+            
             # Check if the landmark has been held for 5 seconds
             if self.rotation_start_time is not None and time.time() - self.rotation_start_time >= 5:
                 self.is_locked = True
@@ -119,8 +126,37 @@ class editFunctions:
     def save_file(self):
         self.image.save("SavedImage.png")
         
-    
-    def set_start(self):
+
+
+    def undo(self): ## THERE ARE SOME SLIGH ISSUES HERE THAT I CANNOT RESOLVE RIGHT NOW
+        if(len(self.imageHistory) > 1):
+            self.start_results = None
+            self.image = self.imageHistory[1]
+            tkUndo = ImageTk.PhotoImage(self.imageHistory[1])
+
+
+            self.start_width = self.image.width
+            self.start_height = self.image.height
+            self.start_pos = self.canvas.coords(self.canvas_image)
+            self.start_rot = 0
+            
+
+
+            self.canvas.itemconfig(self.canvas_image,image=tkUndo)
+            self.canvas.imgref = tkUndo
+
+            self.rotation_start_time = None
+            self.is_locked = False
+        
+    def set_start(self,edit):
+        print(self.imageHistory)
+        if(edit in self.historyDoAdd):
+            if(len(self.imageHistory) == 2):
+                self.imageHistory.pop(1)
+            self.imageHistory.insert(0,self.image)
+           
+        #print(self.imageHistory)
+
         self.start_results = None  # Resetting start position of gesture coordinates
         self.image = self.update_image
         self.start_width = self.update_width

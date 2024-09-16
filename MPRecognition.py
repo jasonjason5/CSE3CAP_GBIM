@@ -84,7 +84,9 @@ class MPRecognizer:
         foreDistance = math.sqrt((self.foreXYZ[0] - self.rootXYZ[0])**2 + (self.foreXYZ[1] - self.rootXYZ[1])**2)
         thumbDistance = math.sqrt((self.thumbXYZ[0] - self.rootXYZ[0])**2 + (self.thumbXYZ[1] - self.rootXYZ[1])**2)
         
-        return pinkyDistance,ringDistance,middleDistance, foreDistance,thumbDistance ## This could possibly be returned as an array   
+        thumbForeDistance = math.sqrt((self.thumbXYZ[0] - self.foreXYZ[0])**2 + (self.thumbXYZ[1] - self.foreXYZ[1])**2)
+        
+        return pinkyDistance,ringDistance,middleDistance, foreDistance,thumbDistance,thumbForeDistance ## This could possibly be returned as an array   
             
 ## An example of how this works: The method recognizeGesture() is called from FL. It is called 5 consecutive times over 5 input frames, filling the buffer of the module
 ## object in FL. Lets say the buffer gets filled [X,Y,X,Y,X] - 3 Xs, 2Ys. Mediapipe knows its either X or Y, but is unsure. Since X is present 3 times (i.e 60% of the buffer)
@@ -100,8 +102,8 @@ class MPRecognizer:
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
                
-                pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
-               # print(foreDistance, middleDistance)
+                pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance,thumbForeDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
+                #print(thumbForeDistance)
                 # Could probably be a switch/case but it doesn't particularly matter
                 #print(foreDistance)
                 if(self.bufferWeighter('rotate') > self.confidence):
@@ -127,7 +129,8 @@ class MPRecognizer:
                     if(foreDistance > 0.2 and middleDistance > 0.2):
                         gesture = "pen"    
                 elif(self.bufferWeighter('undo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
-                    gesture = "undo"
+                    if(thumbForeDistance < 0.2):
+                        gesture = "undo"
                 elif(self.bufferWeighter('redo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
                     gesture = "redo"
 

@@ -1,4 +1,5 @@
 ## PUT UI AND MODULE CALL LOGIC IN HERE ##
+from sys import maxsize
 from turtle import window_height
 import MPRecognition
 import FrameLoop
@@ -11,6 +12,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import W, Canvas, filedialog
 import math
+from collections import deque
 
  ## TEST MATERIAL ##
 model_path = 'gesture_recognizer.task'
@@ -143,26 +145,38 @@ class ImageLoader:
         self.label.configure(image=self.tk_image)
         # Keep a reference to the image to prevent garbage collection
         self.label.image = self.tk_image
-# 
+
 class ActionHistory(CTk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.grid_columnconfigure(0, weight=1)    
-        self.label_list = []
+        self.label_list = deque(maxlen = 2) ## Limiting to 5 History
+        self.colourCounter = 0
+            
+    def pop_item(self):
+        self.label_list[1].destroy()
+        self.label_list.pop()
+        for label in self.label_list: # Shuffles everything back to allow for push to Queue
+            gridRow = label.grid_info()['row']
+            label.grid(row = gridRow + 1)
+            
+        return
 
     def add_item(self, item, image=None):
-        label = CTk.CTkLabel(self, text=item, image=image, compound="left", padx=5, anchor="w")
-        label.grid(row=len(self.label_list), column=0, pady=(0, 10), sticky="w")
-        self.label_list.insert(0,label) # from a list to FIFO
+        if(self.colourCounter > 0):
+            bgColour = Style.popupBackground
+            self.colourCounter = 0
+        else:
+            bgColour = Style.workspaceBackground
+            self.colourCounter += 1
 
+        if(len(self.label_list) == 2):
+            self.pop_item()
 
-    def remove_item(self, item):
-        for label in zip(self.label_list):
-            if item == label.cget("text"):
-                label.destroy()
-                self.label_list.remove(label)
-                return
-    
+        label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
+        label.grid(row= 2 - len(self.label_list), column=0, pady=(0, 10), sticky="w") # 5 - len ensures we're adding it to the start
+        self.label_list.appendleft(label) # from a list to FIFO
+            
     def check_top(self): #Returns topmost element
         return self.label_list[0]
     
@@ -260,7 +274,7 @@ class App(CTk.CTk):
         # add test item to the Action history
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image = CTk.CTkImage(Image.open(os.path.join(current_dir, "Ui_Images", "HelpOr.jpg")))
-        self.uiActionHistory.add_item(item = "test", image=image)
+        self.uiActionHistory.add_item(item = "open")
 
         # Function list
 

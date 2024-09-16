@@ -46,7 +46,7 @@ class GestureVision:
         self.boolBuffer = ["none"]*5
         self.editor = None
         self.history = None
-        self.historyDoAdd = ["translate","crop","rotate","brightness","contrast","resize"]
+        self.historyDoAdd = ["translate","crop","rotate","brightness","contrast","resize","undo","redo"]
         
     def updateFrame(self):
         success, frame = self.frameCapture.read()
@@ -83,7 +83,8 @@ class GestureVision:
 
 
             if(self.history):
-                if(self.history.check_top().cget("text") != MPRecognition.gesture and MPRecognition.gesture in self.historyDoAdd): ## adds the appropriate gestures to the history
+                #sprint(self.prevEdit)
+                if(self.history.check_top().cget("text") != self.prevEdit and MPRecognition.gesture in self.historyDoAdd): ## adds the appropriate gestures to the history
                     self.history.add_item(item = MPRecognition.gesture)
                 
 
@@ -163,7 +164,13 @@ class GestureVision:
                 self.cropMode = False
             
             
-            
+        elif(gesture == "undo"):
+            if(self.cropMode == False):
+                self.editor.undo()
+                self.recognizer.clear_Buffer()
+            else:
+                print("EXITING")
+                self.cropMode = False
             
             
             
@@ -186,9 +193,9 @@ class GestureVision:
             self.root.open_help(self.prevEdit)
             
             
-        elif(self.prevEdit != "none"):
-            self.editor.set_start()
-            if(gesture == "none"):
+        elif(self.prevEdit != "none" and self.prevEdit != "undo"):
+            self.editor.set_start(self.prevEdit)
+            if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"
             
     
