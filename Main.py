@@ -126,6 +126,8 @@ class GIFLabel(CTk.CTkLabel):
     def _animate(self, idx=0):
         self.configure(image=self._frames[idx])
         self.after(self._duration, self._animate, (idx+1)%len(self._frames))
+        
+        
 
 # This class loads images into the label passed to it.
 class ImageLoader:
@@ -315,10 +317,10 @@ class App(CTk.CTk):
         self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
 
     def LoadImages(self):   
-        ImageLoader(self.uiPreimportOpenFileLbl,'Ui_Images\Openfile.jpg',(150,150))
+        ImageLoader(self.uiPreimportOpenFileLbl,'Ui_Images\OpenUI.gif',(175,150)) ## Giffed
         ImageLoader(self.uiPreimportOpenConfirmLbl ,'Ui_Images\Confirm.jpg',(150,150))
         ImageLoader(self.uiPreimportOpenOrLbl,'Ui_Images\Or.jpg',(60,100))
-        ImageLoader(self.uiHelpLbl,'Ui_Images\Help.jpg',(100,100))
+        ImageLoader(self.uiHelpLbl,'Ui_Images\HelpUI.gif',(117,100)) ## Giffed
         ImageLoader(self.uiHelpOrLbl,'Ui_Images\HelpOr.jpg',(50,20))
         
     def killStartFrame(self):
@@ -373,6 +375,7 @@ class App(CTk.CTk):
 
             ## Creates Function objects
             editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame)
+            self.looper.setActive() # Activates detection
             self.looper.setEditor(editor)
             self.looper.setHistory(self.uiActionHistory)
 

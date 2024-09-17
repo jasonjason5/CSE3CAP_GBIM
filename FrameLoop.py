@@ -18,6 +18,8 @@ class GestureVision:
     
     def __init__(self,root,window,affirmation,model_data): ## Initialises all MP and CV variables and objects to be operated on
         
+        self.activated = False
+
         self.frameCapture = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.mpHands = mp.solutions.hands
         self.mpDrawing = mp.solutions.drawing_utils
@@ -49,6 +51,7 @@ class GestureVision:
         self.historyDoAdd = ["translate","crop","rotate","brightness","contrast","resize","undo","redo"]
         
     def updateFrame(self):
+
         success, frame = self.frameCapture.read()
         if success:
             #self.end_timer()
@@ -56,6 +59,18 @@ class GestureVision:
             results = self.mpHandObject.process(frameRGB)
             
             gestureFrame = Image.fromarray(frameRGB)
+
+            if(self.activated == False): ## Make sure we're only detecting when we need to
+                resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
+                displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
+       
+            ## return it to the tkinter widget in which we want to display it
+       
+                self.window.image = displayFrame
+                self.window.configure(image=displayFrame)
+                self.root.after(1,self.updateFrame)  
+                return
+
 
             if(results.multi_hand_landmarks):
               
@@ -65,7 +80,7 @@ class GestureVision:
                     gThread.start()
                     self.runProcessing += 1
                     
-                elif(self.runProcessing < 3):
+                elif(self.runProcessing < 2):
                     self.runProcessing += 1
                     
                 else:
@@ -111,6 +126,8 @@ class GestureVision:
             return
         
       
+    def setActive(self):
+        self.activated = True
 
     def setEditor(self,editor):
         self.editor = editor
@@ -168,6 +185,7 @@ class GestureVision:
             if(self.cropMode == False):
                 self.editor.undo()
                 self.recognizer.clear_Buffer()
+                self.prevEdit = "undo"
             else:
                 print("EXITING")
                 self.cropMode = False
