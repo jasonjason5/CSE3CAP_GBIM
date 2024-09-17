@@ -28,6 +28,7 @@ class editFunctions:
         self.historyDoAdd = ["crop","rotate","brightness","contrast","resize"]
         self.imageHistory = []
         self.imageHistory.insert(0,self.image)
+        self.canRedo = False
 
     def _get_landmark(self, results, index):
         if results.multi_hand_landmarks:
@@ -142,11 +143,14 @@ class editFunctions:
     def save_file(self):
         self.image.save("SavedImage.png")
 
+
+    ## Undo and redo usurp set_start as a function, and perform the resetting of variables by themselves to ensure continuity
+
     def undo(self): ## This could definitely be expanded out to 2-step/ 3-step undo but its fine as is right now.
         if(len(self.imageHistory) > 1):
             self.start_results = None
-            self.image = self.imageHistory[1]
-            tkUndo = ImageTk.PhotoImage(self.imageHistory[1])
+            self.image = self.imageHistory[0]
+            tkUndo = ImageTk.PhotoImage(self.imageHistory[0])
 
 
             self.start_width = self.image.width
@@ -159,14 +163,41 @@ class editFunctions:
 
             self.rotation_start_time = None
             self.is_locked = False
+            
+            self.canRedo = True ## I have undone. I can now redo to a undo an undo.
         
+    def redo(self):
+        if(self.canRedo == True):
+
+            print("REDOING")
+            self.start_results = None
+            self.image = self.imageHistory[1]
+            tkRedo = ImageTk.PhotoImage(self.imageHistory[1])
+
+
+            self.start_width = self.image.width
+            self.start_height = self.image.height
+            self.start_pos = self.canvas.coords(self.canvas_image)
+            self.start_rot = 0
+            
+            self.canvas.itemconfig(self.canvas_image,image=tkRedo)
+            self.canvas.imgref = tkRedo
+
+            self.rotation_start_time = None
+            self.is_locked = False
+            
+            self.canRedo = False
+            
+
     def set_start(self,edit):
-        print(self.imageHistory)
+        print("You made it into setstart")
         if(edit in self.historyDoAdd):
             if(len(self.imageHistory) == 2):
                 self.imageHistory.pop(0)
-            self.imageHistory.insert(1,self.image)
+            self.imageHistory.insert(1,self.update_image)
            
+        print(self.imageHistory)
+        #print(self.redo)
         #print(self.imageHistory)
 
         self.start_results = None  # Resetting start position of gesture coordinates

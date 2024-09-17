@@ -90,7 +90,6 @@ class GestureVision:
                 MPRecognition.gesture = "none"
 
 
-
             if(self.cropMode == False): ## Crop mode indicator
                 self.affirmation.configure(text = MPRecognition.gesture)
             else:
@@ -100,10 +99,7 @@ class GestureVision:
             if(self.history):
                 #sprint(self.prevEdit)
                 if(self.history.check_top().cget("text") != self.prevEdit and MPRecognition.gesture in self.historyDoAdd): ## adds the appropriate gestures to the history
-                    self.history.add_item(item = MPRecognition.gesture)
-                
-
-
+                    self.history.add_item(item = MPRecognition.gesture)              
 
             self.callFunction(MPRecognition.gesture,results)
             
@@ -125,7 +121,7 @@ class GestureVision:
         else:
             return
         
-      
+     
     def setActive(self):
         self.activated = True
 
@@ -135,7 +131,6 @@ class GestureVision:
     def setHistory(self,history):
         self.history = history
         
-
     def drawLandmarks(self): ## Draws hand landmarks. Good debugging tool but unnecessary to do all the time. Could add as boolean option
         return
     
@@ -161,7 +156,6 @@ class GestureVision:
                 self.cropMode = False
                 self.prevEdit = "cropexit"
 
-
 # There's definitely a more elegant way to handle dropping out of crop mode other than checking it each time, but for now this will suffice.
 
         elif(gesture == "rotate"):
@@ -179,8 +173,7 @@ class GestureVision:
             else:
                 print("EXITING")
                 self.cropMode = False
-            
-            
+                        
         elif(gesture == "undo"):
             if(self.cropMode == False):
                 self.editor.undo()
@@ -190,8 +183,14 @@ class GestureVision:
                 print("EXITING")
                 self.cropMode = False
             
-            
-            
+        elif(gesture == "redo"):
+            if(self.cropMode == False):
+                self.editor.redo()
+                self.recognizer.clear_Buffer()
+                self.prevEdit = "redo"
+            else:
+                print("EXITING")
+                self.cropMode = False
             
         elif(gesture == "open file" and self.opened == False): # This can be done here as opposed to functions in order to avoid unnecessary passing of info
             self.opened == True
@@ -203,31 +202,17 @@ class GestureVision:
             self.recognizer.clear_Buffer()
             self.editor.save_file()
            
-
-
         elif(gesture == "help"): # Ditto as above
             MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
             self.recognizer.clear_Buffer()
             self.root.open_help(self.prevEdit)
             
             
-        elif(self.prevEdit != "none" and self.prevEdit != "undo"):
+        elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):
             self.editor.set_start(self.prevEdit)
             if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"
             
-    
-
-
-
-
-
-
-
-
-
-
-
 
    # def start_timer(self): ## Method to count how long a loop takes to run
      #   self.start_time = time.time()

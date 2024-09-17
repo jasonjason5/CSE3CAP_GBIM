@@ -152,11 +152,11 @@ class ActionHistory(CTk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.grid_columnconfigure(0, weight=1)    
-        self.label_list = deque(maxlen = 2) ## Limiting to 5 History
+        self.label_list = deque(maxlen = 3) ## Limiting to 5 History
         self.colourCounter = 0
             
     def pop_item(self):
-        self.label_list[1].destroy()
+        self.label_list[2].destroy()
         self.label_list.pop()
         for label in self.label_list: # Shuffles everything back to allow for push to Queue
             gridRow = label.grid_info()['row']
@@ -165,18 +165,18 @@ class ActionHistory(CTk.CTkScrollableFrame):
         return
 
     def add_item(self, item, image=None):
-        if(self.colourCounter > 0):
+        if(self.colourCounter > 0): # Makes nice alternating colours
             bgColour = Style.popupBackground
             self.colourCounter = 0
         else:
             bgColour = Style.workspaceBackground
             self.colourCounter += 1
 
-        if(len(self.label_list) == 2):
+        if(len(self.label_list) == 3):
             self.pop_item()
 
         label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
-        label.grid(row= 2 - len(self.label_list), column=0, pady=(0, 10), sticky="w") # 5 - len ensures we're adding it to the start
+        label.grid(row= 3 - len(self.label_list), column=0, pady=(0, 10), sticky="w") # 5 - len ensures we're adding it to the start
         self.label_list.appendleft(label) # from a list to FIFO
             
     def check_top(self): #Returns topmost element
