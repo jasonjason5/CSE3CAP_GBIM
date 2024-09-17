@@ -225,7 +225,7 @@ class App(CTk.CTk):
         self.uiDetectedGestureText = CTk.CTkLabel(master=self.uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 50, font=uiFont)
         self.uiDetectedGestureText.grid(column=0, row=0)
         # Removed detected gesture string, frameloop now operates directly on this widget. Fixed widget height / width to avoid changes when text updates
-        self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, height = 30, width=200, fg_color=Style.gestures,text_color=Style.blackText,text="Gesture",corner_radius= 50, font=uiFont)
+        self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, height = 30, width=200, fg_color=Style.gestures,text_color=Style.blackText,text="Help",corner_radius= 50, font=uiFont)
         self.uiDetectedGesture.grid(column=1, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
@@ -292,8 +292,7 @@ class App(CTk.CTk):
 
         self.uiHelpOrLbl = CTk.CTkLabel(master=self.uiHelpFrame, bg_color= "transparent",text = "")
         self.uiHelpOrLbl.grid(column=0, row=1 ,padx=5, pady=5)
-
-        self.uiHelpBtn = CTk.CTkButton(master=self.uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(self.detectedGestureString.get()))
+        self.uiHelpBtn = CTk.CTkButton(master=self.uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(self.uiDetectedGesture.cget("text")))
         self.uiHelpBtn.grid(column=0, row=2)
 
         # Help UI #
@@ -413,15 +412,6 @@ class App(CTk.CTk):
 
 
 
-
-
-
-
-
-
-
-
-
     def handle_resize(self,event): ## This is showing an error since the reshuffle, potentially to do with passing in self
         # Your code to adjust canvas size goes here
             print(f"Canvas (uiRenderFrame) resized: {event.width}x{event.height}")  
@@ -434,17 +424,13 @@ class App(CTk.CTk):
         if affirmation == "none":
             affirmation = "help"          
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():      
-            self.toplevel_window = HelpWindow(self)  # create window if its None or destroyed
-            self.toplevel_window.set_help_text( gesture= affirmation)
-            self.toplevel_window.set_help_image( gesture= affirmation)
-            affirmation = affirmation + ": Help"
-            self.toplevel_window.set_title(title = affirmation)          
+            self.toplevel_window = HelpWindow(self)  # create window if its None or destroyed         
         else:
             self.toplevel_window.focus()  # if window exists focus it
-            self.toplevel_window.set_help_text( gesture= affirmation)
-            self.toplevel_window.set_help_image( gesture= affirmation)
-            affirmation = affirmation + ": Help"
-            self.toplevel_window.set_title(title= affirmation) 
+        self.toplevel_window.set_help_text( gesture= affirmation)
+        self.toplevel_window.set_help_image( gesture= affirmation)
+        affirmation = affirmation + ": Help"
+        self.toplevel_window.set_title(title= affirmation)     
                  
     
     def set_help_title(self, affirmation):
