@@ -253,7 +253,7 @@ class App(CTk.CTk):
         self.uiMasterFrame.columnconfigure(0, weight = 3)
         self.uiMasterFrame.columnconfigure(1, weight = 3)
         self.uiMasterFrame.columnconfigure(2, weight = 3)
-        self.uiMasterFrame.columnconfigure(3, weight = 1, minsize= 320)
+        self.uiMasterFrame.columnconfigure(3, minsize= 320)
         self.uiMasterFrame.rowconfigure(0, weight = 1)
         self.uiMasterFrame.rowconfigure(1, weight = 1)
 
@@ -267,8 +267,8 @@ class App(CTk.CTk):
         self.uiDetectedGesture.grid(column=1, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
-        self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder) 
-        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W, ipadx=20, ipady=20)
+        self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder,corner_radius=0) 
+        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W + CTk.S, ipadx=10, ipady=10)
        
 
 
@@ -310,13 +310,13 @@ class App(CTk.CTk):
 
         # Action history Gui
 
-        self.uiActionHistory = ActionHistory(master=self.uiMenuFrame, height=160,label_text="Action History", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
+        self.uiActionHistory = ActionHistory(master=self.uiMenuFrame, height=150,label_text="Action History", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
         
         # add test item to the Action history
         self.uiActionHistory.add_item(item = "openfile")
 
         # Function list
-        self.uiFunctionList = FunctionList( master=self.uiMenuFrame, height= 150, label_text="Gesture List", orientation= "horizontal", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
+        self.uiFunctionList = FunctionList( master=self.uiMenuFrame, height= 140, label_text="Gesture List", orientation= "horizontal", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
 
 
         gestures = Gesture.return_enums(Gesture)
@@ -340,10 +340,10 @@ class App(CTk.CTk):
         # Help UI #
 
         ## Camera UI ##
-        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder, height=240, width=320)
-        self.uiDeviceCameraFrame.grid(column=3, row=1)
+        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder, height=240, width=320,corner_radius=0)
+        self.uiDeviceCameraFrame.grid(column=3, row=0, rowspan= 2, sticky= CTk.S)
         self.uiDeviceCamera = CTk.CTkLabel(master=self.uiDeviceCameraFrame ,bg_color= Style.workspaceBackground, text="")
-        self.uiDeviceCamera.pack(side=CTk.RIGHT, expand=False, pady = 10, padx = 10)
+        self.uiDeviceCamera.pack(side=CTk.RIGHT, expand=False, pady = 5, padx = 5)
 
         #Hide frames
         self.uiMasterFrame.grid_forget()
