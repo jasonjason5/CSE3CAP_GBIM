@@ -250,10 +250,10 @@ class App(CTk.CTk):
         # frame that holds all of the bottom of the UI
         self.uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
         self.uiMasterFrame.grid(column=0, columnspan= 3,row=1 ,sticky=CTk.EW + CTk.S)
-        self.uiMasterFrame.columnconfigure(0, weight = 1)
-        self.uiMasterFrame.columnconfigure(1, weight = 1)
-        self.uiMasterFrame.columnconfigure(2, weight = 1)
-        self.uiMasterFrame.columnconfigure(3, weight = 1)
+        self.uiMasterFrame.columnconfigure(0, weight = 3)
+        self.uiMasterFrame.columnconfigure(1, weight = 3)
+        self.uiMasterFrame.columnconfigure(2, weight = 3)
+        self.uiMasterFrame.columnconfigure(3, weight = 1, minsize= 320)
         self.uiMasterFrame.rowconfigure(0, weight = 1)
         self.uiMasterFrame.rowconfigure(1, weight = 1)
 
@@ -268,7 +268,7 @@ class App(CTk.CTk):
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
         self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder) 
-        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W, ipadx=10, ipady=10)
+        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W, ipadx=20, ipady=20)
        
 
 
@@ -291,7 +291,7 @@ class App(CTk.CTk):
         ## Pre import UI ##
 
         self.uiPreimportFrame = CTk.CTkFrame(master=self.uiMenuFrame, fg_color="transparent",bg_color="transparent")
-        self.uiPreimportFrame.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
+        self.uiPreimportFrame.pack(side=CTk.LEFT, expand=False, pady = 10, padx = 10)
 
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,image_path='Ui_Images\OpenUI.gif',gif_width=150,gif_height= 150,is_Help=False ,bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
@@ -340,7 +340,7 @@ class App(CTk.CTk):
         # Help UI #
 
         ## Camera UI ##
-        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder)
+        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder, height=240, width=320)
         self.uiDeviceCameraFrame.grid(column=3, row=1)
         self.uiDeviceCamera = CTk.CTkLabel(master=self.uiDeviceCameraFrame ,bg_color= Style.workspaceBackground, text="")
         self.uiDeviceCamera.pack(side=CTk.RIGHT, expand=False, pady = 10, padx = 10)
@@ -406,7 +406,7 @@ class App(CTk.CTk):
             # show the new menu items
             self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
             self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
-            self.uiFunctionList.pack(side=CTk.BOTTOM, expand=False , pady = 10, padx = 10)
+            self.uiFunctionList.pack( expand=True,pady = 10, padx = 10)
 
 
             ## Creates Function objects
