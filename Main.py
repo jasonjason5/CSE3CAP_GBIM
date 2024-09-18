@@ -67,7 +67,9 @@ class HelpWindow(CTk.CTkToplevel):
 
     # This function sets the title of the help window
     def set_title(self, title):
-        self.title(title)
+        enumGesture = Gesture.string_to_enum(title).value
+        message = enumGesture + ": Help"
+        self.title(message)
 
     # This function sets the help text for the specified gesture
     def set_help_text(self,gesture):
@@ -289,7 +291,7 @@ class App(CTk.CTk):
         self.uiActionHistory.grid(row=0, column=0, padx=5, pady=5)
         
         # add test item to the Action history
-        self.uiActionHistory.add_item(item = "open")
+        self.uiActionHistory.add_item(item = "openfile")
 
         # Function list
 
@@ -305,7 +307,6 @@ class App(CTk.CTk):
 
         self.uiHelpOrLbl = ImageLabel(master=self.uiHelpFrame,image_path='Ui_Images\HelpOr.jpg',image_size=(50,20), bg_color= "transparent",text = "")
         self.uiHelpOrLbl.grid(column=0, row=1 ,padx=5, pady=5)
-        #ImageLoader(self.uiHelpOrLbl,'Ui_Images\HelpOr.jpg',(50,20))
         
         self.uiHelpBtn = CTk.CTkButton(master=self.uiHelpFrame ,fg_color=Style.gestures,text_color=Style.blackText,text="Help", font=uiFont, corner_radius=20, width= 60, height= 30, command=lambda:self.open_help(self.uiActionHistory.get_last_gesture_text()))
         self.uiHelpBtn.grid(column=0, row=2)
@@ -317,7 +318,6 @@ class App(CTk.CTk):
         self.uiDeviceCameraFrame.grid(column=3, row=0, rowspan= 2)
         self.uiDeviceCamera = CTk.CTkLabel(master=self.uiDeviceCameraFrame ,bg_color= Style.workspaceBackground, text="")
         self.uiDeviceCamera.grid(column=0, row=0)
-        #uiDeviceCamera.place(relx=1.0,rely=1.0,x=0,y=0,anchor='se')
 
         #Hide frames
         self.uiMasterFrame.grid_forget()
@@ -442,7 +442,6 @@ class App(CTk.CTk):
         print("affirmation = " + affirmation)
         self.toplevel_window.set_help_text( gesture= affirmation)
         self.toplevel_window.set_help_image( gesture= affirmation)
-        affirmation = affirmation + ": Help"
         self.toplevel_window.set_title(title= affirmation)     
                  
     
