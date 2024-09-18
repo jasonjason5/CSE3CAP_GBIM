@@ -51,11 +51,21 @@ class Gesture(Enum):
                     Gesture.HELP: "Resources\Help.gif"
             }
             return gestureImage[cls]
+        def return_enums(cls):
+            enums = []
+            for member in cls:  
+                enums.append(member)
+            return enums
+        
         def string_to_enum(string):
             string = string.replace(" ", "")
             string = string.upper()
             return Gesture.__members__.get(string)
 
+
+#list = Gesture.return_enums(Gesture)
+#print (list)
+#print (list[0])
 #print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
 
 #print(Gesture.string_to_enum("Help"))

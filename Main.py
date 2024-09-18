@@ -6,6 +6,7 @@ import FrameLoop
 import Functions
 import os
 import Style
+import time
 from Gestures import Gesture
 import customtkinter as CTk
 import tkinter as tk
@@ -67,8 +68,11 @@ class HelpWindow(CTk.CTkToplevel):
 
     # This function sets the title of the help window
     def set_title(self, title):
+        # Get the Gesture Enum object from the string value, and return the value of the gesture
         enumGesture = Gesture.string_to_enum(title).value
+        # Append help at the end of the string
         message = enumGesture + ": Help"
+        # set the title of the help window
         self.title(message)
 
     # This function sets the help text for the specified gesture
@@ -158,8 +162,7 @@ class ImageLabel(CTk.CTkLabel):
 
 class ActionHistory(CTk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-        self.grid_columnconfigure(0, weight=1)    
+        super().__init__(master, **kwargs) 
         self.label_list = deque(maxlen = 3) ## Limiting to 5 History
         self.last_gesture = "none"
         self.colourCounter = 0
@@ -195,7 +198,26 @@ class ActionHistory(CTk.CTkScrollableFrame):
     def get_last_gesture_text(self):
         return self.last_gesture
 
-        
+class FunctionList(CTk.CTkScrollableFrame):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)  
+        self.label_list = []
+        self.width = 0
+        self.start_time = None
+        self.end_time = None
+
+    def add_item(self, gesture):
+        gif = Gesture.gesture_image(gesture)
+        text = Gesture(gesture).value
+        label = GIFLabel(master=self,image_path=gif,gif_width=100,gif_height=100,is_Help=False ,bg_color="transparent", text = text)
+       # label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
+        label.grid(row=0 ,column=len(self.label_list), padx=(10, 10), sticky="n")
+        self.label_list.append(label) # from a list to FIFO
+        self.width += 120
+        self.configure(width = self.width)
+        #self.grid_columnconfigure(0, weight=1)
+        #self.pack_configure(side=CTk.LEFT, expand=True)
+             
     
 # Main App Class         
 class App(CTk.CTk):
@@ -228,12 +250,12 @@ class App(CTk.CTk):
         # frame that holds all of the bottom of the UI
         self.uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
         self.uiMasterFrame.grid(column=0, columnspan= 3,row=1 ,sticky=CTk.EW + CTk.S)
-        self.uiMasterFrame.columnconfigure(0, weight = 4)
-        self.uiMasterFrame.columnconfigure(1, weight = 4)
-        self.uiMasterFrame.columnconfigure(2, weight = 4)
+        self.uiMasterFrame.columnconfigure(0, weight = 1)
+        self.uiMasterFrame.columnconfigure(1, weight = 1)
+        self.uiMasterFrame.columnconfigure(2, weight = 1)
         self.uiMasterFrame.columnconfigure(3, weight = 1)
         self.uiMasterFrame.rowconfigure(0, weight = 1)
-        self.uiMasterFrame.rowconfigure(1, weight = 2)
+        self.uiMasterFrame.rowconfigure(1, weight = 1)
 
         # Detected gesture UI
         self.uiDetectedGestureFrame =CTk.CTkFrame(master=self.uiMasterFrame)
@@ -246,7 +268,8 @@ class App(CTk.CTk):
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
         self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder) 
-        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W, ipadx=30, ipady=30)
+        self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W, ipadx=10, ipady=10)
+       
 
 
         ## Static UI ##
@@ -268,7 +291,7 @@ class App(CTk.CTk):
         ## Pre import UI ##
 
         self.uiPreimportFrame = CTk.CTkFrame(master=self.uiMenuFrame, fg_color="transparent",bg_color="transparent")
-        self.uiPreimportFrame.pack(side=CTk.LEFT, expand=False)
+        self.uiPreimportFrame.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
 
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,image_path='Ui_Images\OpenUI.gif',gif_width=150,gif_height= 150,is_Help=False ,bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
@@ -279,28 +302,31 @@ class App(CTk.CTk):
         self.uiPreimportOpenOrLbl = ImageLabel(master=self.uiPreimportFrame,image_path='Ui_Images\Or.jpg',image_size=(60,100), bg_color= "transparent",text = "")
         self.uiPreimportOpenOrLbl.grid(column=2, row=0,padx=20, pady=20)
 
+        self.uiPreimportOpenFileBtn = CTk.CTkButton(master=self.uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=self.open_image,corner_radius=20, width= 60, height= 30)
+        self.uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
+
 
         ## Pre import UI ##
 
         # Action history Gui
 
-        self.uiHistoryFrame = CTk.CTkFrame(master=self.uiMenuFrame, fg_color=Style.popupBackground, width=100, height=100)
-        self.uiHistoryFrame.pack(side=CTk.LEFT, expand=False)
-
-        self.uiActionHistory = ActionHistory(master=self.uiHistoryFrame, width=200, height=5,label_text="Action History", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
-        self.uiActionHistory.grid(row=0, column=0, padx=5, pady=5)
+        self.uiActionHistory = ActionHistory(master=self.uiMenuFrame, height=160,label_text="Action History", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
         
         # add test item to the Action history
         self.uiActionHistory.add_item(item = "openfile")
 
         # Function list
+        self.uiFunctionList = FunctionList( master=self.uiMenuFrame, height= 150, label_text="Gesture List", orientation= "horizontal", corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
 
-        # uiFunctionFrame = CTk.CTk
 
+        gestures = Gesture.return_enums(Gesture)
+        print(gestures)
+        for gesture in gestures:
+            self.uiFunctionList.add_item(gesture = gesture)
 
         ## Help UI #
         self.uiHelpFrame = CTk.CTkFrame(master=self.uiMenuFrame, fg_color="transparent")
-        self.uiHelpFrame.pack(side=CTk.RIGHT, expand=False,)
+        self.uiHelpFrame.pack(side=CTk.RIGHT, expand=False, pady = 10, padx = 10)
 
         self.uiHelpLbl = GIFLabel(master=self.uiHelpFrame,image_path='Ui_Images\HelpUI.gif' ,gif_width=100,gif_height= 100, is_Help=False ,bg_color="transparent", text = "")
         self.uiHelpLbl.grid(column=0, row=0, padx=5, pady=5)
@@ -314,20 +340,18 @@ class App(CTk.CTk):
         # Help UI #
 
         ## Camera UI ##
-        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground)
-        self.uiDeviceCameraFrame.grid(column=3, row=0, rowspan= 2)
+        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder)
+        self.uiDeviceCameraFrame.grid(column=3, row=1)
         self.uiDeviceCamera = CTk.CTkLabel(master=self.uiDeviceCameraFrame ,bg_color= Style.workspaceBackground, text="")
-        self.uiDeviceCamera.grid(column=0, row=0)
+        self.uiDeviceCamera.pack(side=CTk.RIGHT, expand=False, pady = 10, padx = 10)
 
         #Hide frames
         self.uiMasterFrame.grid_forget()
-  
         self.uiDetectedGestureFrame.grid_forget()
-        self.uiHistoryFrame.pack_forget()  
-        
-        self.uiPreimportOpenFileBtn = CTk.CTkButton(master=self.uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=self.open_image,corner_radius=20, width= 60, height= 30)
-        self.uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
 
+
+
+        #start loop
         self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
  
 
@@ -371,17 +395,19 @@ class App(CTk.CTk):
             self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= Style.workspaceBackground, bd=0,highlightthickness=0) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
             self.uiRenderFrame.delete("all")
             self.uiRenderFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-            self.uiRenderFrame.bind("<Configure>", self.handle_resize)
+            #self.uiRenderFrame.bind("<Configure>", self.handle_resize)
             ### Changing this for later
             
             editingImage = self.uiRenderFrame.create_image(canvas_width/2,canvas_height/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
             self.uiRenderFrame.imgref = img_tk
                 
-            #uiRenderFrame.grid(column=1, row=0, columnspan= 3, sticky=tk.W)
-            #show detected gesture
+            # remove the preimport menu
             self.uiPreimportFrame.pack_forget()
+            # show the new menu items
             self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
-            self.uiHistoryFrame.pack(side=CTk.LEFT, expand=False)
+            self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
+            self.uiFunctionList.pack(side=CTk.BOTTOM, expand=False , pady = 10, padx = 10)
+
 
             ## Creates Function objects
             editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame)
