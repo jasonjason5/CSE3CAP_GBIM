@@ -98,8 +98,10 @@ class GestureVision:
 
             if(self.history):
                 #sprint(self.prevEdit)
-                if(self.history.check_top().cget("text") != self.prevEdit and MPRecognition.gesture in self.historyDoAdd): ## adds the appropriate gestures to the history
-                    self.history.add_item(item = MPRecognition.gesture)              
+                historyTop = self.history.check_top().cget("text")
+                if(historyTop != self.prevEdit and MPRecognition.gesture in self.historyDoAdd and self.cropMode == False): ## adds the appropriate gestures to the history
+                    if(self.prevEdit != "cropenter" and self.prevEdit != "cropexit"):
+                        self.history.add_item(item = MPRecognition.gesture)              
 
             self.callFunction(MPRecognition.gesture,results)
             
@@ -111,6 +113,7 @@ class GestureVision:
             self.window.image = displayFrame
             self.window.configure(image=displayFrame)
             self.root.after(1,self.updateFrame)  
+            #print(self.cropMode)
             
             # if after set to 1 takes about  0.07 seconds to loop - UI Choppy
             # if after set to 100 takes about 0.1 seconds to loop - UI much more reponsive
@@ -134,6 +137,11 @@ class GestureVision:
     def drawLandmarks(self): ## Draws hand landmarks. Good debugging tool but unnecessary to do all the time. Could add as boolean option
         return
     
+    def exitCrop(self):
+        print("EXITING")
+        self.cropMode = False
+        self.editor.destroyCropBounds(True)
+
     def callFunction(self,gesture,results): ## This method will be called to check which function to call based on the contents of the buffer
         
         if(gesture == "resize"):
@@ -149,12 +157,14 @@ class GestureVision:
             
             if(self.cropMode == False and self.prevEdit != "cropexit"): #If you didnt just exit crop
                 self.cropMode = True
+                self.editor.createCropBounds()
                 self.prevEdit = "cropenter"
             
             elif(self.cropMode == True and self.prevEdit != "cropenter"): # You were in crop mode but you didnt just literally enter into it. Will need to change how this behaves when gestures other than resize are given
                 print("EXITING")
-                self.cropMode = False
                 self.prevEdit = "cropexit"
+                self.editor.destroyCropBounds(False)
+                self.cropMode = False
 
 # There's definitely a more elegant way to handle dropping out of crop mode other than checking it each time, but for now this will suffice.
 
@@ -163,16 +173,14 @@ class GestureVision:
                 self.editor.rotate(results)
                 self.prevEdit = "rotate"
             else:
-                print("EXITING")
-                self.cropMode = False
+                self.exitCrop()
         
         elif(gesture == "translate"):
             if(self.cropMode == False):
                 self.editor.translate(results)
                 self.prevEdit = "translate"
             else:
-                print("EXITING")
-                self.cropMode = False
+                self.exitCrop()
                         
         elif(gesture == "undo"):
             if(self.cropMode == False):
@@ -180,8 +188,7 @@ class GestureVision:
                 self.recognizer.clear_Buffer()
                 self.prevEdit = "undo"
             else:
-                print("EXITING")
-                self.cropMode = False
+                self.exitCrop()
             
         elif(gesture == "redo"):
             if(self.cropMode == False):
@@ -189,8 +196,7 @@ class GestureVision:
                 self.recognizer.clear_Buffer()
                 self.prevEdit = "redo"
             else:
-                print("EXITING")
-                self.cropMode = False
+                self.exitCrop()
             
         elif(gesture == "open file" and self.opened == False): # This can be done here as opposed to functions in order to avoid unnecessary passing of info
             self.opened == True

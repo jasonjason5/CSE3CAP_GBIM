@@ -1,8 +1,10 @@
 from re import T
-from PIL import ImageTk, Image
+from turtle import update
+from PIL import ImageTk, Image, ImageOps
 import math
 import numpy as np
 import time
+
 
 
 class editFunctions:
@@ -21,11 +23,19 @@ class editFunctions:
         self.update_height = self.start_height
         self.update_rot = self.start_rot
         self.start_results = None
-        self.rotation_start_time = None
-        self.is_locked = False
-        
 
-        self.historyDoAdd = ["crop","rotate","brightness","contrast","resize"]
+        self.cropImage = None
+        self.cropOverlay = None
+        self.cropBounds = None
+        
+        self.cropDim = [0,0]
+
+        self.cropBox_Sheight = None
+        self.cropBox_Swidth = None
+        self.cropBox_Uheight = None
+        self.cropBox_Uwidth = None
+
+        self.historyDoAdd = ["cropexit","rotate","brightness","contrast","resize"]
         self.imageHistory = []
         self.imageHistory.insert(0,self.image)
         self.canRedo = False
@@ -36,8 +46,6 @@ class editFunctions:
         return None
 
     def resize(self, results):
-        if self.is_locked:
-            return
 
         if self.start_results is None:
             self.start_results = results
@@ -68,9 +76,6 @@ class editFunctions:
             self.canvas.imgref = resized_out
 
     def translate(self, results):
-        if self.is_locked:
-            return
-
         if not self.start_results:
             self.start_results = results
 
@@ -78,8 +83,8 @@ class editFunctions:
         cWidth = self.canvas.winfo_reqwidth()
         cHeight = self.canvas.winfo_reqheight()
 
-        print(cWidth)
-        print(cHeight)
+        #print(cWidth)
+        #print(cHeight)
         
 
         if current_point:
@@ -91,9 +96,6 @@ class editFunctions:
         return array[snapped]
 
     def rotate(self, results):
-        print(self.start_rot,self.update_rot)
-        if self.is_locked:
-            return
 
         if self.start_results is None:
             self.start_results = results
@@ -103,6 +105,7 @@ class editFunctions:
         pivot_point = self._get_landmark(results, 8)
 
         if start_point and current_point and pivot_point:
+                
             rot_vec = np.subtract([current_point.x, current_point.y], [pivot_point.x, pivot_point.y])
             rotation = math.atan2(rot_vec[1], rot_vec[0])
 
@@ -122,16 +125,87 @@ class editFunctions:
             
             self.canvas.itemconfig(self.canvas_image, image=rotated_out)
             self.canvas.imgref = rotated_out
-            
-            # Check if the landmark has been held for 5 seconds
-            if self.rotation_start_time is not None and time.time() - self.rotation_start_time >= 5:
-                self.is_locked = True
-            elif self.rotation_start_time is None:
-                self.rotation_start_time = time.time() 
 
+
+    def createCropBounds(self):
+        self.cropImage = Image.new(mode="RGBA", color=(153,153,153,127),size=(math.floor(self.start_width / 2),math.floor(self.start_height / 2) ))
+        self.cropOverlay = ImageTk.PhotoImage(self.cropImage)
+        currentImagePos = self.canvas.coords(self.canvas_image)
+        self.cropBounds = self.canvas.create_image(currentImagePos[0],currentImagePos[1],image = self.cropOverlay) #Creates a new image on the canvas
+        
+        sWidth, sHeight = self.cropImage.size
+
+        self.cropBox_Swidth = sWidth
+        self.cropBox_Sheight = sHeight
+        
+
+    def applyCrop(self):
+        LRDim = self.cropDim[0]
+        TBDim = self.cropDim[1]
+
+        LRCrop = math.floor((self.start_width - LRDim) / 2)
+        TBCrop = math.floor((self.start_height - TBDim) / 2)
+        
+        if(LRCrop < 1 or TBCrop < 1):#I.E The crop box is bigger than the image
+            print("POTENTIAL CROP IS LARGER THAN IMAGE")
+            return
+           
+           
+        crop = (LRCrop,TBCrop,LRCrop,TBCrop)
+        update_image = ImageOps.crop(self.image,crop)
+        update_width,update_height = update_image.size
+           
+        self.update_image = update_image
+        self.update_height = update_height
+        self.update_width = update_width
+
+
+        canvasOut = ImageTk.PhotoImage(update_image)
+        self.canvas.itemconfig(self.canvas_image,image=canvasOut)
+        self.canvas.imgref = canvasOut
+           
+    def destroyCropBounds(self,exit):
+        if(self.cropBounds):
+            if not exit:
+                self.applyCrop()
+            self.canvas.delete(self.cropBounds)
+            self.cropOverlay = None
+            self.cropImage = None
+            self.canvas.image = self.image
+
+  
     def crop(self, results):
-        print("cropping")
-        return
+        
+        if self.start_results is None:
+            self.start_results = results
+
+        start_point = self._get_landmark(self.start_results, 8)
+        current_point = self._get_landmark(results, 8)
+
+        if start_point and current_point:
+
+            distance = math.sqrt((start_point.x - current_point.x) ** 2 + (start_point.y - current_point.y) ** 2)
+            scaler = distance + 1
+
+            if (current_point.x < start_point.x and current_point.y < start_point.y) or \
+               (current_point.x < start_point.x and current_point.y > start_point.y):
+                scaler = 1 / scaler
+
+            resize_width = self.cropBox_Swidth * scaler
+            resize_height = self.cropBox_Sheight * scaler
+
+            self.cropBox_Uwidth = resize_width
+            self.cropBox_Uheight = resize_height
+
+            resized_image = self.cropImage.resize((math.floor(resize_width), math.floor(resize_height)), Image.Resampling.LANCZOS)
+            resized_out = ImageTk.PhotoImage(resized_image)
+            
+            self.cropDim[0] = resized_image.width
+            self.cropDim[1] = resized_image.height
+       
+
+            self.canvas.itemconfig(self.cropBounds, image=resized_out)
+            self.canvas.image = resized_out # Sure this works. Don't know why, don't know how but whatever right
 
     def pen(self,results):
         return
@@ -142,7 +216,6 @@ class editFunctions:
     
     def save_file(self):
         self.image.save("SavedImage.png")
-
 
     ## Undo and redo usurp set_start as a function, and perform the resetting of variables by themselves to ensure continuity
 
@@ -161,19 +234,14 @@ class editFunctions:
             self.canvas.itemconfig(self.canvas_image,image=tkUndo)
             self.canvas.imgref = tkUndo
 
-            self.rotation_start_time = None
-            self.is_locked = False
-            
             self.canRedo = True ## I have undone. I can now redo to a undo an undo.
         
     def redo(self):
         if(self.canRedo == True):
 
-            print("REDOING")
             self.start_results = None
             self.image = self.imageHistory[1]
             tkRedo = ImageTk.PhotoImage(self.imageHistory[1])
-
 
             self.start_width = self.image.width
             self.start_height = self.image.height
@@ -182,24 +250,17 @@ class editFunctions:
             
             self.canvas.itemconfig(self.canvas_image,image=tkRedo)
             self.canvas.imgref = tkRedo
-
-            self.rotation_start_time = None
-            self.is_locked = False
             
             self.canRedo = False
             
 
     def set_start(self,edit):
-        print("You made it into setstart")
+
         if(edit in self.historyDoAdd):
             if(len(self.imageHistory) == 2):
                 self.imageHistory.pop(0)
             self.imageHistory.insert(1,self.update_image)
            
-        print(self.imageHistory)
-        #print(self.redo)
-        #print(self.imageHistory)
-
         self.start_results = None  # Resetting start position of gesture coordinates
        
         #Update Values
@@ -207,6 +268,5 @@ class editFunctions:
         self.start_width = self.update_width
         self.start_height = self.update_height
         self.start_rot = 0
+        self.isPadded = False
         
-        self.rotation_start_time = None  # Reset rotation start time
-        self.is_locked = False
