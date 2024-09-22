@@ -231,7 +231,7 @@ class App(CTk.CTk):
         #max_width = 1920
         #max_height = 1080
         self.toplevel_window = None
-        self.title("Gesture Based Image Manipulation")
+        self.title("Finger Print")
         self.geometry("1280x900")
         self.minsize(min_width, min_height)
         uiFont = CTk.CTkFont(family='Inter', size=24) 
@@ -279,7 +279,7 @@ class App(CTk.CTk):
         self.uiStartFrame = CTk.CTkFrame(master=self, height=100,width=500, fg_color=Style.popupBackground, border_color = Style.windowBorder)
         self.uiStartFrame.place(relx=0.5,rely=0.5,anchor='center')
 
-        self.uiStartWelcome = CTk.CTkLabel(master=self.uiStartFrame,fg_color=Style.popupBackground, text_color=Style.whiteText,text="Welcome to [Application Name]!", font=uiFont)
+        self.uiStartWelcome = CTk.CTkLabel(master=self.uiStartFrame,fg_color=Style.popupBackground, text_color=Style.whiteText,text="Welcome to Finger Print!", font=uiFont)
         self.uiStartWelcome.place(relx=0.5,rely=0.3,anchor='center')
 
         self.uiStartButton = CTk.CTkButton(master=self.uiStartFrame,text="Start Device Camera", fg_color=Style.gestures, text_color=Style.blackText, command = self.startCamera)
@@ -480,4 +480,3 @@ if __name__ == "__main__":
     app = App()
     app.mainloop()
     
-
