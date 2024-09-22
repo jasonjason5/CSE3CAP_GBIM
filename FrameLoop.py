@@ -24,6 +24,7 @@ class GestureVision:
         self.mpHands = mp.solutions.hands
         self.mpDrawing = mp.solutions.drawing_utils
         self.mpHandObject = self.mpHands.Hands()
+        self.cursor_control_active = False
         
         ##MPRecognition REFERENCES
         
