@@ -1,28 +1,39 @@
-from re import T
-from turtle import update
+from email.mime import image
 from PIL import ImageTk, Image, ImageOps
 import math
 import numpy as np
 import time
+from tkinter import messagebox
+from operator import add
 
 
 
 class editFunctions:
-    def __init__(self, image: ImageTk, canvas_image, canvas):
+    def __init__(self, image: ImageTk, canvas_image, canvas, positioner):
+       
+        ## Application Componentry References 
+
         self.image: Image = ImageTk.getimage(image)
         self.canvas = canvas
         self.canvas_image = canvas_image
+        self.positioner = positioner
 
+        ## Image properties References
+        
         self.start_width = self.image.width
         self.start_height = self.image.height
         self.start_pos = canvas.coords(self.canvas_image)
         self.start_rot = 0
 
-        self.update_image = self.image # We need to actually update the image reference with the modifications, otherwise the modifications will not reflect in the saved file that operates from this reference
+        self.update_image = self.image 
         self.update_width = self.start_width
         self.update_height = self.start_height
         self.update_rot = self.start_rot
         self.start_results = None
+
+        ## Crop Properties References
+
+        self.cropStage = "move"
 
         self.cropImage = None
         self.cropOverlay = None
@@ -34,6 +45,8 @@ class editFunctions:
         self.cropBox_Swidth = None
         self.cropBox_Uheight = None
         self.cropBox_Uwidth = None
+
+        ## History References
 
         self.historyDoAdd = ["cropexit","rotate","brightness","contrast","resize"]
         self.imageHistory = []
@@ -83,10 +96,7 @@ class editFunctions:
         cWidth = self.canvas.winfo_reqwidth()
         cHeight = self.canvas.winfo_reqheight()
 
-        #print(cWidth)
-        #print(cHeight)
-        
-
+        print(self.canvas.coords(self.canvas_image))
         if current_point:
             self.canvas.moveto(self.canvas_image, current_point.x * cWidth, current_point.y * cHeight) ## This will need to be adjusted based on canvas size. we need to pass canvas size into functiosn
 
@@ -130,35 +140,58 @@ class editFunctions:
     def createCropBounds(self):
         self.cropImage = Image.new(mode="RGBA", color=(153,153,153,127),size=(math.floor(self.start_width / 2),math.floor(self.start_height / 2) ))
         self.cropOverlay = ImageTk.PhotoImage(self.cropImage)
-        currentImagePos = self.canvas.coords(self.canvas_image)
-        self.cropBounds = self.canvas.create_image(currentImagePos[0],currentImagePos[1],image = self.cropOverlay) #Creates a new image on the canvas
+
+        canvasCentre = (int(self.canvas.winfo_width()/2),int(self.canvas.winfo_height()/2) - 150) # Hardcoded value to get the crop box overlay roughly in centre
+
+        self.cropBounds = self.canvas.create_image(canvasCentre[0],canvasCentre[1], image = self.cropOverlay, anchor="center") #Creates a new image on the canvas
         
         sWidth, sHeight = self.cropImage.size
 
         self.cropBox_Swidth = sWidth
         self.cropBox_Sheight = sHeight
+        self.cropDim[0] = sWidth
+        self.cropDim[1] = sHeight
+
+        self.cropStage == "scale"
         
 
     def applyCrop(self):
-        LRDim = self.cropDim[0]
-        TBDim = self.cropDim[1]
 
-        LRCrop = math.floor((self.start_width - LRDim) / 2)
-        TBCrop = math.floor((self.start_height - TBDim) / 2)
+        ## All the coordinates need to be adjusted by the image dimensions due to the center anchor placement of the canvas objects    
+
+        cropBoxCoordsTL = self.canvas.coords(self.cropBounds)
+        cropBoxCoordsTL[0] -= self.cropDim[0] / 2
+        cropBoxCoordsTL[1] -= self.cropDim[1] / 2
         
-        if(LRCrop < 1 or TBCrop < 1):#I.E The crop box is bigger than the image
+        imageCoordsTL = self.canvas.coords(self.canvas_image)
+        imageCoordsTL[0] -= self.start_width / 2
+        imageCoordsTL[1] -= self.start_height / 2
+        cropBoxCoordsBR = list(map(add,cropBoxCoordsTL, self.cropDim))
+        BRimSize = (self.start_width,self.start_height)
+        imageCoordsBR = list(map(add,imageCoordsTL,BRimSize))
+
+        
+        print(cropBoxCoordsTL,cropBoxCoordsBR,imageCoordsTL,imageCoordsBR)
+        
+        LCrop = -imageCoordsTL[0] + cropBoxCoordsTL[0] 
+        TCrop = -imageCoordsTL[1] + cropBoxCoordsTL[1]
+        RCrop = imageCoordsBR[0] - cropBoxCoordsBR[0]
+        BCrop = imageCoordsBR[1] - cropBoxCoordsBR[1]
+        
+        crop = (LCrop,TCrop,RCrop,BCrop)
+        print(crop)
+
+        if(RCrop < 0 or TCrop < 0 or LCrop < 0 or BCrop < 0):#I.E The crop box is bigger than the image 
+            messagebox.showerror("Crop Error","Potential crop is larger than image dimensions. Try a smaller crop.")
             print("POTENTIAL CROP IS LARGER THAN IMAGE")
             return
            
-           
-        crop = (LRCrop,TBCrop,LRCrop,TBCrop)
         update_image = ImageOps.crop(self.image,crop)
         update_width,update_height = update_image.size
            
         self.update_image = update_image
         self.update_height = update_height
         self.update_width = update_width
-
 
         canvasOut = ImageTk.PhotoImage(update_image)
         self.canvas.itemconfig(self.canvas_image,image=canvasOut)
@@ -169,43 +202,73 @@ class editFunctions:
             if not exit:
                 self.applyCrop()
             self.canvas.delete(self.cropBounds)
+           
             self.cropOverlay = None
             self.cropImage = None
             self.canvas.image = self.image
-
-  
-    def crop(self, results):
-        
-        if self.start_results is None:
-            self.start_results = results
-
-        start_point = self._get_landmark(self.start_results, 8)
-        current_point = self._get_landmark(results, 8)
-
-        if start_point and current_point:
-
-            distance = math.sqrt((start_point.x - current_point.x) ** 2 + (start_point.y - current_point.y) ** 2)
-            scaler = distance + 1
-
-            if (current_point.x < start_point.x and current_point.y < start_point.y) or \
-               (current_point.x < start_point.x and current_point.y > start_point.y):
-                scaler = 1 / scaler
-
-            resize_width = self.cropBox_Swidth * scaler
-            resize_height = self.cropBox_Sheight * scaler
-
-            self.cropBox_Uwidth = resize_width
-            self.cropBox_Uheight = resize_height
-
-            resized_image = self.cropImage.resize((math.floor(resize_width), math.floor(resize_height)), Image.Resampling.LANCZOS)
-            resized_out = ImageTk.PhotoImage(resized_image)
+           
+            self.cropStage = "none"
+            self.cropBounds = None
             
-            self.cropDim[0] = resized_image.width
-            self.cropDim[1] = resized_image.height
-       
+            self.cropDim = [0,0]
+            
+            self.cropBox_Sheight = None
+            self.cropBox_Swidth = None
+            self.cropBox_Uheight = None
+            self.cropBox_Uwidth = None
 
-            self.canvas.itemconfig(self.cropBounds, image=resized_out)
-            self.canvas.image = resized_out # Sure this works. Don't know why, don't know how but whatever right
+
+    def resetCropStage(self):
+        self.cropStage = "none"
+        
+    def crop(self, results):
+        ## Create a two step crop process: Step one, position the image under the crop box, step two, resize the crop box.
+        
+        if(self.cropStage == "move"):
+            
+            if not self.start_results:
+                self.start_results = results
+
+            current_point = self._get_landmark(results, 8)
+            cWidth = self.canvas.winfo_reqwidth()
+            cHeight = self.canvas.winfo_reqheight()
+        
+            if current_point:
+                self.canvas.moveto(self.canvas_image, current_point.x * cWidth, current_point.y * cHeight) #
+                
+        elif(self.cropStage == "scale"):
+            
+
+            if self.start_results is None:
+                self.start_results = results
+
+            start_point = self._get_landmark(self.start_results, 8)
+            current_point = self._get_landmark(results, 8)
+
+            if start_point and current_point:
+
+                distance = math.sqrt((start_point.x - current_point.x) ** 2 + (start_point.y - current_point.y) ** 2)
+                scaler = distance + 1
+
+                if (current_point.x < start_point.x and current_point.y < start_point.y) or \
+                   (current_point.x < start_point.x and current_point.y > start_point.y):
+                    scaler = 1 / scaler
+
+                resize_width = self.cropBox_Swidth * scaler
+                resize_height = self.cropBox_Sheight * scaler
+
+                self.cropBox_Uwidth = resize_width
+                self.cropBox_Uheight = resize_height
+
+                resized_image = self.cropImage.resize((math.floor(resize_width), math.floor(resize_height)), Image.Resampling.LANCZOS)
+                resized_out = ImageTk.PhotoImage(resized_image)
+            
+                self.cropDim[0] = resized_image.width
+                self.cropDim[1] = resized_image.height
+                print(self.cropDim)
+
+                self.canvas.itemconfig(self.cropBounds, image=resized_out)
+                self.canvas.image = resized_out 
 
     def pen(self,results):
         return
@@ -213,7 +276,6 @@ class editFunctions:
         return
     def contrast(self,results):
         return
-    
     def save_file(self):
         self.image.save("SavedImage.png")
 
@@ -224,8 +286,7 @@ class editFunctions:
             self.start_results = None
             self.image = self.imageHistory[0]
             tkUndo = ImageTk.PhotoImage(self.imageHistory[0])
-
-
+            
             self.start_width = self.image.width
             self.start_height = self.image.height
             self.start_pos = self.canvas.coords(self.canvas_image)
@@ -252,7 +313,6 @@ class editFunctions:
             self.canvas.imgref = tkRedo
             
             self.canRedo = False
-            
 
     def set_start(self,edit):
 
@@ -263,6 +323,14 @@ class editFunctions:
            
         self.start_results = None  # Resetting start position of gesture coordinates
        
+        ## When we finish with the crop box resizing, we make it into here
+        if(self.cropStage == "move"):
+            self.cropStage = "scale"
+        elif(self.cropStage == "scale"):
+            self.cropStage = "move"
+        else:
+            self.cropStage = "none"
+        
         #Update Values
         self.image = self.update_image
         self.start_width = self.update_width

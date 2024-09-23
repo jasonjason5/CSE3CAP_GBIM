@@ -22,7 +22,7 @@ class MPRecognizer:
         self.options = vision.GestureRecognizerOptions(base_options=python.BaseOptions(model_asset_buffer = self.model_data)) # Model Data can't be passed directly for some reason
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
         
-        self.confidence = 0.6 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness
+        self.confidence = 0.8 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness
         self.buffer = ["none"]*5
         
         ## Having these here stops redefinition everytime cleanup is called
@@ -48,7 +48,6 @@ class MPRecognizer:
                 gestureID = [category.category_name for category in detectedGesture]
                 self.buffer.pop(4)
                 self.buffer.insert(0,gestureID[0])
-                #print(self.buffer)
                 outGesture = self.gestureCleanup(lmdata)
             
             return outGesture

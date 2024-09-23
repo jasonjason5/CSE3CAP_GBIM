@@ -55,7 +55,7 @@ class GestureVision:
 
         success, frame = self.frameCapture.read()
         if success:
-            #self.end_timer()
+
             frameRGB = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB) ## OpenCV takes images in BGR format, this converts them into the proper RGB format for display and processing
             results = self.mpHandObject.process(frameRGB)
             
@@ -98,7 +98,7 @@ class GestureVision:
 
 
             if(self.history):
-                #sprint(self.prevEdit)
+
                 historyTop = self.history.check_top().cget("text")
                 if(historyTop != self.prevEdit and MPRecognition.gesture in self.historyDoAdd and self.cropMode == False): ## adds the appropriate gestures to the history
                     if(self.prevEdit != "cropenter" and self.prevEdit != "cropexit"):
@@ -113,14 +113,7 @@ class GestureVision:
        
             self.window.image = displayFrame
             self.window.configure(image=displayFrame)
-            self.root.after(1,self.updateFrame)  
-            #print(self.cropMode)
-            
-            # if after set to 1 takes about  0.07 seconds to loop - UI Choppy
-            # if after set to 100 takes about 0.1 seconds to loop - UI much more reponsive
-            # The above is likely varied on the PC running it 
-            
-           # print(self.prevEdit)
+            self.root.after(1,self.updateFrame)         
             
         else:
             return
@@ -142,6 +135,7 @@ class GestureVision:
         print("EXITING")
         self.cropMode = False
         self.editor.destroyCropBounds(True)
+        self.editor.resetCropStage()
 
     def callFunction(self,gesture,results): ## This method will be called to check which function to call based on the contents of the buffer
         
@@ -166,8 +160,6 @@ class GestureVision:
                 self.prevEdit = "cropexit"
                 self.editor.destroyCropBounds(False)
                 self.cropMode = False
-
-# There's definitely a more elegant way to handle dropping out of crop mode other than checking it each time, but for now this will suffice.
 
         elif(gesture == "rotate"):
             if(self.cropMode == False):
@@ -210,25 +202,12 @@ class GestureVision:
             self.editor.save_file()
            
         elif(gesture == "help"): # Ditto as above
+            self.root.open_help(self.history.check_top().cget("text"))
             MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
             self.recognizer.clear_Buffer()
-            self.root.open_help(self.prevEdit)
             
             
         elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):
             self.editor.set_start(self.prevEdit)
             if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"
-            
-
-   # def start_timer(self): ## Method to count how long a loop takes to run
-     #   self.start_time = time.time()
-     #   return 
-    
-    #def end_timer(self): ## Method to count how long a loop takes to run
-    #    if self.start_time is None:
-      #      return  
-      #  self.end_time = time.time()
-      #  elapsed_time = self.end_time - self.start_time
-      #  print(f"Time taken for the loop to run: {elapsed_time} seconds")
-      #  return 

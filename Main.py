@@ -56,12 +56,12 @@ class HelpWindow(CTk.CTkToplevel):
         self.uiHelpImage = None
 
         # Set up the help label and place it in frame
-        self.uiHelpMessage = CTk.CTkLabel(master=self.uiHelpFrame, text="Help Window", justify="left", wraplength=200, font=uiFont)
+        self.uiHelpMessage = CTk.CTkLabel(master=self.uiHelpFrame, text="Help Window", justify="left", wraplength=200, font=uiFont,text_color = Style.whiteText)
         self.uiHelpMessage.grid(column=0, row=1,sticky=CTk.N)
         
         # Set up exit image
-        self.uiHelpExit = ImageLabel(master=self.uiHelpFrame,image_path='Ui_Images\Exit.jpg',image_size=(100,100), bg_color="transparent", text="")
-        self.uiHelpExit.grid(column=1, row=1,sticky=CTk.S)
+       # self.uiHelpExit = ImageLabel(master=self.uiHelpFrame,image_path='Ui_Images\Exit.jpg',image_size=(100,100), bg_color="transparent", text="")
+       # self.uiHelpExit.grid(column=1, row=1,sticky=CTk.S)
 
         # Set the window to be at the front of everything 
         self.attributes("-topmost", True)
@@ -89,7 +89,7 @@ class HelpWindow(CTk.CTkToplevel):
         # Get the Gesture Enum object from the string value
         enumGesture = Gesture.string_to_enum(gesture)
         # Get the image name for the specific Gesture
-        help_image_path = Gesture.gesture_image(enumGesture)
+        help_image_path = Gesture.gesture_help_image(enumGesture)
         # Load the GIF into the label        
         self.uiHelpImage = GIFLabel(master=self.uiHelpImageFrame,image_path=help_image_path,is_Help=True ,bg_color="transparent", text = "")
         self.uiHelpImage.grid(column=0, row=0)
@@ -128,6 +128,7 @@ class GIFLabel(CTk.CTkLabel):
         else:
             self.bind("<Enter>", lambda event:self._animate())
             self.bind("<Leave>", lambda event:self._killAnimate())
+            self.bind("<Button-1>", lambda event:self._openHelp)
             self.configure(image=self._frames[1])
 
     def _animate(self, idx=0):
@@ -188,7 +189,7 @@ class ActionHistory(CTk.CTkScrollableFrame):
         if(len(self.label_list) == 3):
             self.pop_item()
 
-        label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
+        label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour,text_color=Style.whiteText)
         label.grid(row= 3 - len(self.label_list), column=0, pady=(0, 10), sticky="w") # 5 - len ensures we're adding it to the start
         self.label_list.appendleft(label) # from a list to FIFO
             
@@ -208,8 +209,8 @@ class FunctionList(CTk.CTkScrollableFrame):
 
     def add_item(self, gesture):
         gif = Gesture.gesture_image(gesture)
-        text = Gesture(gesture).value
-        label = GIFLabel(master=self,image_path=gif,gif_width=100,gif_height=100,is_Help=False ,bg_color="transparent", text = text)
+        #text = Gesture(gesture).value
+        label = GIFLabel(master=self,image_path=gif,gif_width=100,gif_height=100,is_Help=False ,bg_color="transparent")
        # label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
         label.grid(row=0 ,column=len(self.label_list), padx=(10, 10), sticky="n")
         self.label_list.append(label) # from a list to FIFO
@@ -295,9 +296,6 @@ class App(CTk.CTk):
 
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,image_path='Ui_Images\OpenUI.gif',gif_width=150,gif_height= 150,is_Help=False ,bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
-        
-        self.uiPreimportOpenConfirmLbl = ImageLabel(master=self.uiPreimportFrame,image_path='Ui_Images\Confirm.jpg',image_size=(150,150), bg_color= "transparent",text = "")
-        self.uiPreimportOpenConfirmLbl.grid(column=1, row=0, padx=20, pady=20)
 
         self.uiPreimportOpenOrLbl = ImageLabel(master=self.uiPreimportFrame,image_path='Ui_Images\Or.jpg',image_size=(60,100), bg_color= "transparent",text = "")
         self.uiPreimportOpenOrLbl.grid(column=2, row=0,padx=20, pady=20)
@@ -408,9 +406,9 @@ class App(CTk.CTk):
             self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
             self.uiFunctionList.pack( expand=True,pady = 10, padx = 10)
 
-
+            positioner = self.uiMenuFrame.winfo_height()
             ## Creates Function objects
-            editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame)
+            editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame,positioner)
             self.looper.setActive() # Activates detection
             self.looper.setEditor(editor)
             self.looper.setHistory(self.uiActionHistory)
