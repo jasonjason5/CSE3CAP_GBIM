@@ -236,6 +236,7 @@ class GestureVision:
             
             
         elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):
+            self.recognizer.clear_Buffer() ## Ensures we dont have hangover, adds a little bit of delay but the benefits outweight the cost here.
             self.editor.set_start(self.prevEdit)
             if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"

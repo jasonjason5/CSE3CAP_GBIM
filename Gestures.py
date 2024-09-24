@@ -12,6 +12,8 @@ class Gesture(Enum):
         SAVEFILE = "Save File"
         OPENFILE = "Open File"
         HELP = "Help"
+        UNDO = "Undo"
+        REDO = "Redo"
         
         def gesture_help(cls):
             gestureHelp = {
@@ -25,7 +27,9 @@ class Gesture(Enum):
                     Gesture.PEN: "Pen: Draw or write on the image using a finger, simulating a pen effect.",
                     Gesture.SAVEFILE: "Save File: Use this gesture to save the current image or project.",
                     Gesture.OPENFILE: "Open File: Use this gesture to open a new image file from your device.",
-                    Gesture.HELP: "Help: Use this gesture to bring up the help menu or information about gestures."
+                    Gesture.HELP: "Help: Use this gesture to bring up the help menu or information about gestures.",
+                    Gesture.UNDO: "Undo: Use this gesture to undo the previous editing step.",
+                    Gesture.REDO: "Redo: Use this gesture to redo the previous editing step."
             }
             return gestureHelp[cls]
         def gesture_image(cls):
@@ -40,7 +44,9 @@ class Gesture(Enum):
                     Gesture.PEN: "Resources\PenUI.gif",
                     Gesture.SAVEFILE: "Resources\SaveUI.gif",
                     Gesture.OPENFILE: "Resources\OpenUI.gif",
-                    Gesture.HELP: "Resources\HelpUI.gif"
+                    Gesture.HELP: "Resources\HelpUI.gif",
+                    Gesture.UNDO: "Resources\\UndoUI.gif",
+                    Gesture.REDO: "Resources\RedoUI.gif"
             }
             return gestureImage[cls]
         
@@ -56,7 +62,9 @@ class Gesture(Enum):
                     Gesture.PEN: "Resources\Pen.gif",
                     Gesture.SAVEFILE: "Resources\Save.gif",
                     Gesture.OPENFILE: "Resources\Open.gif",
-                    Gesture.HELP: "Resources\Help.gif" 
+                    Gesture.HELP: "Resources\Help.gif",
+                    Gesture.UNDO: "Resources\\Undo.gif",
+                    Gesture.REDO: "Resources\Redo.gif"
             } 
             return gestureHelpImage[cls]
        

@@ -37,6 +37,7 @@ class MPRecognizer:
         self.buffer = ["none"] * 5
 
     def recognizeGesture(self,frame,lmdata):
+        print(self.buffer)
         
         processingFrame = mp.Image(image_format = mp.ImageFormat.SRGB,data = np.asarray(frame))
         recognitionResult = self.recognizer.recognize(processingFrame)

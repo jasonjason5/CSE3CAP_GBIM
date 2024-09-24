@@ -8,6 +8,7 @@ from operator import add
 import mouse
 import pyautogui
 from PIL import ImageEnhance
+import mouse
 
 
 
@@ -277,8 +278,32 @@ class editFunctions:
                 self.canvas.itemconfig(self.cropBounds, image=resized_out)
                 self.canvas.image = resized_out 
 
-    def pen(self,results):
-        return
+    def pointer(self,results):
+
+
+        if self.start_results is None:
+            self.start_results = results
+
+
+        indexMouse = self._get_landmark(results, 8)
+        fingPosx = indexMouse.x
+        fingPosy = indexMouse.y
+        
+       # print(fingPosx,fingPosy)
+        print(self.screenDimensions)
+        relX = fingPosx * self.screenDimensions[0]
+        relY = fingPosy * self.screenDimensions[1]
+        self.penHold = (relX,relY)
+
+        if(self.penHold[0] - 10 <= relX <= self.penHold[0] + 10 and self.penHold[1] - 10 <= relY <= self.penHold[1] + 10):
+            self.penFrameCounter += 1
+        if(self.penFrameCounter > 45):
+            mouse.click(button = "left")
+            self.penFrameCounter = 0
+
+    
+        mouse.move(relX,relY)
+       
     def brightness(self, results):
         if self.start_results is None:
             self.start_results = results
@@ -288,7 +313,7 @@ class editFunctions:
         current_point = self._get_landmark(results, 20)
 
         if start_point and current_point:
-            delta_y = current_point.y - start_point.y
+            delta_y = start_point.y  -  current_point.y
             brightness_factor = 1 + (delta_y * 1.5)
 
             # Apply brightness adjustment using ImageEnhance.Brightness
@@ -300,6 +325,7 @@ class editFunctions:
             self.update_image = brightened_image
             self.canvas.itemconfig(self.canvas_image, image=brightened_out)
             self.canvas.imgref = brightened_out
+            
     def contrast(self, results):
         if self.start_results is None:
             self.start_results = results
@@ -312,8 +338,8 @@ class editFunctions:
             delta_y = current_point.x - start_point.x
             contrast_factor = 1 + (delta_y * 1.5)
 
-            # Apply brightness adjustment using ImageEnhance.Brightness
-            enhancer = ImageEnhance.Brightness(self.image)
+            # Apply Contrast adjustment using ImageEnhance.Contrast
+            enhancer = ImageEnhance.Contrast(self.image)
             contrasted_image = enhancer.enhance(contrast_factor)
             contrasted_out = ImageTk.PhotoImage(contrasted_image)
 
@@ -321,6 +347,7 @@ class editFunctions:
             self.update_image = contrasted_image
             self.canvas.itemconfig(self.canvas_image, image=contrasted_out)
             self.canvas.imgref = contrasted_out
+            
     def save_file(self):
         self.image.save("SavedImage.png")
 
