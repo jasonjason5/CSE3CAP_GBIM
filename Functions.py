@@ -5,6 +5,9 @@ import numpy as np
 import time
 from tkinter import messagebox
 from operator import add
+import mouse
+import pyautogui
+from PIL import ImageEnhance
 
 
 
@@ -17,7 +20,7 @@ class editFunctions:
         self.canvas = canvas
         self.canvas_image = canvas_image
         self.positioner = positioner
-
+        self.screenDimensions = pyautogui.size()
         ## Image properties References
         
         self.start_width = self.image.width
@@ -30,6 +33,9 @@ class editFunctions:
         self.update_height = self.start_height
         self.update_rot = self.start_rot
         self.start_results = None
+
+        self.penHold = None
+        self.penFrameCounter = 0
 
         ## Crop Properties References
 
@@ -134,6 +140,7 @@ class editFunctions:
             self.update_image = rez_rot_image
             
             self.canvas.itemconfig(self.canvas_image, image=rotated_out)
+            self.canvas.imgref = rotated_out
             self.canvas.imgref = rotated_out
 
 
@@ -270,10 +277,32 @@ class editFunctions:
                 self.canvas.itemconfig(self.cropBounds, image=resized_out)
                 self.canvas.image = resized_out 
 
-    def pen(self,results):
-        return
-    def brightness(self, results):
-        return
+    def pointer(self,results):
+
+
+        if self.start_results is None:
+            self.start_results = results
+
+
+        indexMouse = self._get_landmark(results, 8)
+        fingPosx = indexMouse.x
+        fingPosy = indexMouse.y
+        
+       # print(fingPosx,fingPosy)
+        print(self.screenDimensions)
+        relX = fingPosx * self.screenDimensions[0]
+        relY = fingPosy * self.screenDimensions[1]
+        self.penHold = (relX,relY)
+
+        if(self.penHold[0] - 10 <= relX <= self.penHold[0] + 10 and self.penHold[1] - 10 <= relY <= self.penHold[1] + 10):
+            self.penFrameCounter += 1
+        if(self.penFrameCounter > 60):
+            mouse.click(button = "left")
+            self.penFrameCounter = 0
+
+    
+        mouse.move(relX,relY)
+       
     def contrast(self,results):
         return
     def save_file(self):
@@ -336,5 +365,6 @@ class editFunctions:
         self.start_width = self.update_width
         self.start_height = self.update_height
         self.start_rot = 0
-        self.isPadded = False
+        self.penHold = None
+        self.penFrameCounter = 0
         

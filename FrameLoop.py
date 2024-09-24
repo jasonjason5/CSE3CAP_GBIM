@@ -190,7 +190,21 @@ class GestureVision:
                 self.prevEdit = "redo"
             else:
                 self.exitCrop()
-            
+                
+        elif(gesture == "pointer"):
+            if(self.cropMode == False):
+                self.editor.pointer(results)
+                self.prevEdit = "pointer"
+            else:
+                self.exitCrop()
+                
+        elif(gesture == "brightness"):
+            if(self.cropMode == False):
+                self.editor.brightness(results)
+                self.prevEdit = "brightness"
+            else:
+                self.exitCrop()
+
         elif(gesture == "open file" and self.opened == False): # This can be done here as opposed to functions in order to avoid unnecessary passing of info
             self.opened == True
             MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
