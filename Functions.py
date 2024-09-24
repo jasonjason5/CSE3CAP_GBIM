@@ -1,5 +1,5 @@
 from email.mime import image
-from PIL import ImageTk, Image, ImageOps
+from PIL import ImageTk, Image, ImageOps, ImageTk, ImageEnhance
 import math
 import numpy as np
 import time
@@ -277,34 +277,50 @@ class editFunctions:
                 self.canvas.itemconfig(self.cropBounds, image=resized_out)
                 self.canvas.image = resized_out 
 
-    def pointer(self,results):
-
-
+    def pen(self,results):
+        return
+    def brightness(self, results):
         if self.start_results is None:
             self.start_results = results
 
+        # Get start and current positions for the pinky finger (landmark index 20)
+        start_point = self._get_landmark(self.start_results, 20)
+        current_point = self._get_landmark(results, 20)
 
-        indexMouse = self._get_landmark(results, 8)
-        fingPosx = indexMouse.x
-        fingPosy = indexMouse.y
-        
-       # print(fingPosx,fingPosy)
-        print(self.screenDimensions)
-        relX = fingPosx * self.screenDimensions[0]
-        relY = fingPosy * self.screenDimensions[1]
-        self.penHold = (relX,relY)
+        if start_point and current_point:
+            delta_y = current_point.y - start_point.y
+            brightness_factor = 1 + (delta_y * 1.5)
 
-        if(self.penHold[0] - 10 <= relX <= self.penHold[0] + 10 and self.penHold[1] - 10 <= relY <= self.penHold[1] + 10):
-            self.penFrameCounter += 1
-        if(self.penFrameCounter > 60):
-            mouse.click(button = "left")
-            self.penFrameCounter = 0
+            # Apply brightness adjustment using ImageEnhance.Brightness
+            enhancer = ImageEnhance.Brightness(self.image)
+            brightened_image = enhancer.enhance(brightness_factor)
+            brightened_out = ImageTk.PhotoImage(brightened_image)
 
-    
-        mouse.move(relX,relY)
-       
-    def contrast(self,results):
-        return
+            # Update the canvas and image with the new brightened image
+            self.update_image = brightened_image
+            self.canvas.itemconfig(self.canvas_image, image=brightened_out)
+            self.canvas.imgref = brightened_out
+    def contrast(self, results):
+        if self.start_results is None:
+            self.start_results = results
+
+        # Get start and current positions for the pinky finger (landmark index 20)
+        start_point = self._get_landmark(self.start_results, 20)
+        current_point = self._get_landmark(results, 20)
+
+        if start_point and current_point:
+            delta_y = current_point.x - start_point.x
+            contrast_factor = 1 + (delta_y * 1.5)
+
+            # Apply brightness adjustment using ImageEnhance.Brightness
+            enhancer = ImageEnhance.Brightness(self.image)
+            contrasted_image = enhancer.enhance(contrast_factor)
+            contrasted_out = ImageTk.PhotoImage(contrasted_image)
+
+            # Update the canvas and image with the new brightened image
+            self.update_image = contrasted_image
+            self.canvas.itemconfig(self.canvas_image, image=contrasted_out)
+            self.canvas.imgref = contrasted_out
     def save_file(self):
         self.image.save("SavedImage.png")
 

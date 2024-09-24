@@ -174,7 +174,21 @@ class GestureVision:
                 self.prevEdit = "translate"
             else:
                 self.exitCrop()
-                        
+        
+        elif(gesture == "brightness"):
+            if(self.cropMode == False):
+                self.editor.brightness(results)
+                self.prevEdit = "brightness"
+            else:
+                self.exitCrop()
+
+        elif(gesture == "contrast"):
+            if(self.cropMode == False):
+                self.editor.contrast(results)
+                self.prevEdit = "contrast"
+            else:
+                self.exitCrop()
+                                    
         elif(gesture == "undo"):
             if(self.cropMode == False):
                 self.editor.undo()
