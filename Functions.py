@@ -1,5 +1,5 @@
 from email.mime import image
-from PIL import ImageTk, Image, ImageOps
+from PIL import ImageTk, Image, ImageOps, ImageTk, ImageEnhance
 import math
 import numpy as np
 import time
@@ -273,9 +273,47 @@ class editFunctions:
     def pen(self,results):
         return
     def brightness(self, results):
-        return
-    def contrast(self,results):
-        return
+        if self.start_results is None:
+            self.start_results = results
+
+        # Get start and current positions for the pinky finger (landmark index 20)
+        start_point = self._get_landmark(self.start_results, 20)
+        current_point = self._get_landmark(results, 20)
+
+        if start_point and current_point:
+            delta_y = current_point.y - start_point.y
+            brightness_factor = 1 + (delta_y * 1.5)
+
+            # Apply brightness adjustment using ImageEnhance.Brightness
+            enhancer = ImageEnhance.Brightness(self.image)
+            brightened_image = enhancer.enhance(brightness_factor)
+            brightened_out = ImageTk.PhotoImage(brightened_image)
+
+            # Update the canvas and image with the new brightened image
+            self.update_image = brightened_image
+            self.canvas.itemconfig(self.canvas_image, image=brightened_out)
+            self.canvas.imgref = brightened_out
+    def contrast(self, results):
+        if self.start_results is None:
+            self.start_results = results
+
+        # Get start and current positions for the pinky finger (landmark index 20)
+        start_point = self._get_landmark(self.start_results, 20)
+        current_point = self._get_landmark(results, 20)
+
+        if start_point and current_point:
+            delta_y = current_point.x - start_point.x
+            contrast_factor = 1 + (delta_y * 1.5)
+
+            # Apply brightness adjustment using ImageEnhance.Brightness
+            enhancer = ImageEnhance.Brightness(self.image)
+            contrasted_image = enhancer.enhance(contrast_factor)
+            contrasted_out = ImageTk.PhotoImage(contrasted_image)
+
+            # Update the canvas and image with the new brightened image
+            self.update_image = contrasted_image
+            self.canvas.itemconfig(self.canvas_image, image=contrasted_out)
+            self.canvas.imgref = contrasted_out
     def save_file(self):
         self.image.save("SavedImage.png")
 
