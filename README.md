@@ -11,6 +11,13 @@ Patrick Mika
 
 ---------------------------
 
-Note: The Crop function currently removes padding from the image, as such it should be performed last. There is the potential to re-pad the image. This will be investigated later.
-    
+DEPENDENCIES:
+
+Mediapipe - ```pip install mediapipe```
+OpenCV 2 - ```pip install opencv-python```
+PIL - ```pip install pillow```
+Mouse - ```pip install mouse```
+Tkinter - ```pip install tk```
+CustomTkinter - ```pip install customtkinter```
+PyAutoGUI - ```pip install PyAutoGUI```
 
