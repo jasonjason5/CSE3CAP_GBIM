@@ -78,13 +78,20 @@ class Gesture(Enum):
             string = string.replace(" ", "")
             string = string.upper()
             return Gesture.__members__.get(string)
+        
+        def get_gesture_from_imagepath(cls, image_path):
+            for member in cls:
+                 string = Gesture.gesture_image(member)
+                 if(string == image_path):
+                      return member.value
+
 
 
 #list = Gesture.return_enums(Gesture)
 #print (list)
 #print (list[0])
 #print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
-
+print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\RedoUI.gif"))
 #print(Gesture.string_to_enum("Help"))
 
 #print(Gesture.gesture_image(Gesture.HELP))
