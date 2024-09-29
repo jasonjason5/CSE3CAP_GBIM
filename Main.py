@@ -1,6 +1,8 @@
 ## PUT UI AND MODULE CALL LOGIC IN HERE ##
 from sys import maxsize
 from turtle import window_height
+
+from cv2 import text
 import MPRecognition
 import FrameLoop
 import Functions
@@ -230,14 +232,14 @@ class App(CTk.CTk):
         min_width = 320
         min_height = 320
         #max size of window
-        #max_width = 1920
-        #max_height = 1080
+        max_width = 1920
+        max_height = 1080
         self.toplevel_window = None
         self.title("Finger Print")
         self.geometry("1280x900")
         self.minsize(min_width, min_height)
         uiFont = CTk.CTkFont(family='Inter', size=24) 
-        #self.maxsize(max_width, max_height)
+        self.maxsize(max_width, max_height)
         self.configure(bg_color=Style.workspaceBackground,fg_color= Style.workspaceBackground)
         self.rowconfigure(0, weight = 3)
         self.rowconfigure(1, weight = 1)
@@ -245,9 +247,7 @@ class App(CTk.CTk):
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
         
-        # frame for the rendering canvas
-        self.uiRenderFrame1 = CTk.CTkFrame(master=self, fg_color= "red", bg_color= Style.workspaceBackground)
-        self.uiRenderFrame1.grid(column=0, columnspan= 3,row=0 ,sticky=CTk.EW)
+        # frame for the rendering canvas - REMOVED - we've now got the canvas directly on the master frame instead of on an intermediary
 
         # frame that holds all of the bottom of the UI
         self.uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
@@ -264,14 +264,14 @@ class App(CTk.CTk):
         self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
         self.uiDetectedGestureText = CTk.CTkLabel(master=self.uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 50, font=uiFont)
         self.uiDetectedGestureText.grid(column=0, row=0)
-        # Removed detected gesture string, frameloop now operates directly on this widget. Fixed widget height / width to avoid changes when text updates
+       
+       # Removed detected gesture string, frameloop now operates directly on this widget. Fixed widget height / width to avoid changes when text updates
         self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, height = 30, width=200, fg_color=Style.gestures,text_color=Style.blackText,text="Help",corner_radius= 50, font=uiFont)
         self.uiDetectedGesture.grid(column=1,columnspan = 2, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
         self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder,corner_radius=0) 
         self.uiMenuFrame.grid(column=0, columnspan= 3, row=1, sticky=CTk.E + CTk.W + CTk.S, ipadx=10, ipady=10)
-       
 
 
         ## Static UI ##
@@ -297,6 +297,9 @@ class App(CTk.CTk):
 
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,root= self, image_path='Ui_Images\OpenUI.gif',gif_width=150,gif_height= 150,is_Help=False ,bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
+
+        self.uiPreimportBoilerPlate = CTk.CTkLabel(master=self.uiPreimportFrame, width = 150, text_color=Style.whiteText, text="Welcome to Fingerprint!\n\nPlease ensure you are seated in a well lit room.\nHave your camera facing directly head on.\n\nWhen you are ready to begin, press the open file button\nor give the gesture!")
+        self.uiPreimportBoilerPlate.grid(column=1,row=0,padx=20,pady=20)
 
         self.uiPreimportOpenOrLbl = ImageLabel(master=self.uiPreimportFrame,image_path='Ui_Images\Or.jpg',image_size=(60,100), bg_color= "transparent",text = "")
         self.uiPreimportOpenOrLbl.grid(column=2, row=0,padx=20, pady=20)
@@ -353,7 +356,9 @@ class App(CTk.CTk):
 
         #start loop
         self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
- 
+        self.editor = Functions.editFunctions()
+        self.looper.setEditor(self.editor)
+        self.looper.setHistory(self.uiActionHistory)
 
         
     def killStartFrame(self):
@@ -361,16 +366,11 @@ class App(CTk.CTk):
         self.uiMasterFrame.grid(column=0, row=1, columnspan= 3, sticky=CTk.EW + CTk.S)
 
         # remove the row span below to place the Canvas above the menu frame         
-        self.uiRenderFrame1.grid(column=0, row=0, columnspan= 3, sticky=tk.NSEW)
+        #self.uiRenderFrame1.grid(column=0, row=0, columnspan= 3, sticky=tk.NSEW)
 
     def startCamera(self):
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
-
-    def handle_gesture_changed(self,var, index, mode):
-        # Your code to adjust canvas size goes here
-            #print("Gesture (detectedGestureString.get()) Changed: " + detectedGestureString.get()) 
-            return
 
     def open_image(self):
         global editor
@@ -383,24 +383,27 @@ class App(CTk.CTk):
         if file_path:
             img = Image.open(file_path)
 
-            canvas_width = int((self.uiRenderFrame1.winfo_width()) / 1.5)
-            canvas_height = int((self.uiRenderFrame1.winfo_height()) / 1.5)
-            print("Height:" + str(self.winfo_height()) + "Width:" + str(self.winfo_width()))
+            UIoffset = self.uiMenuFrame.winfo_height() + 85 # 85 accounts for gesture detection
+            rfHeight = self.winfo_height() - UIoffset
+            relPos = 1 - (rfHeight / self.winfo_height())
             
-            img = self.resizeImport(img,canvas_width,canvas_height)
-
+            img = self.resizeImport(img,self.winfo_width(),rfHeight)
                 
             img_tk = ImageTk.PhotoImage(img)
                 
-            self.uiRenderFrame = tk.Canvas(master=self.uiRenderFrame1, width=canvas_width, height=canvas_height, bg= Style.canvasColour, bd=0,highlightthickness=0) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
+            self.uiRenderFrame = tk.Canvas(master=self, width=self.winfo_width(), height= rfHeight, bg= 'red', bd=0, highlightthickness=0,) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
             self.uiRenderFrame.delete("all")
-            self.uiRenderFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-            #self.uiRenderFrame.bind("<Configure>", self.handle_resize)
-            ### Changing this for later
+            self.uiRenderFrame.place(x=0,y=0)
             
-            editingImage = self.uiRenderFrame.create_image(canvas_width/2,canvas_height/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
+            self.bind("<Configure>", lambda event: self.handle_resize(event)) # This doesnt necessarily need to be in here but there's no real reason it can't be either
+
+            editingImage = self.uiRenderFrame.create_image(self.winfo_width()/2,rfHeight/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
             self.uiRenderFrame.imgref = img_tk
-                
+               
+            self.editor.setRefs(img_tk,editingImage,self.uiRenderFrame)
+            self.looper.setActive() # Activates detection
+            
+            
             # remove the preimport menu
             self.uiPreimportFrame.pack_forget()
             # show the new menu items
@@ -408,12 +411,9 @@ class App(CTk.CTk):
             self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
             self.uiFunctionList.pack( expand=True,pady = 10, padx = 10)
 
-            positioner = self.uiMenuFrame.winfo_height()
+
             ## Creates Function objects
-            editor = Functions.editFunctions(img_tk,editingImage,self.uiRenderFrame,positioner)
-            self.looper.setActive() # Activates detection
-            self.looper.setEditor(editor)
-            self.looper.setHistory(self.uiActionHistory)
+
 
     def resizeImport(self,img,canvas_width,canvas_height): 
         ## Resizes the image to better fit the current canvas size
@@ -445,14 +445,15 @@ class App(CTk.CTk):
         padBox.paste(img,offset)
 
         return padBox
-    
 
+    def handle_resize(self,event): # Correctly resizes the canvas based on root window size :)
 
-
-    def handle_resize(self,event): ## This is showing an error since the reshuffle, potentially to do with passing in self
-        # Your code to adjust canvas size goes here
-            print(f"Canvas (uiRenderFrame) resized: {event.width}x{event.height}")  
-        
+            UIoffset = self.uiMenuFrame.winfo_height() + 35 # 35 accounts for little gesture readout's size
+            rfHeight = self.winfo_height() - UIoffset
+            newWidth = self.winfo_width()
+            print(f"Canvas (uiRenderFrame) resized: {newWidth}x{rfHeight}") 
+            self.uiRenderFrame.config(width = newWidth, height =rfHeight )
+      
 
     def open_file(self):
         self.open_image()

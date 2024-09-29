@@ -22,8 +22,8 @@ class MPRecognizer:
         self.options = vision.GestureRecognizerOptions(base_options=python.BaseOptions(model_asset_buffer = self.model_data)) # Model Data can't be passed directly for some reason
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
         
-        self.confidence = 0.6 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness
-        self.buffer = ["none"]*5
+        self.confidence = 0.49 # Lower the value, the more inaccurate it becomes. We can dial this in with different buffer lengths as well - at the cost of responsiveness .625 is 5/8
+        self.buffer = ["none"]*8
         
         ## Having these here stops redefinition everytime cleanup is called
         self.pinkyXYZ = [None]*3
@@ -34,7 +34,7 @@ class MPRecognizer:
         self.rootXYZ = [None]*3
 
     def clear_Buffer(self):
-        self.buffer = ["none"] * 5
+        self.buffer = ["none"] * 8
 
     def recognizeGesture(self,frame,lmdata):
         print(self.buffer)
@@ -47,7 +47,7 @@ class MPRecognizer:
             for detectedGesture in recognitionResult.gestures:
                 
                 gestureID = [category.category_name for category in detectedGesture]
-                self.buffer.pop(4)
+                self.buffer.pop(7)
                 self.buffer.insert(0,gestureID[0])
                 outGesture = self.gestureCleanup(lmdata)
             
@@ -96,53 +96,62 @@ class MPRecognizer:
 ## Since we actually gave Y, these values will be at a mismatch, and the gesture won't result in a false positive.
         
     def gestureCleanup(self,landmark_data):
-        #gesture = "none"
-        #print(self.buffer)
+
         global gesture 
+        print(self.pinkyXYZ[2], self.thumbXYZ[2]) ## z depths
+        
         if(landmark_data.multi_hand_landmarks):
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
                
                 pinkyDistance,ringDistance,middleDistance,foreDistance,thumbDistance,thumbForeDistance = self.cleanupLandmarkValueGenerator(landmark_data)    
-                #print(thumbForeDistance)
-                # Could probably be a switch/case but it doesn't particularly matter
-                #print(foreDistance)
+
                 if(self.bufferWeighter('rotate') > self.confidence):
                     if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance < 0.25 and foreDistance > 0.45):
                         gesture = "rotate"
+                
                 elif(self.bufferWeighter('resize') > self.confidence):
                     if(pinkyDistance < 0.25 and ringDistance < 0.25 and middleDistance > 0.25): # This is the prime example of the work this does. This makes rotate and resize distinct by comparing middleDistance
                         gesture = "resize"
+                
                 elif(self.bufferWeighter('crop') > self.confidence):
                     if(pinkyDistance < 0.25 and ringDistance < 0.25):
                         gesture = "crop"
+                
                 elif(self.bufferWeighter('translate') > self.confidence):
                     if(pinkyDistance < 0.2 and thumbDistance < 0.3):
                         gesture = "translate"
-                elif(self.bufferWeighter('contrast') > self.confidence): # These two detect quite well and differentiate from one another when detected. Any hardcoding would have to deal with absolute coordinates not relative, but it seems unnecessary when its working as well as it is.
+               
+                elif(self.bufferWeighter('contrast') > self.confidence or self.bufferWeighter('help') > self.confidence): # Help and contrasat can look the same, so we're checking them both here
+                    if(self.pinkyXYZ[2] - 0.01 < self.thumbXYZ[2] <  self.pinkyXYZ[2] + 0.01): # landmark coordinates when in contrast gesture
+                        gesture = "open hand" # Open hand has been moved here simply because the check would prevent it from being detected later in the chain
+                    elif(self.bufferWeighter('contrast') > self.confidence / 2):
                         gesture= "contrast"
+               
                 elif(self.bufferWeighter('brightness') > self.confidence):
                         gesture= "brightness"
+                
                 elif(self.bufferWeighter('pointer') > self.confidence):
                     if(foreDistance > 0.2 and middleDistance < 0.25):
                         gesture= "pointer"
+                
                 elif(self.bufferWeighter('pen') > self.confidence):
                     if(foreDistance > 0.2 and middleDistance > 0.2):
                         gesture = "pen"    
+                
                 elif(self.bufferWeighter('undo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
                     if(thumbForeDistance < 0.2):
                         gesture = "undo"
+                
                 elif(self.bufferWeighter('redo') > self.confidence): ## THESE COULD USE SOME HARDCODE CHECKS
                     gesture = "redo"
 
-
-                elif(self.buffer[0] == 'close' and (self.buffer[4] == 'help' or self.buffer[3] == 'help' or self.buffer[2] == 'help')): # Definitely a better way to do this check
+                elif(self.buffer[0] == 'close' and (self.buffer[7] == 'help' or self.buffer[6] == 'help' or self.buffer[5] == 'help')): # Definitely a better way to do this check
                      gesture = "save file"
-                elif(self.buffer[0] == 'help' and (self.buffer[4] == 'close' or self.buffer[3] == 'close' or self.buffer[2] == 'close')): # Definitely a better way to do this check
+               
+                elif(self.buffer[0] == 'help' and (self.buffer[7] == 'close' or self.buffer[6] == 'close' or self.buffer[5] == 'close')): # Definitely a better way to do this check
                      gesture = "open file"
-                    
-                elif(self.bufferWeighter('help') > self.confidence):
-                    gesture = "open hand"
+               
                 elif(self.bufferWeighter('close') > self.confidence):
                     gesture = "closed hand"   
                 else:

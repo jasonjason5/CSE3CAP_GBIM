@@ -13,26 +13,26 @@ import mouse
 
 
 class editFunctions:
-    def __init__(self, image: ImageTk, canvas_image, canvas, positioner):
+    def __init__(self):
        
         ## Application Componentry References 
 
-        self.image: Image = ImageTk.getimage(image)
-        self.canvas = canvas
-        self.canvas_image = canvas_image
-        self.positioner = positioner
+        self.image: Image = None
+        self.canvas = None
+        self.canvas_image = None
+
         self.screenDimensions = pyautogui.size()
         ## Image properties References
         
-        self.start_width = self.image.width
-        self.start_height = self.image.height
-        self.start_pos = canvas.coords(self.canvas_image)
+        self.start_width = None
+        self.start_height = None
+        self.start_pos = None
         self.start_rot = 0
 
-        self.update_image = self.image 
-        self.update_width = self.start_width
-        self.update_height = self.start_height
-        self.update_rot = self.start_rot
+        self.update_image = None
+        self.update_width = None
+        self.update_height = None
+        self.update_rot = None
         self.start_results = None
 
         self.penHold = None
@@ -57,8 +57,23 @@ class editFunctions:
 
         self.historyDoAdd = ["cropexit","rotate","brightness","contrast","resize"]
         self.imageHistory = []
-        self.imageHistory.insert(0,self.image)
         self.canRedo = False
+
+    def setRefs(self, image, canvas_image, canvas): ## This has to be moved out of init to account for initialising the editor to handle mouse and open file gestures first, where there is no canvas or image
+        self.image = ImageTk.getimage(image)
+        self.canvas = canvas
+        self.canvas_image = canvas_image
+        
+        self.start_width = self.image.width
+        self.start_height = self.image.height
+        self.start_pos = canvas.coords(self.canvas_image)
+        
+        self.update_image = self.image 
+        self.update_width = self.start_width
+        self.update_height = self.start_height
+        self.update_rot = self.start_rot
+        
+        self.imageHistory.insert(0,self.image)
 
     def _get_landmark(self, results, index):
         if results.multi_hand_landmarks:
@@ -102,10 +117,13 @@ class editFunctions:
         current_point = self._get_landmark(results, 8)
         cWidth = self.canvas.winfo_reqwidth()
         cHeight = self.canvas.winfo_reqheight()
+        
+        anchorOffsetX = self.start_height / 2
+        anchorOffsetY = self.start_width / 2
 
         print(self.canvas.coords(self.canvas_image))
         if current_point:
-            self.canvas.moveto(self.canvas_image, current_point.x * cWidth, current_point.y * cHeight) ## This will need to be adjusted based on canvas size. we need to pass canvas size into functiosn
+            self.canvas.moveto(self.canvas_image, current_point.x * cWidth - anchorOffsetX, current_point.y * cHeight - anchorOffsetY) ## This will need to be adjusted based on canvas size. we need to pass canvas size into functiosn
 
     def snap(self,array,value):
         snapped = (np.abs(array-value)).argmin()
@@ -144,7 +162,6 @@ class editFunctions:
             self.canvas.imgref = rotated_out
             self.canvas.imgref = rotated_out
 
-
     def createCropBounds(self):
         self.cropImage = Image.new(mode="RGBA", color=(153,153,153,127),size=(math.floor(self.start_width / 2),math.floor(self.start_height / 2) ))
         self.cropOverlay = ImageTk.PhotoImage(self.cropImage)
@@ -160,8 +177,7 @@ class editFunctions:
         self.cropDim[0] = sWidth
         self.cropDim[1] = sHeight
 
-        self.cropStage == "scale"
-        
+        self.cropStage == "scale" 
 
     def applyCrop(self):
 
@@ -225,7 +241,6 @@ class editFunctions:
             self.cropBox_Uheight = None
             self.cropBox_Uwidth = None
 
-
     def resetCropStage(self):
         self.cropStage = "none"
         
@@ -242,7 +257,7 @@ class editFunctions:
             cHeight = self.canvas.winfo_reqheight()
         
             if current_point:
-                self.canvas.moveto(self.canvas_image, current_point.x * cWidth, current_point.y * cHeight) #
+                self.canvas.moveto(self.cropBounds, current_point.x * cWidth, current_point.y * cHeight) #
                 
         elif(self.cropStage == "scale"):
             
@@ -284,13 +299,10 @@ class editFunctions:
         if self.start_results is None:
             self.start_results = results
 
-
         indexMouse = self._get_landmark(results, 8)
         fingPosx = indexMouse.x
         fingPosy = indexMouse.y
-        
-       # print(fingPosx,fingPosy)
-        print(self.screenDimensions)
+
         relX = fingPosx * self.screenDimensions[0]
         relY = fingPosy * self.screenDimensions[1]
         self.penHold = (relX,relY)
@@ -304,6 +316,14 @@ class editFunctions:
     
         mouse.move(relX,relY)
        
+    def clamp(self, value):
+        if(value < 0):
+            return 0
+        elif(value > 5):
+            return 5
+        else:
+            return value
+
     def brightness(self, results):
         if self.start_results is None:
             self.start_results = results
@@ -315,10 +335,10 @@ class editFunctions:
         if start_point and current_point:
             delta_y = start_point.y  -  current_point.y
             brightness_factor = 1 + (delta_y * 1.5)
-
+            clampedBF = self.clamp(brightness_factor)
             # Apply brightness adjustment using ImageEnhance.Brightness
             enhancer = ImageEnhance.Brightness(self.image)
-            brightened_image = enhancer.enhance(brightness_factor)
+            brightened_image = enhancer.enhance(clampedBF)
             brightened_out = ImageTk.PhotoImage(brightened_image)
 
             # Update the canvas and image with the new brightened image
@@ -337,10 +357,10 @@ class editFunctions:
         if start_point and current_point:
             delta_y = current_point.x - start_point.x
             contrast_factor = 1 + (delta_y * 1.5)
-
+            clampedCF = self.clamp(contrast_factor)
             # Apply Contrast adjustment using ImageEnhance.Contrast
             enhancer = ImageEnhance.Contrast(self.image)
-            contrasted_image = enhancer.enhance(contrast_factor)
+            contrasted_image = enhancer.enhance(clampedCF)
             contrasted_out = ImageTk.PhotoImage(contrasted_image)
 
             # Update the canvas and image with the new brightened image

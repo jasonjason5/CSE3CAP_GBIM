@@ -1,5 +1,4 @@
 import cv2
-from cv2.cuda import setBufferPoolConfig
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -46,7 +45,6 @@ class GestureVision:
         self.opened = False # For making sure you cant open an image on an open image
         self.prevEdit = "none"
         self.cropMode = False
-        self.boolBuffer = ["none"]*5
         self.editor = None
         self.history = None
         self.historyDoAdd = ["translate","crop","rotate","brightness","contrast","resize","undo","redo"]
@@ -61,16 +59,7 @@ class GestureVision:
             
             gestureFrame = Image.fromarray(frameRGB)
 
-            if(self.activated == False): ## Make sure we're only detecting when we need to
-                resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
-                displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
-       
-            ## return it to the tkinter widget in which we want to display it
-       
-                self.window.image = displayFrame
-                self.window.configure(image=displayFrame)
-                self.root.after(1,self.updateFrame)  
-                return
+
 
 
             if(results.multi_hand_landmarks):
@@ -90,7 +79,6 @@ class GestureVision:
             else:
                 MPRecognition.gesture = "none"
 
-
             if(self.cropMode == False): ## Crop mode indicator
                 self.affirmation.configure(text = MPRecognition.gesture)
             else:
@@ -104,8 +92,20 @@ class GestureVision:
                     if(self.prevEdit != "cropenter" and self.prevEdit != "cropexit"):
                         self.history.add_item(item = MPRecognition.gesture)              
 
-            self.callFunction(MPRecognition.gesture,results)
+
+            if(self.activated == False): ## this isolates pointer and open file as being able to be accessed whilst in the pre-import stage
+                
+                if(MPRecognition.gesture == "pointer"):
+                    self.callFunction(MPRecognition.gesture,results)
+                if(MPRecognition.gesture == "open file" and self.opened == False):
+                    self.opened == True
+                    MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
+                    self.recognizer.clear_Buffer()
+                    self.root.open_file()
             
+            elif(self.activated == True):
+                self.callFunction(MPRecognition.gesture,results)
+                           
             resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
             displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
        
@@ -218,12 +218,6 @@ class GestureVision:
                 self.prevEdit = "brightness"
             else:
                 self.exitCrop()
-
-        elif(gesture == "open file" and self.opened == False): # This can be done here as opposed to functions in order to avoid unnecessary passing of info
-            self.opened == True
-            MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
-            self.recognizer.clear_Buffer()
-            self.root.open_file()
             
         elif(gesture == "save file"):
             self.recognizer.clear_Buffer()
@@ -233,8 +227,7 @@ class GestureVision:
             self.root.open_help(self.history.check_top().cget("text"))
             MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
             self.recognizer.clear_Buffer()
-            
-            
+                      
         elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):
             self.recognizer.clear_Buffer() ## Ensures we dont have hangover, adds a little bit of delay but the benefits outweight the cost here.
             self.editor.set_start(self.prevEdit)
