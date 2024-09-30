@@ -1,4 +1,5 @@
 ## PUT UI AND MODULE CALL LOGIC IN HERE ##
+from symbol import varargslist
 from sys import maxsize
 from turtle import window_height
 
@@ -141,8 +142,6 @@ class GIFLabel(CTk.CTkLabel):
         self.after_cancel(self.animate_Job)
         self.animate_Job = None
         self.configure(image=self._frames[1])
-
-        
         
 # This class creates an image label.
 class ImageLabel(CTk.CTkLabel):
@@ -229,8 +228,8 @@ class App(CTk.CTk):
         super().__init__(*args, **kwargs)
         
         # Minimum size of window
-        min_width = 320
-        min_height = 320
+        min_width = 1280
+        min_height = 900
         #max size of window
         max_width = 1920
         max_height = 1080
@@ -298,13 +297,13 @@ class App(CTk.CTk):
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,root= self, image_path='Ui_Images\OpenUI.gif',gif_width=150,gif_height= 150,is_Help=False ,bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
 
-        self.uiPreimportBoilerPlate = CTk.CTkLabel(master=self.uiPreimportFrame, width = 150, text_color=Style.whiteText, text="Welcome to Fingerprint!\n\nPlease ensure you are seated in a well lit room.\nHave your camera facing directly head on.\n\nWhen you are ready to begin, press the open file button\nor give the gesture!")
+        self.uiPreimportBoilerPlate = CTk.CTkLabel(master=self.uiPreimportFrame, width = 150, text_color=Style.whiteText,font=('Inter',16), text="Welcome to Finger Print!\n\nPlease ensure you are seated in a well lit room.\nHave your camera facing directly head on.\n\nWhen you are ready to begin:\npress the open file button or give the gesture!")
         self.uiPreimportBoilerPlate.grid(column=1,row=0,padx=20,pady=20)
 
         self.uiPreimportOpenOrLbl = ImageLabel(master=self.uiPreimportFrame,image_path='Ui_Images\Or.jpg',image_size=(60,100), bg_color= "transparent",text = "")
         self.uiPreimportOpenOrLbl.grid(column=2, row=0,padx=20, pady=20)
 
-        self.uiPreimportOpenFileBtn = CTk.CTkButton(master=self.uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=self.open_image,corner_radius=20, width= 60, height= 30)
+        self.uiPreimportOpenFileBtn = CTk.CTkButton(master=self.uiPreimportFrame, fg_color=Style.gestures, text_color=Style.blackText, text="Open File", font=uiFont, command=self.importOptionsPopUp,corner_radius=20, width= 60, height= 30)
         self.uiPreimportOpenFileBtn.grid(column=3, row=0, sticky=tk.W)
 
 
@@ -352,8 +351,6 @@ class App(CTk.CTk):
         self.uiMasterFrame.grid_forget()
         self.uiDetectedGestureFrame.grid_forget()
 
-
-
         #start loop
         self.looper = FrameLoop.GestureVision(self,self.uiDeviceCamera,self.uiDetectedGesture,model_data) ##instantiates gesturevision object (frameloop), passes references to ui root and device camera widget
         self.editor = Functions.editFunctions()
@@ -372,9 +369,27 @@ class App(CTk.CTk):
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
 
+    def importOptionsPopUp(self):
+        popup = tk.Toplevel()
+        popup.geometry("300x100")
+        popup.resizable(False,False)
+        popup.title("Import Options")
+
+        self.paddingBool = tk.BooleanVar()
+        self.overlayBool = tk.BooleanVar()
+        
+        pCheckBox = tk.Checkbutton(popup, text= "Pad the image to avoid rotational clipping?",variable= self.paddingBool)
+        pCheckBox.select()
+        oCheckBox = tk.Checkbutton(popup, text= "Overlay CV2 landmarks on webcam?", variable= self.overlayBool)
+        continueButton = tk.Button(popup, text= "Continue", command = self.open_image)
+        
+        pCheckBox.place(x=10,y=10)
+        oCheckBox.place(x=10,y=30)
+        continueButton.place(x=150,y=75,anchor='center')
+        
     def open_image(self):
         global editor
-            
+
         file_path = filedialog.askopenfilename(
             filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")],
             title="Select an Image File"
@@ -391,7 +406,7 @@ class App(CTk.CTk):
                 
             img_tk = ImageTk.PhotoImage(img)
                 
-            self.uiRenderFrame = tk.Canvas(master=self, width=self.winfo_width(), height= rfHeight, bg= 'red', bd=0, highlightthickness=0,) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
+            self.uiRenderFrame = tk.Canvas(master=self, width=self.winfo_width(), height= rfHeight, bg= Style.workspaceBackground, bd=0, highlightthickness=0,) ## This will need to be changed along with some window dimensions but nothing that cant be changed in an afternoon.
             self.uiRenderFrame.delete("all")
             self.uiRenderFrame.place(x=0,y=0)
             
@@ -400,9 +415,11 @@ class App(CTk.CTk):
             editingImage = self.uiRenderFrame.create_image(self.winfo_width()/2,rfHeight/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
             self.uiRenderFrame.imgref = img_tk
                
+
             self.editor.setRefs(img_tk,editingImage,self.uiRenderFrame)
             self.looper.setActive() # Activates detection
-            
+            if(self.overlayBool.get() == True):
+                self.looper.setOverlay()
             
             # remove the preimport menu
             self.uiPreimportFrame.pack_forget()
@@ -410,9 +427,6 @@ class App(CTk.CTk):
             self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
             self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
             self.uiFunctionList.pack( expand=True,pady = 10, padx = 10)
-
-
-            ## Creates Function objects
 
 
     def resizeImport(self,img,canvas_width,canvas_height): 
@@ -433,30 +447,33 @@ class App(CTk.CTk):
         resOutHeight = math.floor(resizer*image_height)
         img = img.resize((resOutWidth, resOutHeight), Image.Resampling.LANCZOS)
         
-        padDim = math.ceil(math.sqrt(resOutHeight**2 + resOutWidth **2))
-        padBox = Image.new(mode="RGBA",size = (padDim,padDim)) # color=(153,153,153,255) ## This fixes the rotation, problem, but any image output by this program will input back in with a larger padding onto of whatever was originally added
-        # in saying that, this is sort of a problem that photoshop / photopea etc. also have. Like if you create a bigger canvas and then rotate your image, the output image will be the size of the canvas,
-        # and then when you put that new image back in, its pulled in as one layer, it isnt as if you can separate out the original image from the padding. So its not a problem we have to solve.
+        if(self.paddingBool.get() == True):
+            padDim = math.ceil(math.sqrt(resOutHeight**2 + resOutWidth **2))
+            padBox = Image.new(mode="RGBA",size = (padDim,padDim)) # color=(153,153,153,255) ## This fixes the rotation, problem, but any image output by this program will input back in with a larger padding onto of whatever was originally added
+            # in saying that, this is sort of a problem that photoshop / photopea etc. also have. Like if you create a bigger canvas and then rotate your image, the output image will be the size of the canvas,
+            # and then when you put that new image back in, its pulled in as one layer, it isnt as if you can separate out the original image from the padding. So its not a problem we have to solve.
         
-        padBoxWidth, padBoxHeight = padBox.size
+            padBoxWidth, padBoxHeight = padBox.size
 
-        offset = ((padBoxWidth - resOutWidth) // 2, (padBoxHeight - resOutHeight) // 2)
+            offset = ((padBoxWidth - resOutWidth) // 2, (padBoxHeight - resOutHeight) // 2)
         
-        padBox.paste(img,offset)
+            padBox.paste(img,offset)
+        else:
+            padBox = img
 
         return padBox
 
     def handle_resize(self,event): # Correctly resizes the canvas based on root window size :)
-
+            print(event)
             UIoffset = self.uiMenuFrame.winfo_height() + 35 # 35 accounts for little gesture readout's size
             rfHeight = self.winfo_height() - UIoffset
             newWidth = self.winfo_width()
-            print(f"Canvas (uiRenderFrame) resized: {newWidth}x{rfHeight}") 
+            #print(f"Canvas (uiRenderFrame) resized: {newWidth}x{rfHeight}") 
             self.uiRenderFrame.config(width = newWidth, height =rfHeight )
       
 
     def open_file(self):
-        self.open_image()
+        self.importOptionsPopUp()
 
     def open_help(self, affirmation):
         if affirmation is None or affirmation == "none":

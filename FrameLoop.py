@@ -2,9 +2,8 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-from PIL import Image
 import customtkinter as CTk
-from PIL import ImageTk
+from PIL import ImageTk, ImageEnhance, Image
 import _tkinter as tk
 import MPRecognition
 import numpy as np
@@ -24,7 +23,7 @@ class GestureVision:
         self.mpDrawing = mp.solutions.drawing_utils
         self.mpHandObject = self.mpHands.Hands()
         self.cursor_control_active = False
-        
+        self.doOverlay = False
         ##MPRecognition REFERENCES
         
         self.model_data = model_data
@@ -58,14 +57,16 @@ class GestureVision:
             results = self.mpHandObject.process(frameRGB)
             
             gestureFrame = Image.fromarray(frameRGB)
-
-
-
+            ppFrame = self.preProcess(gestureFrame) # Preprocessing to increase image sharpness, contrast
 
             if(results.multi_hand_landmarks):
-              
+                if(self.doOverlay):
+                    for landmark in results.multi_hand_landmarks:
+                        self.mpDrawing.draw_landmarks(frameRGB,landmark,self.mpHands.HAND_CONNECTIONS)              
+                gestureFrame = Image.fromarray(frameRGB)
+
                 if(self.runProcessing == 0):
-                    gThread = Thread(target = self.recognizer.recognizeGesture,args = [gestureFrame,results])
+                    gThread = Thread(target = self.recognizer.recognizeGesture,args = [ppFrame,results])
                     gThread.daemon = True
                     gThread.start()
                     self.runProcessing += 1
@@ -84,14 +85,12 @@ class GestureVision:
             else:
                 self.affirmation.configure(text = "crop")
 
-
             if(self.history):
 
                 historyTop = self.history.check_top().cget("text")
                 if(historyTop != self.prevEdit and MPRecognition.gesture in self.historyDoAdd and self.cropMode == False): ## adds the appropriate gestures to the history
                     if(self.prevEdit != "cropenter" and self.prevEdit != "cropexit"):
                         self.history.add_item(item = MPRecognition.gesture)              
-
 
             if(self.activated == False): ## this isolates pointer and open file as being able to be accessed whilst in the pre-import stage
                 
@@ -117,8 +116,14 @@ class GestureVision:
             
         else:
             return
-        
-     
+       
+    def preProcess(self,frame): # Preprocesses the frame for recognition - increases image sharpness and contrast
+        contrastPreProcessor = ImageEnhance.Contrast(frame)
+        cppFrame = contrastPreProcessor.enhance(1.3)
+        sharpnessPreProcessor = ImageEnhance.Sharpness(cppFrame)
+        scppFrame = sharpnessPreProcessor.enhance(1.75)
+        return scppFrame
+    
     def setActive(self):
         self.activated = True
 
@@ -128,8 +133,8 @@ class GestureVision:
     def setHistory(self,history):
         self.history = history
         
-    def drawLandmarks(self): ## Draws hand landmarks. Good debugging tool but unnecessary to do all the time. Could add as boolean option
-        return
+    def setOverlay(self):
+        self.doOverlay = True
     
     def exitCrop(self):
         print("EXITING")
