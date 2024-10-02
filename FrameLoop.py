@@ -105,8 +105,8 @@ class GestureVision:
             elif(self.activated == True):
                 self.callFunction(MPRecognition.gesture,results)
                            
-            resizedFrame = gestureFrame.resize((320,240),Image.Resampling.LANCZOS)
-            displayFrame = CTk.CTkImage(resizedFrame, size= (320,240))
+            resizedFrame = gestureFrame.resize((260,180),Image.Resampling.LANCZOS)
+            displayFrame = CTk.CTkImage(resizedFrame, size= (260,180))
        
             ## return it to the tkinter widget in which we want to display it
        
