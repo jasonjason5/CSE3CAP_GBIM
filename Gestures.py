@@ -1,4 +1,6 @@
 from enum import Enum
+from datetime import datetime, timedelta
+import time
 
 class Gesture(Enum):
         ROTATE = "Rotate"
@@ -34,19 +36,19 @@ class Gesture(Enum):
             return gestureHelp[cls]
         def gesture_image(cls):
             gestureImage = {
-                    Gesture.ROTATE: "Resources\RotateUI.gif",
-                    Gesture.CROP: "Resources\CropUI.gif",
-                    Gesture.RESIZE: "Resources\ResizeUI.gif",
-                    Gesture.TRANSLATE :"Resources\TranslateUI.gif",
-                    Gesture.CONTRAST :"Resources\ContrastUI.gif",
-                    Gesture.BRIGHTNESS: "Resources\BrightnessUI.gif",
-                    Gesture.POINTER: "Resources\PointerUI.gif",
-                    Gesture.PEN: "Resources\PenUI.gif",
-                    Gesture.SAVEFILE: "Resources\SaveUI.gif",
-                    Gesture.OPENFILE: "Resources\OpenUI.gif",
-                    Gesture.HELP: "Resources\HelpUI.gif",
-                    Gesture.UNDO: "Resources\\UndoUI.gif",
-                    Gesture.REDO: "Resources\RedoUI.gif"
+                    Gesture.ROTATE: "Resources\RotateStatic.png",
+                    Gesture.CROP: "Resources\CropStatic.png",
+                    Gesture.RESIZE: "Resources\ResizeStatic.png",
+                    Gesture.TRANSLATE :"Resources\TranslateStatic.png",
+                    Gesture.CONTRAST :"Resources\ContrastStatic.png",
+                    Gesture.BRIGHTNESS: "Resources\BrightnessStatic.png",
+                    Gesture.POINTER: "Resources\PointerStatic.png",
+                    Gesture.PEN: "Resources\PenStatic.png",
+                    Gesture.SAVEFILE: "Resources\SaveStatic.png",
+                    Gesture.OPENFILE: "Resources\OpenStatic.png",
+                    Gesture.HELP: "Resources\HelpStatic.png",
+                    Gesture.UNDO: "Resources\\Undo.gif",
+                    Gesture.REDO: "Resources\Redo.gif"
             }
             return gestureImage[cls]
         
@@ -91,7 +93,15 @@ class Gesture(Enum):
 #print (list)
 #print (list[0])
 #print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
-print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\RedoUI.gif"))
+#print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\RedoUI.gif"))
 #print(Gesture.string_to_enum("Help"))
 
 #print(Gesture.gesture_image(Gesture.HELP))
+
+future_time = datetime.now() + timedelta(milliseconds=16.67)
+print("Future Time (16.67 ms from now):", future_time)
+if (future_time <  datetime.now()):
+     print("Future Time is less than now")
+time.sleep(1)
+if (future_time <  datetime.now()):
+     print("Future Time is great than now")
