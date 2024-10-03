@@ -204,7 +204,7 @@ class ActionHistory(CTk.CTkFrame):
         if(len(self.label_list) == 3):
             self.pop_item()
 
-        label = CTk.CTkLabel(self, text=item,font=("Arial",20) ,image=image,height = 35, width=120 ,compound="left", justify = "center", anchor= "center", corner_radius= 20, bg_color = bgColour,text_color=Style.whiteText)
+        label = CTk.CTkLabel(self, text=item,font=("Arial",20) ,image=image,height = 35, width=120 ,compound="left", justify = "center", anchor= "center", corner_radius= 50, fg_color = bgColour,text_color=Style.whiteText)
         label.grid(row= 4 - len(self.label_list), column=0) # 5 - len ensures we're adding it to the start
         self.label_list.appendleft(label) # from a list to FIFO
             
@@ -226,7 +226,7 @@ class FunctionFrame(CTk.CTkFrame):
     def add_item(self, gesture):
         img = Gesture.gesture_image(gesture)
         #text = Gesture(gesture).value
-        label = ImageLabel(master=self,root= self.root,image_path=img,image_size=(55,55),is_gesture=True ,bg_color="transparent",text = "")
+        label = ImageLabel(master=self,root= self.root,image_path=img,image_size=(60,60),is_gesture=True ,bg_color="transparent",text = "")
        # label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
         if len(self.label_list) < 6:
             label.grid(row=0 ,column=len(self.label_list), padx=(5,5), pady=(5,5), sticky="nsew")
@@ -276,14 +276,14 @@ class App(CTk.CTk):
         self.uiMasterFrame.rowconfigure(1, weight = 4)
 
         # Detected gesture UI
-        self.uiDetectedGestureFrame =CTk.CTkFrame(master=self.uiMasterFrame)
-        self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
+        self.uiDetectedGestureFrame =CTk.CTkFrame(master=self.uiMasterFrame, fg_color= Style.workspaceBackground)
+        self.uiDetectedGestureFrame.grid(column=0, columnspan = 3, row=0, sticky=CTk.E + CTk.W + CTk.S)
         self.uiDetectedGestureText = CTk.CTkLabel(master=self.uiDetectedGestureFrame, fg_color=Style.gestures,text_color=Style.blackText,text="Current Edit Gesture: ", corner_radius= 50, font=uiFont)
         self.uiDetectedGestureText.grid(column=0, row=0)
        
        # Removed detected gesture string, frameloop now operates directly on this widget. Fixed widget height / width to avoid changes when text updates
         self.uiDetectedGesture = CTk.CTkLabel(master=self.uiDetectedGestureFrame, height = 30, width=200, fg_color=Style.gestures,text_color=Style.blackText,text="Help",corner_radius= 50, font=uiFont)
-        self.uiDetectedGesture.grid(column=1,columnspan = 2, row=0 )
+        self.uiDetectedGesture.grid(column=1, row=0 )
 
         # menu frame, holds the gesture help, open file, action history, gesture function list
         self.uiMenuFrame = CTk.CTkFrame(master=self.uiMasterFrame, fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder,corner_radius=0) 
@@ -441,7 +441,7 @@ class App(CTk.CTk):
             # remove the preimport menu
             self.uiPreimportFrame.pack_forget()
             # show the new menu items
-            self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
+            self.uiDetectedGestureFrame.grid(column=1, columnspan = 2, row=0, sticky=CTk.E + CTk.W + CTk.S)
             self.uiActionHistory.pack(side=CTk.LEFT, fill= CTk.BOTH ,expand=False , pady = 10, padx = 10)
             self.uiFunctionList.pack( expand=True, fill= CTk.BOTH, pady = 10, padx = 10)
 

@@ -36,19 +36,19 @@ class Gesture(Enum):
             return gestureHelp[cls]
         def gesture_image(cls):
             gestureImage = {
-                    Gesture.ROTATE: "Resources\RotateStatic.png",
-                    Gesture.CROP: "Resources\CropStatic.png",
-                    Gesture.RESIZE: "Resources\ResizeStatic.png",
-                    Gesture.TRANSLATE :"Resources\TranslateStatic.png",
-                    Gesture.CONTRAST :"Resources\ContrastStatic.png",
-                    Gesture.BRIGHTNESS: "Resources\BrightnessStatic.png",
-                    Gesture.POINTER: "Resources\PointerStatic.png",
-                    Gesture.PEN: "Resources\PenStatic.png",
-                    Gesture.SAVEFILE: "Resources\SaveStatic.png",
-                    Gesture.OPENFILE: "Resources\OpenStatic.png",
-                    Gesture.HELP: "Resources\HelpStatic.png",
-                    Gesture.UNDO: "Resources\\Undo.gif",
-                    Gesture.REDO: "Resources\Redo.gif"
+                    Gesture.ROTATE: "Resources\RotateUI.gif",
+                    Gesture.CROP: "Resources\CropUI.gif",
+                    Gesture.RESIZE: "Resources\ResizeUI.gif",
+                    Gesture.TRANSLATE :"Resources\TranslateUI.gif",
+                    Gesture.CONTRAST :"Resources\ContrastUI.gif",
+                    Gesture.BRIGHTNESS: "Resources\BrightnessUI.gif",
+                    Gesture.POINTER: "Resources\PointerUI.gif",
+                    Gesture.PEN: "Resources\PenUI.gif",
+                    Gesture.SAVEFILE: "Resources\SaveUI.gif",
+                    Gesture.OPENFILE: "Resources\OpenUI.gif",
+                    Gesture.HELP: "Resources\Helpui.gif",
+                    Gesture.UNDO: "Resources\\Undoui.gif",
+                    Gesture.REDO: "Resources\Redoui.gif"
             }
             return gestureImage[cls]
         
