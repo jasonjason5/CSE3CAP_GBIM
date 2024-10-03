@@ -180,6 +180,8 @@ class ActionHistory(CTk.CTkFrame):
         self.label_list = deque(maxlen = 3) ## Limiting to 5 History
         self.last_gesture = "none"
         self.colourCounter = 0
+        self.nav_title = CTk.CTkLabel(self, text="Action History", fg_color=Style.gestures,text_color=Style.blackText, width= 150)
+        self.nav_title.grid(row = 0, column = 0)
             
     def pop_item(self):
         self.label_list[2].destroy()
@@ -202,8 +204,8 @@ class ActionHistory(CTk.CTkFrame):
         if(len(self.label_list) == 3):
             self.pop_item()
 
-        label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 30, width=100 ,compound="left", padx=5, anchor="w",bg_color = bgColour,text_color=Style.whiteText)
-        label.grid(row= 3 - len(self.label_list), column=0, pady=(0, 10), sticky="w") # 5 - len ensures we're adding it to the start
+        label = CTk.CTkLabel(self, text=item,font=("Arial",20) ,image=image,height = 35, width=120 ,compound="left", justify = "center", anchor= "center", corner_radius= 20, bg_color = bgColour,text_color=Style.whiteText)
+        label.grid(row= 4 - len(self.label_list), column=0) # 5 - len ensures we're adding it to the start
         self.label_list.appendleft(label) # from a list to FIFO
             
     def check_top(self): #Returns topmost element
@@ -222,14 +224,14 @@ class FunctionFrame(CTk.CTkFrame):
         self.end_time = None
 
     def add_item(self, gesture):
-        gif = Gesture.gesture_image(gesture)
+        img = Gesture.gesture_image(gesture)
         #text = Gesture(gesture).value
-        label = ImageLabel(master=self,root= self.root,image_path=gif,image_size=(50,50),is_gesture=True ,bg_color="transparent",text = "")
+        label = ImageLabel(master=self,root= self.root,image_path=img,image_size=(55,55),is_gesture=True ,bg_color="transparent",text = "")
        # label = CTk.CTkLabel(self, text=item,font=("Arial",25) ,image=image,height = 50, width=400 ,compound="left", padx=5, anchor="w",bg_color = bgColour)
         if len(self.label_list) < 6:
-            label.grid(row=0 ,column=len(self.label_list), padx=(5,5), pady=(5,5), sticky="n")
+            label.grid(row=0 ,column=len(self.label_list), padx=(5,5), pady=(5,5), sticky="nsew")
         else:
-            label.grid(row=1 ,column=len(self.label_list) - 6, padx=(5,5), pady=(5,5), sticky="n")
+            label.grid(row=1 ,column=len(self.label_list) - 6, padx=(5,5), pady=(5,5), sticky="nsew")
         self.label_list.append(label) # from a list to FIFO
         self.width += 120
         self.configure(width = self.width)
@@ -269,7 +271,7 @@ class App(CTk.CTk):
         self.uiMasterFrame.columnconfigure(0, weight = 3)
         self.uiMasterFrame.columnconfigure(1, weight = 3)
         self.uiMasterFrame.columnconfigure(2, weight = 3)
-        self.uiMasterFrame.columnconfigure(3, minsize= 320)
+        self.uiMasterFrame.columnconfigure(3, minsize= Style.cameraWidth)
         self.uiMasterFrame.rowconfigure(0, weight = 1)
         self.uiMasterFrame.rowconfigure(1, weight = 4)
 
@@ -326,13 +328,13 @@ class App(CTk.CTk):
 
         # Action history Gui
 
-        self.uiActionHistory = ActionHistory(master=self.uiMenuFrame, height=140, corner_radius=0, fg_color=Style.popupBackground,border_width= 0, border_color= Style.windowBorder)
+        self.uiActionHistory = ActionHistory(master=self.uiMenuFrame, height=130, width = 150, corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
         
         # add test item to the Action history
         self.uiActionHistory.add_item(item = "openfile")
 
         # Function list
-        self.uiFunctionList = FunctionFrame( master=self.uiMenuFrame, root=self,height= 140, corner_radius=0, fg_color=Style.popupBackground,border_width= 3, border_color= Style.windowBorder)
+        self.uiFunctionList = FunctionFrame( master=self.uiMenuFrame, root=self,height= 130, corner_radius=0, fg_color=Style.popupBackground,border_width= 0, border_color= Style.windowBorder)
 
 
         gestures = Gesture.return_enums(Gesture)
@@ -357,7 +359,7 @@ class App(CTk.CTk):
         # Help UI #
 
         ## Camera UI ##
-        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder, height=140, width=220,corner_radius=0)
+        self.uiDeviceCameraFrame = CTk.CTkFrame(master=self.uiMasterFrame,fg_color=Style.popupBackground ,border_width= 3, border_color= Style.windowBorder, height=Style.cameraHeight, width=Style.cameraWidth,corner_radius=0)
         self.uiDeviceCameraFrame.grid(column=3, row=0, rowspan= 2, sticky= CTk.S)
         self.uiDeviceCamera = CTk.CTkLabel(master=self.uiDeviceCameraFrame ,bg_color= Style.workspaceBackground, text="")
         self.uiDeviceCamera.pack(side=CTk.RIGHT, expand=False, pady = 5, padx = 5)
@@ -440,8 +442,8 @@ class App(CTk.CTk):
             self.uiPreimportFrame.pack_forget()
             # show the new menu items
             self.uiDetectedGestureFrame.grid(column=2, row=0, sticky=CTk.S)
-            self.uiActionHistory.pack(side=CTk.LEFT, expand=False , pady = 10, padx = 10)
-            self.uiFunctionList.pack( expand=True,pady = 10, padx = 10)
+            self.uiActionHistory.pack(side=CTk.LEFT, fill= CTk.BOTH ,expand=False , pady = 10, padx = 10)
+            self.uiFunctionList.pack( expand=True, fill= CTk.BOTH, pady = 10, padx = 10)
 
 
     def resizeImport(self,img,canvas_width,canvas_height): 

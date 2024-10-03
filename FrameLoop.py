@@ -1,4 +1,5 @@
 import cv2
+import Style
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -105,8 +106,8 @@ class GestureVision:
             elif(self.activated == True):
                 self.callFunction(MPRecognition.gesture,results)
                            
-            resizedFrame = gestureFrame.resize((260,180),Image.Resampling.LANCZOS)
-            displayFrame = CTk.CTkImage(resizedFrame, size= (260,180))
+            resizedFrame = gestureFrame.resize((Style.cameraWidth,Style.cameraHeight),Image.Resampling.LANCZOS)
+            displayFrame = CTk.CTkImage(resizedFrame, size= (Style.cameraWidth,Style.cameraHeight))
        
             ## return it to the tkinter widget in which we want to display it
        
