@@ -1,16 +1,12 @@
-from email.mime import image
 from PIL import ImageTk, Image, ImageOps, ImageTk, ImageEnhance
 import math
 import numpy as np
-import time
 from tkinter import messagebox
 from operator import add
 import mouse
 import pyautogui
 from PIL import ImageEnhance
 import mouse
-
-
 
 class editFunctions:
     def __init__(self):
@@ -22,7 +18,8 @@ class editFunctions:
         self.canvas_image = None
 
         self.screenDimensions = pyautogui.size()
-        ## Image properties References
+       
+       ## Image properties References
         
         self.start_width = None
         self.start_height = None
@@ -59,7 +56,9 @@ class editFunctions:
         self.imageHistory = []
         self.canRedo = False
 
-    def setRefs(self, image, canvas_image, canvas): ## This has to be moved out of init to account for initialising the editor to handle mouse and open file gestures first, where there is no canvas or image
+    ## INPUT: image, the variable containing the canvas, the canvas object
+    ## FUNCTION: Initialises all required references within the Function object. Enables the object to be instatiateed without references.
+    def setRefs(self, image, canvas_image, canvas): 
         self.image = ImageTk.getimage(image)
         self.canvas = canvas
         self.canvas_image = canvas_image
@@ -75,11 +74,16 @@ class editFunctions:
         
         self.imageHistory.insert(0,self.image)
 
+    ## INPUT: Landmark results, Index
+    ## OUTPUT: Specific landmark coordinates
     def _get_landmark(self, results, index):
         if results.multi_hand_landmarks:
             return results.multi_hand_landmarks[0].landmark[index]
         return None
 
+    ## INPUT: Landmark Results
+    ## FUNCTION: Calculates distance between initial point of gesture and current point of gesture,
+    ## applies proportional distance as scaling operation to image. Updates references.
     def resize(self, results):
 
         if self.start_results is None:
@@ -110,6 +114,8 @@ class editFunctions:
             self.canvas.itemconfig(self.canvas_image, image=resized_out)
             self.canvas.imgref = resized_out
 
+    ## INPUT: Landmark Results
+    ## FUNCTION: Applies landmark coordinates to image coordinates. Moves image.
     def translate(self, results):
         if not self.start_results:
             self.start_results = results
@@ -118,18 +124,22 @@ class editFunctions:
         cWidth = self.canvas.winfo_reqwidth()
         cHeight = self.canvas.winfo_reqheight()
         
-        anchorOffsetX = self.start_height / 2
+        anchorOffsetX = self.start_height / 2 # Offsetting central anchor of image
         anchorOffsetY = self.start_width / 2
 
         print(self.canvas.coords(self.canvas_image))
         if current_point:
-            self.canvas.moveto(self.canvas_image, current_point.x * cWidth - anchorOffsetX, current_point.y * cHeight - anchorOffsetY) ## This will need to be adjusted based on canvas size. we need to pass canvas size into functiosn
+            self.canvas.moveto(self.canvas_image, current_point.x * cWidth - anchorOffsetX, current_point.y * cHeight - anchorOffsetY) 
 
+    ## INPUT: Array of 15 degree increments, current rotation 
+    ## OUTPUT: Rotation value snapped to the nearest increment
     def snap(self,array,value):
         snapped = (np.abs(array-value)).argmin()
         print(snapped)
         return array[snapped]
 
+    ## INPUT: Results
+    ## FUNCTION: Rotates the image based on the relative rotation of two landmarks. Updates references
     def rotate(self, results):
 
         if self.start_results is None:
@@ -162,11 +172,13 @@ class editFunctions:
             self.canvas.imgref = rotated_out
             self.canvas.imgref = rotated_out
 
+    ## INPUT: Nil
+    ## FUNCTION: Creates crop overlay image, updates crop-specific references. 
     def createCropBounds(self):
         self.cropImage = Image.new(mode="RGBA", color=(153,153,153,127),size=(math.floor(self.start_width / 2),math.floor(self.start_height / 2) ))
         self.cropOverlay = ImageTk.PhotoImage(self.cropImage)
 
-        canvasCentre = (int(self.canvas.winfo_width()/2),int(self.canvas.winfo_height()/2) - 150) # Hardcoded value to get the crop box overlay roughly in centre
+        canvasCentre = (int(self.canvas.winfo_width()/2),int(self.canvas.winfo_height()/2) - 75) # Hardcoded value to get the crop box overlay roughly in centre
 
         self.cropBounds = self.canvas.create_image(canvasCentre[0],canvasCentre[1], image = self.cropOverlay, anchor="center") #Creates a new image on the canvas
         
@@ -179,6 +191,8 @@ class editFunctions:
 
         self.cropStage == "scale" 
 
+    ## INPUT: Nil
+    ## FUNCTION: Applies the crop. Locates crop window position and image position, subtracts difference in pixels
     def applyCrop(self):
 
         ## All the coordinates need to be adjusted by the image dimensions due to the center anchor placement of the canvas objects    
@@ -220,7 +234,9 @@ class editFunctions:
         canvasOut = ImageTk.PhotoImage(update_image)
         self.canvas.itemconfig(self.canvas_image,image=canvasOut)
         self.canvas.imgref = canvasOut
-           
+          
+    ## INPUT: exit boolean
+    ## FUNCTION: Destroys crop overlay, empties references. Checks to see if crop should be applied before exiting.
     def destroyCropBounds(self,exit):
         if(self.cropBounds):
             if not exit:
@@ -240,12 +256,15 @@ class editFunctions:
             self.cropBox_Swidth = None
             self.cropBox_Uheight = None
             self.cropBox_Uwidth = None
-
+    
+    ## INPUT: Nil
+    ## FUNCTION: Resets crop stage
     def resetCropStage(self):
         self.cropStage = "none"
         
+    ## INPUT: Landmark Results
+    ## FUNCTION: Two steop crop process - positioning and resizing. Updates references for crop operations.
     def crop(self, results):
-        ## Create a two step crop process: Step one, position the image under the crop box, step two, resize the crop box.
         
         if(self.cropStage == "move"):
             
@@ -293,6 +312,8 @@ class editFunctions:
                 self.canvas.itemconfig(self.cropBounds, image=resized_out)
                 self.canvas.image = resized_out 
 
+    ## INPUT: Landmark Results
+    ## FUNCTION: Moves mouse proportionally based on landmark coordinates
     def pointer(self,results):
 
 
@@ -316,6 +337,8 @@ class editFunctions:
     
         mouse.move(relX,relY)
        
+    ## INPUT: B/C Value
+    ## OUTPUT: Clamped value
     def clamp(self, value):
         if(value < 0):
             return 0
@@ -324,6 +347,8 @@ class editFunctions:
         else:
             return value
 
+    ## INPUT: Landmark Results
+    ## FUNCTION: Increases / Decreases image brightness based on landmark position
     def brightness(self, results):
         if self.start_results is None:
             self.start_results = results
@@ -345,7 +370,9 @@ class editFunctions:
             self.update_image = brightened_image
             self.canvas.itemconfig(self.canvas_image, image=brightened_out)
             self.canvas.imgref = brightened_out
-            
+    
+    ## INPUT: Landmark Results
+    ## FUNCTION: Increases / Decreases image contrast based on landmark position   
     def contrast(self, results):
         if self.start_results is None:
             self.start_results = results
@@ -368,12 +395,16 @@ class editFunctions:
             self.canvas.itemconfig(self.canvas_image, image=contrasted_out)
             self.canvas.imgref = contrasted_out
             
+    ## INPUT: Nil
+    ## FUNCTION: Saves Image
     def save_file(self):
         self.image.save("SavedImage.png")
 
     ## Undo and redo usurp set_start as a function, and perform the resetting of variables by themselves to ensure continuity
 
-    def undo(self): ## This could definitely be expanded out to 2-step/ 3-step undo but its fine as is right now.
+    ## INPUT: Nil
+    ## FUNCTION: Updates references with image stored in history
+    def undo(self): 
         if(len(self.imageHistory) > 1):
             self.start_results = None
             self.image = self.imageHistory[0]
@@ -389,6 +420,8 @@ class editFunctions:
 
             self.canRedo = True ## I have undone. I can now redo to a undo an undo.
         
+    ## INPUT: Nil
+    ## FUNCTION: Updates references with iamge stored in history
     def redo(self):
         if(self.canRedo == True):
 
@@ -406,6 +439,9 @@ class editFunctions:
             
             self.canRedo = False
 
+    ## INPUT: edit performed
+    ## FUNCTION: Conditionally adds a copy of the image to array for undo/redo. Shifts crop state, resets/updates value.
+    ## Handles all end-of-gesture processes in preparation for the enxt gesture
     def set_start(self,edit):
 
         if(edit in self.historyDoAdd):
@@ -415,7 +451,6 @@ class editFunctions:
            
         self.start_results = None  # Resetting start position of gesture coordinates
        
-        ## When we finish with the crop box resizing, we make it into here
         if(self.cropStage == "move"):
             self.cropStage = "scale"
         elif(self.cropStage == "scale"):

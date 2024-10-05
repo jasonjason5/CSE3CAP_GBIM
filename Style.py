@@ -5,5 +5,5 @@ whiteText = "#DEDEDE"
 blackText = "#222222"
 workspaceBackground = "#464646"
 canvasColour = "white"
-cameraHeight = 170
+cameraHeight = 188
 cameraWidth = 250

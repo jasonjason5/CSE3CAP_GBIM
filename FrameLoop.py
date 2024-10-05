@@ -4,13 +4,9 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import customtkinter as CTk
-from PIL import ImageTk, ImageEnhance, Image
-import _tkinter as tk
+from PIL import ImageEnhance, Image
 import MPRecognition
-import numpy as np
-import math
 from threading import Thread
-import time
 
 
 class GestureVision:
@@ -19,36 +15,38 @@ class GestureVision:
         
         self.activated = False
 
+        ## CV REFERENCES ##
+       
         self.frameCapture = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.mpHands = mp.solutions.hands
         self.mpDrawing = mp.solutions.drawing_utils
         self.mpHandObject = self.mpHands.Hands()
         self.cursor_control_active = False
         self.doOverlay = False
-        ##MPRecognition REFERENCES
+        self.runProcessing = 0
+        ## MPRecognition REFERENCES ##
         
         self.model_data = model_data
         self.recognizer = MPRecognition.MPRecognizer(self.model_data)
         self.gesture = None
+        
         ## UI REFERENCES ##
        
         self.root = root 
         self.window = window
         self.affirmation = affirmation
-        
-        ## Optimisations ##
-        self.runProcessing = 0
-        self.start_time = None
-        self.end_time = None
-        
-        ## Editing ##
+     
+        ## EDITING BOOLEANS ##
+
         self.opened = False # For making sure you cant open an image on an open image
         self.prevEdit = "none"
         self.cropMode = False
         self.editor = None
         self.history = None
         self.historyDoAdd = ["translate","crop","rotate","brightness","contrast","resize","undo","redo"]
-        
+      
+    ## INPUT: Nil
+    ## FUNCTION: Reads the frame, feeds it into detection to return gesture. Adds gestures to history, checks crop and then returns the webcam frame.
     def updateFrame(self):
 
         success, frame = self.frameCapture.read()
@@ -118,13 +116,19 @@ class GestureVision:
         else:
             return
        
-    def preProcess(self,frame): # Preprocesses the frame for recognition - increases image sharpness and contrast
+    ## INPUT: Webcame frame
+    ## OUTPUT: Preprocessed frame with sharpness and contrast increased
+    def preProcess(self,frame): 
         contrastPreProcessor = ImageEnhance.Contrast(frame)
         cppFrame = contrastPreProcessor.enhance(1.3)
         sharpnessPreProcessor = ImageEnhance.Sharpness(cppFrame)
         scppFrame = sharpnessPreProcessor.enhance(1.75)
         return scppFrame
     
+    ## setActive, setEditory, setHistory and setOverlay are booleans accessed through other modules.
+    ## Operated through setters allows FrameLoop to be disabled at parts, and enables the correct
+    ## order of operations when instantiating specific objects in Main.py
+
     def setActive(self):
         self.activated = True
 
@@ -137,14 +141,20 @@ class GestureVision:
     def setOverlay(self):
         self.doOverlay = True
     
+    ## INPUT: Nil
+    ## FUNCTION: Calls to destroy crop artefacts, and sets cropMode to false
     def exitCrop(self):
         print("EXITING")
         self.cropMode = False
         self.editor.destroyCropBounds(True)
         self.editor.resetCropStage()
 
-    def callFunction(self,gesture,results): ## This method will be called to check which function to call based on the contents of the buffer
+    ## INPUT: Detected gesture, Landmark Results
+    ## FUNCTION: Based on the gesture, calls specific editing functions
+
+    def callFunction(self,gesture,results): 
         
+        ## Different Flow Control Case: Resize performs different functionality based on the cropMode state
         if(gesture == "resize"):
             if(self.cropMode == True):
                 self.editor.crop(results)
@@ -154,19 +164,22 @@ class GestureVision:
                 self.editor.resize(results)
                 self.prevEdit = "resize"
         
+
+        ## Different Flow Control Case: Entering and exiting crop based on the previous gesture given.
         elif(gesture == "crop"):
             
-            if(self.cropMode == False and self.prevEdit != "cropexit"): #If you didnt just exit crop
+            if(self.cropMode == False and self.prevEdit != "cropexit"): 
                 self.cropMode = True
                 self.editor.createCropBounds()
                 self.prevEdit = "cropenter"
             
-            elif(self.cropMode == True and self.prevEdit != "cropenter"): # You were in crop mode but you didnt just literally enter into it. Will need to change how this behaves when gestures other than resize are given
+            elif(self.cropMode == True and self.prevEdit != "cropenter"): 
                 print("EXITING")
                 self.prevEdit = "cropexit"
                 self.editor.destroyCropBounds(False)
                 self.cropMode = False
 
+        ## Generic Flow Control: Checks gesture if out of crop mode. If in crop mode, exits.
         elif(gesture == "rotate"):
             if(self.cropMode == False):
                 self.editor.rotate(results)
@@ -225,17 +238,20 @@ class GestureVision:
             else:
                 self.exitCrop()
             
+        ## .clear_buffer() Ensures we dont have hangover within the buffer, adds a little bit of delay but the benefits outweight the cost here.
         elif(gesture == "save file"):
-            self.recognizer.clear_Buffer()
+            self.recognizer.clear_Buffer() 
             self.editor.save_file()
            
-        elif(gesture == "help"): # Ditto as above
+        ## Different Flow Control Case: retrieves previously given gesture if it was appended to history
+        elif(gesture == "help"): 
             self.root.open_help(self.history.check_top().cget("text"))
-            MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
+            MPRecognition.gesture = "none" 
             self.recognizer.clear_Buffer()
-                      
+                    
+        ## Different Flow Control Case: Allocates appropriate previous gesture. Check previous gesture, resets editor references.
         elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):
-            self.recognizer.clear_Buffer() ## Ensures we dont have hangover, adds a little bit of delay but the benefits outweight the cost here.
+            self.recognizer.clear_Buffer()
             self.editor.set_start(self.prevEdit)
             if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"
