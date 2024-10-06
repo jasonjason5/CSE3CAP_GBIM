@@ -15,6 +15,49 @@ model_path = 'gesture_recognizer.task'
 with open(model_path,'rb') as file:
     model_data = file.read()
 
+class SaveWindow(CTk.CTkToplevel):
+    def __init__(self, master, *args, **kwargs):
+        self.master = master
+        super().__init__(*args, **kwargs)
+        # Window settings
+        window_height = round(self.master.winfo_height() /2) 
+        window_width = round(self.master.winfo_width() /2)
+        window_size = str(window_width) + "x" + str(window_height)
+        self.geometry(window_size)
+        self.title("Save Window")
+        save_button = CTk.CTkButton(self, text="Save File", cursor ="hand2", command=lambda : [self.destroy()]) 
+        save_button.grid(row=0,column=0)
+        self.attributes("-topmost", True)
+
+        
+
+class ImportOptionsPopUp(CTk.CTkToplevel):
+    def __init__(self, master, *args, **kwargs):
+        self.master = master
+        super().__init__(*args, **kwargs)
+        self.geometry("300x110")
+        self.resizable(False,False)
+        self.title("Import Options")
+        self.attributes("-topmost", True)
+
+        
+        master.overlayBool = tk.BooleanVar()
+        master.paddingBool = tk.BooleanVar()
+        
+        self.pCheckBox =CTk.CTkCheckBox(self, text= "Pad the image to avoid rotational clipping?",cursor="hand2" ,variable= master.paddingBool)
+        self.pCheckBox.select()
+        self.oCheckBox = CTk.CTkCheckBox(self, text= "Overlay CV2 landmarks on webcam?",cursor="hand2" , variable= master.overlayBool)
+        self.continueButton = CTk.CTkButton(self, text= "Continue",cursor="hand2" ,command = self.destroy_window)
+        
+        self.pCheckBox.place(x=10,y=10)
+        self.oCheckBox.place(x=10,y=40)
+        self.continueButton.place(x=150,y=85,anchor='center')
+        
+    def destroy_window(self):
+        self.destroy()
+        self.master.open_image()
+        
+
 # Class for the Help Window.
 class HelpWindow(CTk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -119,7 +162,7 @@ class GIFLabel(CTk.CTkLabel):
             self._animate()
             return
         if(is_Open):
-            self.bind("<Button-1>", lambda event:root.importOptionsPopUp())
+            self.bind("<Button-1>", lambda event:root.open_file(master = root))
         elif(is_Help_Button):
             self.bind("<Button-1>", lambda event:root.open_help(root.uiActionHistory.get_last_gesture_text()))
         else:
@@ -353,6 +396,7 @@ class App(CTk.CTk):
         self.editor = Functions.editFunctions()
         self.looper.setEditor(self.editor)
         self.looper.setHistory(self.uiActionHistory)
+        
 
     ## INPUT: Nil
     ## FUNCITON: Destroys start frame, rearranges UI   
@@ -365,26 +409,11 @@ class App(CTk.CTk):
     def startCamera(self):
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
+        #SaveWindow(master=self)
 
     ## INPUT: Nil
     ## FUNCTION: Creates popup for import options. Sets self variables from checkboxes for later references.
-    def importOptionsPopUp(self):
-        popup = tk.Toplevel()
-        popup.geometry("300x100")
-        popup.resizable(False,False)
-        popup.title("Import Options")
 
-        self.paddingBool = tk.BooleanVar()
-        self.overlayBool = tk.BooleanVar()
-        
-        pCheckBox = tk.Checkbutton(popup, text= "Pad the image to avoid rotational clipping?",cursor="hand2" ,variable= self.paddingBool)
-        pCheckBox.select()
-        oCheckBox = tk.Checkbutton(popup, text= "Overlay CV2 landmarks on webcam?",cursor="hand2" , variable= self.overlayBool)
-        continueButton = tk.Button(popup, text= "Continue",cursor="hand2" ,command =lambda : [self.open_image(),popup.destroy()])
-        
-        pCheckBox.place(x=10,y=10)
-        oCheckBox.place(x=10,y=30)
-        continueButton.place(x=150,y=75,anchor='center')
     
     ## INPUT: Nil
     ## FUNCTION: Opens file explorer dialog, generates editing canvas based on relative coordinates, resizes image. Sets editor and looper states. 
@@ -470,8 +499,8 @@ class App(CTk.CTk):
             self.uiRenderFrame.config(width = newWidth, height =rfHeight )
       
     ## Intermediary called by FrameLoop
-    def open_file(self):
-        self.importOptionsPopUp()
+    def open_file(self, master):
+        self.toplevel_window = ImportOptionsPopUp(master= master)
     
     ## INPUT: previous gesture (affirmation)
     ## FUNCTION: Creates appropriate help window

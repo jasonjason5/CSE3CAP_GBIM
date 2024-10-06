@@ -99,7 +99,7 @@ class GestureVision:
                     self.opened == True
                     MPRecognition.gesture = "none" # This forces the gesture out of recognition so that it doesnt repeatedly open windows
                     self.recognizer.clear_Buffer()
-                    self.root.open_file()
+                    self.root.open_file(master = self.root)
             
             elif(self.activated == True):
                 self.callFunction(MPRecognition.gesture,results)
