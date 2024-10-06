@@ -20,14 +20,37 @@ class SaveWindow(CTk.CTkToplevel):
         self.master = master
         super().__init__(*args, **kwargs)
         # Window settings
-        window_height = round(self.master.winfo_height() /2) 
-        window_width = round(self.master.winfo_width() /2)
+        self.title("Save Window")
+
+        self.pil_image = master.editor.return_image()
+        #print("pil image hight = " + str(self.pil_image.height))
+        #print("pil image Width = " + str(self.pil_image.width))
+        #print("pil image Size = " + str(self.pil_image.size))
+        self.tk_image = CTk.CTkImage(self.pil_image, size= (self.pil_image.size))
+
+        self.CurrentImage = CTk.CTkLabel(self, image=self.tk_image, text= "", bg_color= Style.workspaceBackground)
+        self.CurrentImage.grid(row=0,column=0, columnspan = 2)
+ 
+        save_button = CTk.CTkButton(self, text="Save File", cursor ="hand2", command= self.save, corner_radius=50) 
+        save_button.grid(row=1,column=0, padx=5,pady=5)
+        cancel_button = CTk.CTkButton(self, text="Cancel", cursor ="hand2", command= self.cancel,corner_radius=50) 
+        cancel_button.grid(row=1,column=1,padx=5,pady=5)
+        
+        window_height = round(self.pil_image.height + 40) 
+        window_width = round(self.pil_image.width)
         window_size = str(window_width) + "x" + str(window_height)
         self.geometry(window_size)
-        self.title("Save Window")
-        save_button = CTk.CTkButton(self, text="Save File", cursor ="hand2", command=lambda : [self.destroy()]) 
-        save_button.grid(row=0,column=0)
         self.attributes("-topmost", True)
+
+    def save(self):
+        self.master.editor.save_file()
+        self.destroy()
+        print("Saved file")
+
+    def cancel(self):
+        self.destroy()
+        print("Cancelled")
+
 
         
 
@@ -39,16 +62,11 @@ class ImportOptionsPopUp(CTk.CTkToplevel):
         self.resizable(False,False)
         self.title("Import Options")
         self.attributes("-topmost", True)
-
-        
-        master.overlayBool = tk.BooleanVar()
-        master.paddingBool = tk.BooleanVar()
         
         self.pCheckBox =CTk.CTkCheckBox(self, text= "Pad the image to avoid rotational clipping?",cursor="hand2" ,variable= master.paddingBool)
         self.pCheckBox.select()
         self.oCheckBox = CTk.CTkCheckBox(self, text= "Overlay CV2 landmarks on webcam?",cursor="hand2" , variable= master.overlayBool)
         self.continueButton = CTk.CTkButton(self, text= "Continue",cursor="hand2" ,command = self.destroy_window)
-        
         self.pCheckBox.place(x=10,y=10)
         self.oCheckBox.place(x=10,y=40)
         self.continueButton.place(x=150,y=85,anchor='center')
@@ -158,15 +176,18 @@ class GIFLabel(CTk.CTkLabel):
             self._frames.append(CTk.CTkImage(self.gif_image.copy(), size=(self.gif_width, self.gif_height)))
        
         # start animation
+        gesture_text = Gesture.get_gesture_from_imagepath(Gesture, image_path)
         if(is_Help):
             self._animate()
             return
         if(is_Open):
             self.bind("<Button-1>", lambda event:root.open_file(master = root))
+        elif(gesture_text == "Save File"):
+            self.bind("<Button-1>", lambda event:root.save_window(master = root))
         elif(is_Help_Button):
             self.bind("<Button-1>", lambda event:root.open_help(root.uiActionHistory.get_last_gesture_text()))
         else:
-            self.bind("<Button-1>", lambda event:root.open_help(Gesture.get_gesture_from_imagepath(Gesture, image_path)))
+            self.bind("<Button-1>", lambda event:root.open_help(gesture_text))
         self.bind("<Enter>", lambda event:self._animate())
         self.bind("<Leave>", lambda event:self._killAnimate())
         self.configure(image=self._frames[1])
@@ -176,9 +197,10 @@ class GIFLabel(CTk.CTkLabel):
         self.animate_Job = self.after(self._duration, self._animate, (idx+1)%len(self._frames))
     
     def _killAnimate(self):
-        self.after_cancel(self.animate_Job)
-        self.animate_Job = None
-        self.configure(image=self._frames[1])
+        if self.animate_Job is not None:
+            self.after_cancel(self.animate_Job)
+            self.animate_Job = None
+            self.configure(image=self._frames[1])
         
 # Class for the image labels
 class ImageLabel(CTk.CTkLabel):
@@ -283,6 +305,7 @@ class App(CTk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        #Comfiguration
         # Minimum size of window
         min_width = 1280
         min_height = 900
@@ -301,6 +324,8 @@ class App(CTk.CTk):
         self.columnconfigure(0, weight = 1)
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
+        self.overlayBool = CTk.BooleanVar() # declare boolean variable used to select whether or not to add CV2 overlay
+        self.paddingBool = CTk.BooleanVar() # declare boolean variable used to select whether to pad the canvas image
         
         # frame that holds all of the bottom of the UI
         self.uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
@@ -367,7 +392,7 @@ class App(CTk.CTk):
 
         gestures = Gesture.return_enums(Gesture)
         for gesture in gestures:
-            print(gesture)
+            #print(gesture)
             if(gesture.value != 'Open File'):
                 self.uiFunctionList.add_item(gesture = gesture)
       
@@ -409,7 +434,6 @@ class App(CTk.CTk):
     def startCamera(self):
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
-        #SaveWindow(master=self)
 
     ## INPUT: Nil
     ## FUNCTION: Creates popup for import options. Sets self variables from checkboxes for later references.
@@ -439,14 +463,15 @@ class App(CTk.CTk):
             self.uiRenderFrame = tk.Canvas(master=self, width=self.winfo_width(), height= rfHeight,bg=Style.workspaceBackground ,bd=0, highlightthickness=0,)
             self.uiRenderFrame.delete("all")
             self.uiRenderFrame.place(x=0,y=0)
+
             
             self.bind("<Configure>", lambda event: self.handle_resize(event))
 
-            editingImage = self.uiRenderFrame.create_image(self.winfo_width()/2,rfHeight/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
+            self.editingImage = self.uiRenderFrame.create_image(self.winfo_width()/2,rfHeight/2,anchor='center',image=img_tk) ## Creates the reference to be passed to the looper
             self.uiRenderFrame.imgref = img_tk
                
 
-            self.editor.setRefs(img_tk,editingImage,self.uiRenderFrame)
+            self.editor.setRefs(img_tk, self.editingImage,self.uiRenderFrame)
             self.looper.setActive() # Activates detection
             if(self.overlayBool.get() == True):
                 self.looper.setOverlay()
@@ -502,6 +527,9 @@ class App(CTk.CTk):
     def open_file(self, master):
         self.toplevel_window = ImportOptionsPopUp(master= master)
     
+    def save_window(self, master):
+        SaveWindow(master= master)
+
     ## INPUT: previous gesture (affirmation)
     ## FUNCTION: Creates appropriate help window
     def open_help(self, affirmation):

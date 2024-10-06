@@ -11,11 +11,11 @@ class Gesture(Enum):
         BRIGHTNESS = "Brightness"
         POINTER = "Pointer"
         PEN = "Pen"
-        SAVEFILE = "Save File"
-        OPENFILE = "Open File"
         HELP = "Help"
         UNDO = "Undo"
         REDO = "Redo"
+        SAVEFILE = "Save File"
+        OPENFILE = "Open File"
         
         def gesture_help(cls):
             gestureHelp = {
@@ -27,11 +27,11 @@ class Gesture(Enum):
                     Gesture.BRIGHTNESS: "Brightness: Change the brightness of the image by raising or lowering your hand.",
                     Gesture.POINTER: "Pointer: Use this gesture to control the cursor with your hand movements. Activate it to click and interact with elements.",
                     Gesture.PEN: "Pen: Draw or write on the image using a finger, simulating a pen effect.",
-                    Gesture.SAVEFILE: "Save File: Use this gesture to save the current image or project.",
-                    Gesture.OPENFILE: "Open File: Use this gesture to open a new image file from your device.",
                     Gesture.HELP: "Help: Use this gesture to bring up the help menu or information about gestures.",
                     Gesture.UNDO: "Undo: Use this gesture to undo the previous editing step.",
-                    Gesture.REDO: "Redo: Use this gesture to redo the previous editing step."
+                    Gesture.REDO: "Redo: Use this gesture to redo the previous editing step.",
+                    Gesture.SAVEFILE: "Save File: Use this gesture to save the current image or project.",
+                    Gesture.OPENFILE: "Open File: Use this gesture to open a new image file from your device."
             }
             return gestureHelp[cls]
         def gesture_image(cls):
@@ -44,11 +44,11 @@ class Gesture(Enum):
                     Gesture.BRIGHTNESS: "Resources\BrightnessUI.gif",
                     Gesture.POINTER: "Resources\PointerUI.gif",
                     Gesture.PEN: "Resources\PenUI.gif",
-                    Gesture.SAVEFILE: "Resources\SaveUI.gif",
-                    Gesture.OPENFILE: "Resources\OpenUI.gif",
                     Gesture.HELP: "Resources\Helpui.gif",
                     Gesture.UNDO: "Resources\\Undoui.gif",
-                    Gesture.REDO: "Resources\Redoui.gif"
+                    Gesture.REDO: "Resources\Redoui.gif",
+                    Gesture.SAVEFILE: "Resources\SaveUI.gif",
+                    Gesture.OPENFILE: "Resources\OpenUI.gif"
             }
             return gestureImage[cls]
         
@@ -62,11 +62,11 @@ class Gesture(Enum):
                     Gesture.BRIGHTNESS: "Resources\Brightness.gif",
                     Gesture.POINTER: "Resources\Pointer.gif",
                     Gesture.PEN: "Resources\Pen.gif",
-                    Gesture.SAVEFILE: "Resources\Save.gif",
-                    Gesture.OPENFILE: "Resources\Open.gif",
                     Gesture.HELP: "Resources\Help.gif",
                     Gesture.UNDO: "Resources\\Undo.gif",
-                    Gesture.REDO: "Resources\Redo.gif"
+                    Gesture.REDO: "Resources\Redo.gif",
+                    Gesture.SAVEFILE: "Resources\Save.gif",
+                    Gesture.OPENFILE: "Resources\Open.gif"
             } 
             return gestureHelpImage[cls]
        
@@ -93,15 +93,15 @@ class Gesture(Enum):
 #print (list)
 #print (list[0])
 #print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
-#print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\RedoUI.gif"))
+#print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\SaveUI.gif"))
 #print(Gesture.string_to_enum("Help"))
 
 #print(Gesture.gesture_image(Gesture.HELP))
 
-future_time = datetime.now() + timedelta(milliseconds=16.67)
-print("Future Time (16.67 ms from now):", future_time)
-if (future_time <  datetime.now()):
-     print("Future Time is less than now")
-time.sleep(1)
-if (future_time <  datetime.now()):
-     print("Future Time is great than now")
+#future_time = datetime.now() + timedelta(milliseconds=16.67)
+#print("Future Time (16.67 ms from now):", future_time)
+#if (future_time <  datetime.now()):
+#     print("Future Time is less than now")
+#time.sleep(1)
+#if (future_time <  datetime.now()):
+#     print("Future Time is great than now")

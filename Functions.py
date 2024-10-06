@@ -466,3 +466,6 @@ class editFunctions:
         self.penHold = None
         self.penFrameCounter = 0
         
+    def return_image(self):
+        return self.image
+        
