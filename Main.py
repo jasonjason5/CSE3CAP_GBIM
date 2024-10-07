@@ -22,32 +22,46 @@ class SaveWindow(CTk.CTkToplevel):
         self.master = master
         super().__init__(*args, **kwargs)
         # Window settings
-        self.title("Save Window")
+        self.title("Save Preview Window")
 
+        image_info_label = CTk.CTkLabel(self , text= "Preview image is scaled to 60% size")
+        image_info_label.grid(row=0,column=1, rowspan = 1, columnspan = 2,sticky=CTk.E+ CTk.W )
+        image_frame = CTk.CTkFrame(self,fg_color=Style.workspaceBackground, border_color = Style.windowBorder, border_width= 3)
+        image_frame.grid(row=1,column=1, rowspan = 2, columnspan = 2)
         self.pil_image = master.editor.return_image()
         #print("pil image hight = " + str(self.pil_image.height))
         #print("pil image Width = " + str(self.pil_image.width))
-        #print("pil image Size = " + str(self.pil_image.size))
-        self.tk_image = CTk.CTkImage(self.pil_image, size= (self.pil_image.size))
-
-        self.CurrentImage = CTk.CTkLabel(self, image=self.tk_image, text= "", bg_color= Style.workspaceBackground)
-        self.CurrentImage.grid(row=0,column=0, columnspan = 2)
- 
-        save_button = CTk.CTkButton(self, text="Save File", cursor ="hand2", command= self.save, corner_radius=50) 
-        save_button.grid(row=1,column=0, padx=5,pady=5)
-        cancel_button = CTk.CTkButton(self, text="Cancel", cursor ="hand2", command= self.cancel,corner_radius=50) 
-        cancel_button.grid(row=1,column=1,padx=5,pady=5)
+        print("pil image Size = " + str(self.pil_image.size))
+        pil_image_width = round(self.pil_image.width * .6)
+        pil_image_height = round(self.pil_image.height * .6)
+        pil_scale_image = (pil_image_width, pil_image_height)   
+        self.tk_image = CTk.CTkImage(self.pil_image, size= (pil_scale_image))
+        self.CurrentImage = CTk.CTkLabel(image_frame, image=self.tk_image, text= "")
+        self.CurrentImage.pack(side=CTk.TOP)
         
-        window_height = round(self.pil_image.height + 40) 
-        window_width = round(self.pil_image.width)
+        information_frame = CTk.CTkFrame(self,fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder,corner_radius=0)
+        information_frame.grid(row = 0, column = 0, rowspan =4,sticky=CTk.E+ CTk.W +CTk.N + CTk.S)
+        information_label = CTk.CTkLabel(information_frame , text= "Output Image Details:")
+        information_label.pack(side=CTk.TOP, padx=5,pady=5)
+        dimensions_height = CTk.CTkLabel(information_frame , text= "Height = " + str(self.pil_image.height))
+        dimensions_height.pack(side=CTk.TOP, padx=5,pady=5)
+        dimensions_width = CTk.CTkLabel(information_frame , text= "Width = " + str(self.pil_image.width))
+        dimensions_width.pack(side=CTk.TOP, padx=5,pady=5)
+        save_button = CTk.CTkButton(self, text="Save File", cursor ="hand2", command= self.save, corner_radius=50,fg_color=Style.gestures, text_color=Style.blackText) 
+        save_button.grid(row=3,column=1, padx=5,pady=5)
+        cancel_button = CTk.CTkButton(self, text="Cancel", cursor ="hand2", command= self.cancel,corner_radius=50,fg_color=Style.gestures, text_color=Style.blackText) 
+        cancel_button.grid(row=3,column=2,padx=5,pady=5)
+        
+        window_height = round(pil_image_height + 40) 
+        window_width = round(pil_image_width + 50)
         window_size = str(window_width) + "x" + str(window_height)
-        self.geometry(window_size)
+        #self.geometry(window_size)
         self.attributes("-topmost", True)
 
     def save(self):
-        self.master.editor.save_file()
         self.destroy()
-        print("Saved file")
+        self.master.editor.save_file() 
+        #print("Saved file")
 
     def cancel(self):
         self.destroy()
@@ -514,6 +528,7 @@ class App(CTk.CTk):
             padBox = img
 
         return padBox
+    
 
     ## INPUT: Event
     ## FUNCTION: Resizes canvas based on overall window size.
