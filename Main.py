@@ -21,7 +21,8 @@ class SaveWindow(CTk.CTkToplevel):
         super().__init__(*args, **kwargs)
         # Window settings
         self.title("Save Preview Window")
-
+        master.saveWindowOpenBool = True
+        print ("Save window open =" + str(master.saveWindowOpenBool))
         image_info_label = CTk.CTkLabel(self , text= "Preview image is scaled to 60% size")
         image_info_label.grid(row=0,column=1, rowspan = 1, columnspan = 2,sticky=CTk.E+ CTk.W )
         image_frame = CTk.CTkFrame(self,fg_color=Style.workspaceBackground, border_color = Style.windowBorder, border_width= 3)
@@ -55,15 +56,19 @@ class SaveWindow(CTk.CTkToplevel):
         window_size = str(window_width) + "x" + str(window_height)
         #self.geometry(window_size)
         self.attributes("-topmost", True)
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
 
     def save(self):
+        self.master.saveWindowOpenBool = False
         self.destroy()
         self.master.editor.save_file() 
         #print("Saved file")
 
     def cancel(self):
-        self.destroy()
+        self.master.saveWindowOpenBool = False
         print("Cancelled")
+        print("Save window open =" + str(self.master.saveWindowOpenBool))
+        self.destroy()
 
 
         
@@ -340,6 +345,7 @@ class App(CTk.CTk):
         self.columnconfigure(2, weight = 1)
         self.overlayBool = CTk.BooleanVar() # declare boolean variable used to select whether or not to add CV2 overlay
         self.paddingBool = CTk.BooleanVar() # declare boolean variable used to select whether to pad the canvas image
+        self.saveWindowOpenBool = False # declare boolean variable used tell if save window is open
         
         # frame that holds all of the bottom of the UI
         self.uiMasterFrame = CTk.CTkFrame(master=self, fg_color= Style.workspaceBackground, bg_color= Style.workspaceBackground)
@@ -543,7 +549,7 @@ class App(CTk.CTk):
         self.toplevel_window = ImportOptionsPopUp(master= master)
     
     def save_window(self, master):
-        SaveWindow(master= master)
+        master.saveWindow = SaveWindow(master= master)
 
     ## INPUT: previous gesture (affirmation)
     ## FUNCTION: Creates appropriate help window

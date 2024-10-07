@@ -241,7 +241,12 @@ class GestureVision:
         ## .clear_buffer() Ensures we dont have hangover within the buffer, adds a little bit of delay but the benefits outweight the cost here.
         elif(gesture == "save file"):
             self.recognizer.clear_Buffer()
-            self.root.save_window(master = self.root)
+            if not self.root.saveWindowOpenBool:
+                self.root.save_window(master = self.root)
+                self.recognizer.clear_Buffer()
+            else:
+                self.root.saveWindow.save()
+                self.recognizer.clear_Buffer()
            
         ## Different Flow Control Case: retrieves previously given gesture if it was appended to history
         elif(gesture == "help"): 
