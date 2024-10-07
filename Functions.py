@@ -2,6 +2,7 @@ from PIL import ImageTk, Image, ImageOps, ImageTk, ImageEnhance
 import math
 import numpy as np
 from tkinter import messagebox
+from tkinter import filedialog
 from operator import add
 import mouse
 import pyautogui
@@ -398,7 +399,12 @@ class editFunctions:
     ## INPUT: Nil
     ## FUNCTION: Saves Image
     def save_file(self):
-        self.image.save("SavedImage.png")
+        file_path = filedialog.asksaveasfilename(defaultextension=".png",
+                                             filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
+        if file_path:
+            self.image.save(file_path)
+        else:
+            print("not a valid file path to save image")
 
     ## Undo and redo usurp set_start as a function, and perform the resetting of variables by themselves to ensure continuity
 
