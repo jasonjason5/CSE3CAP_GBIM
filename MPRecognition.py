@@ -96,7 +96,7 @@ class MPRecognizer:
     def gestureCleanup(self,landmark_data):
 
         global gesture 
-        
+        print(len(landmark_data.multi_hand_landmarks))
         if(landmark_data.multi_hand_landmarks):
             ### SINGLE HANDED GESTURES ###
             if(len(landmark_data.multi_hand_landmarks) == 1):
@@ -151,6 +151,9 @@ class MPRecognizer:
                 elif(self.buffer[0] == 'help' and (self.buffer[7] == 'close' or self.buffer[6] == 'close' or self.buffer[5] == 'close')):
                      gesture = "open file"
                
+                elif(self.bufferWeighter('help') > self.confidence):
+                    gesture = "open hand"
+
                 elif(self.bufferWeighter('close') > self.confidence):
                     gesture = "closed hand"   
                 else:

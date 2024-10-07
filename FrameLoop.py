@@ -240,14 +240,17 @@ class GestureVision:
             
         ## .clear_buffer() Ensures we dont have hangover within the buffer, adds a little bit of delay but the benefits outweight the cost here.
         elif(gesture == "save file"):
+            self.root.save_window(self.root)
             self.recognizer.clear_Buffer()
-            self.root.save_window()
+            MPRecognition.gesture = "none" ## Prevent additional windows from being produced
+
            
         ## Different Flow Control Case: retrieves previously given gesture if it was appended to history
-        elif(gesture == "help"): 
-            self.root.open_help(self.history.check_top().cget("text"))
-            MPRecognition.gesture = "none" 
-            self.recognizer.clear_Buffer()
+        elif(gesture == "help"):
+            if(len(results.multi_hand_landmarks) == 2):
+                self.root.open_help(self.history.check_top().cget("text"))
+                MPRecognition.gesture = "none"  ## Prevent additional windows from being produced
+                self.recognizer.clear_Buffer()
                     
         ## Different Flow Control Case: Allocates appropriate previous gesture. Check previous gesture, resets editor references.
         elif(self.prevEdit != "none" and self.prevEdit != "undo" and self.prevEdit != "redo"):

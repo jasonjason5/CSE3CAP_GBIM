@@ -15,6 +15,8 @@ model_path = 'gesture_recognizer.task'
 with open(model_path,'rb') as file:
     model_data = file.read()
 
+
+# Ckass for the save preview window
 class SaveWindow(CTk.CTkToplevel):
     def __init__(self, master, *args, **kwargs):
         self.master = master
@@ -51,9 +53,7 @@ class SaveWindow(CTk.CTkToplevel):
         self.destroy()
         print("Cancelled")
 
-
-        
-
+# Class for the import options popup
 class ImportOptionsPopUp(CTk.CTkToplevel):
     def __init__(self, master, *args, **kwargs):
         self.master = master
