@@ -38,7 +38,7 @@ class SaveWindow(CTk.CTkToplevel):
         self.CurrentImage.pack(side=CTk.TOP)
         
         information_frame = CTk.CTkFrame(self,fg_color=Style.popupBackground, border_width= 3, border_color= Style.windowBorder,corner_radius=0)
-        information_frame.grid(row = 0, column = 0, rowspan =3,sticky=CTk.E+ CTk.W +CTk.N + CTk.S)
+        information_frame.grid(row = 0, column = 0, rowspan =4,sticky=CTk.E+ CTk.W +CTk.N + CTk.S)
         information_label = CTk.CTkLabel(information_frame , text= "Output Image Details:")
         information_label.pack(side=CTk.TOP, padx=5,pady=5)
         dimensions_height = CTk.CTkLabel(information_frame , text= "Height = " + str(self.pil_image.height))
