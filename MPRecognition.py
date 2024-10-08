@@ -21,7 +21,7 @@ class MPRecognizer:
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
         
         ## Confidence value corresponding to proportion of identical gestures in buffer.
-        self.confidence = 0.49 
+        self.confidence = 0.74 # 6/8
         ## Buffer for storing gestures detected for the last 8 frames.
         self.buffer = ["none"]*8
         

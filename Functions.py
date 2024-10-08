@@ -155,7 +155,7 @@ class editFunctions:
             rot_vec = np.subtract([current_point.x, current_point.y], [pivot_point.x, pivot_point.y])
             rotation = math.atan2(rot_vec[1], rot_vec[0])
 
-            out_rot = -(math.degrees(rotation) - 90)
+            out_rot = (math.degrees(rotation) - 90)
             array = np.array([-210,-180,-150,-120,-90,-75,-60,-45,-30,-15,0,15,30,45,60,75,90,120,150,180,210]) ## Snaps to 15/30 degree increments
             out_rot = self.snap(array,out_rot)
 
@@ -190,7 +190,7 @@ class editFunctions:
         self.cropDim[0] = sWidth
         self.cropDim[1] = sHeight
 
-        self.cropStage == "scale" 
+        self.cropStage = "scale" 
 
     ## INPUT: Nil
     ## FUNCTION: Applies the crop. Locates crop window position and image position, subtracts difference in pixels
@@ -322,16 +322,16 @@ class editFunctions:
             self.start_results = results
 
         indexMouse = self._get_landmark(results, 8)
-        fingPosx = indexMouse.x
+        fingPosx = 1 - indexMouse.x
         fingPosy = indexMouse.y
 
         relX = fingPosx * self.screenDimensions[0]
-        relY = fingPosy * self.screenDimensions[1]
+        relY = fingPosy * self.screenDimensions[1] * 1.35
         self.penHold = (relX,relY)
 
         if(self.penHold[0] - 10 <= relX <= self.penHold[0] + 10 and self.penHold[1] - 10 <= relY <= self.penHold[1] + 10):
             self.penFrameCounter += 1
-        if(self.penFrameCounter > 45):
+        if(self.penFrameCounter > 90):
             mouse.click(button = "left")
             self.penFrameCounter = 0
 
