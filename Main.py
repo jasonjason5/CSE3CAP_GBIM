@@ -18,7 +18,14 @@ with open(model_path,'rb') as file:
 
 # Ckass for the save preview window
 class SaveWindow(CTk.CTkToplevel):
+    """
+    Top level window to display preview of edited image. 
+    also displays Height and Width infomation in text.
+    """
     def __init__(self, master, *args, **kwargs):
+        """
+        sets all of the content inside of the Save Window
+        """
         self.master = master
         super().__init__(*args, **kwargs)
         # Window settings
@@ -61,12 +68,18 @@ class SaveWindow(CTk.CTkToplevel):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
     def save(self):
+        """
+        Destroys the save window and opens the save file dialogue
+        """
         self.master.saveWindowOpenBool = False
         self.destroy()
         self.master.editor.save_file() 
         #print("Saved file")
 
     def cancel(self):
+        """
+        Destoys the save window
+        """
         self.master.saveWindowOpenBool = False
         print("Cancelled")
         print("Save window open =" + str(self.master.saveWindowOpenBool))
@@ -74,7 +87,15 @@ class SaveWindow(CTk.CTkToplevel):
 
 # Class for the import options popup
 class ImportOptionsPopUp(CTk.CTkToplevel):
+    """
+    Top level window to display options avaiable
+    - Pad the image to avoid rotational clipping
+    - Overlay CV2 landmarks on webcam
+    """
     def __init__(self, master, *args, **kwargs):
+        """
+        sets all of the content inside of the import Options pop up
+        """
         self.master = master
         super().__init__(*args, **kwargs)
         self.geometry("300x110")
@@ -90,14 +111,26 @@ class ImportOptionsPopUp(CTk.CTkToplevel):
         self.oCheckBox.place(x=10,y=40)
         self.continueButton.place(x=150,y=85,anchor='center')
         
-    def destroy_window(self):
+    def destroy_window(self) -> None:
+        """
+        Destroys the window and calls the Open image function
+        """
         self.destroy()
         self.master.open_image()
         
 
 # Class for the Help Window.
 class HelpWindow(CTk.CTkToplevel):
+    """
+    Top level window that displays help for a gesture.
+    content:
+    - animated Help gif showing the gesture in action
+    - text tool tip to help explain the gesture
+    """
     def __init__(self, *args, **kwargs):
+        """
+        sets all of the content inside of the Help Window
+        """
         super().__init__(*args, **kwargs)
         # Window settings
         self.geometry("375x400")
@@ -138,7 +171,13 @@ class HelpWindow(CTk.CTkToplevel):
         self.attributes("-topmost", True)
 
     # This function sets the title of the help window
-    def set_title(self, title):
+    def set_title(self, title : str):
+        """
+        Sets the title of the help window. Takes in a string that must exist as a gesture
+
+        :type title: string that must exist as a gesture
+        :param title: string
+        """
         # Get the Gesture Enum object from the string value, and return the value of the gesture
         enumGesture = Gesture.string_to_enum(title).value
         # Append help at the end of the string
@@ -147,7 +186,13 @@ class HelpWindow(CTk.CTkToplevel):
         self.title(message)
 
     # This function sets the help text for the specified gesture
-    def set_help_text(self,gesture):
+    def set_help_text(self,gesture:str):
+        """
+        Sets the help text of the help window. Takes in a string that must exist as a gesture
+
+        :type gesture: string that must exist as a gesture
+        :param gesture: string
+        """
         # Get the Gesture Enum object from the string value
         enumGesture = Gesture.string_to_enum(gesture)
         # Get the help message for the specific Gesture
@@ -156,7 +201,13 @@ class HelpWindow(CTk.CTkToplevel):
         self.uiHelpMessage.configure(text=help)
 
     # This function sets the help image for the specified gesture
-    def set_help_image(self,gesture):
+    def set_help_image(self,gesture:str):
+        """
+        Sets the Gif displayed in the help window. Takes in a string that must exist as a gesture
+
+        :type gesture: string that must exist as a gesture
+        :param gesture: string
+        """
         # Get the Gesture Enum object from the string value
         enumGesture = Gesture.string_to_enum(gesture)
         # Get the image name for the specific Gesture
@@ -167,7 +218,31 @@ class HelpWindow(CTk.CTkToplevel):
 
 # Class for the gif labels
 class GIFLabel(CTk.CTkLabel):
+    """
+    A label that has the content of a GIF image. can animate on hover or loop continuosly.
+    """
     def __init__(self, master, root, image_path, gif_width = 320, gif_height = 220, is_Help = True, is_Open = False, is_Help_Button = False,**kwargs):
+        """
+        sets all of the content inside of the GIF label
+
+        :type master: The CTK root window
+        :param master: CTK.CTK        
+        :type root: The CTK root window
+        :param root: CTK.CTK
+        :type image_path: The file path of the GIF
+        :param image_path: string
+        :type gif_width: The width that you would like to set the GIF image to. Default is 320
+        :param gif_width: int    
+        :type gif_height: The height that you would like to set the GIF image to. Default is 220
+        :param gif_height: int
+        :type is_Help: is the gif for the Help Window? Default True
+        :param is_Help: Boolean
+        :type is_Open: is the gif the Open File label? Default False
+        :param is_Open: Boolean
+        :type is_Help_Button: is the gif the a help label in the function options? Default False
+        :param is_Help_Button: Boolean
+        
+        """
         self.is_Help = is_Help
         self.is_Help_Button = is_Help_Button
         self.is_Open = is_Open

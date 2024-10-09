@@ -1,8 +1,10 @@
 from enum import Enum
-from datetime import datetime, timedelta
-import time
 
 class Gesture(Enum):
+        """
+        Class of tupe enum that holds all of the available gestures.
+        includes functions to return the help text and images for all gestures. 
+        """
         ROTATE = "Rotate"
         CROP = "Crop"
         RESIZE = "Resize"
@@ -17,7 +19,16 @@ class Gesture(Enum):
         SAVEFILE = "Save File"
         OPENFILE = "Open File"
         
-        def gesture_help(cls):
+        def gesture_help(cls :Enum) -> str:
+            """
+            Returns the help text of the gesture inputted to the function
+
+            :type cls: Gesture that you require the help text for
+            :param cls: Enum of type Gesture
+            :Example:
+            >>> print(Gesture.gesture_help(Gesture.BRIGHTNESS))
+            Brightness: Change the brightness of the image by raising or lowering your hand.
+            """
             gestureHelp = {
                     Gesture.ROTATE: "Rotate: Use this gesture to rotate the image clockwise or counterclockwise.",
                     Gesture.CROP: "Crop: Used to enter and exit crop mode. Once in crop mode, utilise the resize gesture to position and scale the image under the crop visualisation.",
@@ -34,7 +45,16 @@ class Gesture(Enum):
                     Gesture.OPENFILE: "Open File: Use this gesture to open a new image file from your device."
             }
             return gestureHelp[cls]
-        def gesture_image(cls):
+        def gesture_image(cls :Enum) -> str:
+            """
+            Returns the path of the image for function menu of the gesture inputted to the function
+
+            :type cls: Gesture that you require the function menu image of
+            :param cls: Enum of type Gesture
+            :Example:
+            >>> print(Gesture.gesture_image(Gesture.HELP))
+            Resources\Helpui.gif
+            """
             gestureImage = {
                     Gesture.ROTATE: "Resources\RotateUI.gif",
                     Gesture.CROP: "Resources\CropUI.gif",
@@ -52,7 +72,17 @@ class Gesture(Enum):
             }
             return gestureImage[cls]
         
-        def gesture_help_image(cls):
+        def gesture_help_image(cls :Enum) -> str:
+            """
+            Returns the path of the the gif for the help window of the gesture inputted to the function
+
+            :type cls: Gesture that you require the help window gif of
+            :param cls: Enum of type Gesture
+
+            :Example:
+            >>> print(Gesture.gesture_help_image(Gesture.HELP))
+            Resources\Help.gif
+            """            
             gestureHelpImage = {
                     Gesture.ROTATE: "Resources\Rotate.gif",
                     Gesture.CROP: "Resources\Crop.gif",
@@ -70,18 +100,39 @@ class Gesture(Enum):
             } 
             return gestureHelpImage[cls]
        
-        def return_enums(cls):
+        def return_enums(cls) -> list:
+            """
+            Returns the full list of gestures
+
+            :type cls: The Gesture class
+            :param cls: The Gesture class
+            """         
             enums = []
             for member in cls:  
                 enums.append(member)
             return enums
         
-        def string_to_enum(string):
+        def string_to_enum(string: str) ->Enum:
+            """
+            Takes in a string eg: "Rotate","crop" and returns the Gesture:Enum assosiated
+            :type string: The Gesture string
+            :param string: str
+            """  
             string = string.replace(" ", "")
             string = string.upper()
             return Gesture.__members__.get(string)
         
-        def get_gesture_from_imagepath(cls, image_path):
+        def get_gesture_from_imagepath(cls, image_path) ->Enum:
+            """
+            Takes in a image path string eg "Resources\Penui.gif","Resources\Redoui.gif" and returns the GestureEnum assosiated
+            :type image_path: The imagepath string
+            :param image_path: str
+            :return: the Gesture:Enum assosiated with image_path
+            :rtype: Gestureenum
+            :Example:
+            >>> print(Gesture.get_gesture_from_imagepath(Gesture, "Resources\SaveUI.gif"))
+            Save File
+            """  
             for member in cls:
                  string = Gesture.gesture_image(member)
                  if(string == image_path):
@@ -89,19 +140,10 @@ class Gesture(Enum):
 
 
 
-#list = Gesture.return_enums(Gesture)
-#print (list)
-#print (list[0])
-#print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
-#print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\SaveUI.gif"))
-#print(Gesture.string_to_enum("Help"))
 
-#print(Gesture.gesture_image(Gesture.HELP))
+print(Gesture.BRIGHTNESS.value + " = " +Gesture.gesture_help(Gesture.BRIGHTNESS))
+print (Gesture.get_gesture_from_imagepath(Gesture, "Resources\SaveUI.gif"))
+print(Gesture.string_to_enum("Help"))
+print(Gesture.gesture_image(Gesture.HELP))
 
-#future_time = datetime.now() + timedelta(milliseconds=16.67)
-#print("Future Time (16.67 ms from now):", future_time)
-#if (future_time <  datetime.now()):
-#     print("Future Time is less than now")
-#time.sleep(1)
-#if (future_time <  datetime.now()):
-#     print("Future Time is great than now")
+#help(Gesture)
