@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main module &mdash; CSE3CAP 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=7ab3649f" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Style module" href="Style.html" />
+    <link rel="prev" title="MPRecognition module" href="MPRecognition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CSE3CAP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">CSE3CAP_GBIM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="FrameLoop.html">FrameLoop module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Functions.html">Functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Gestures.html">Gestures module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MPRecognition.html">MPRecognition module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Main module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Main.ActionHistory"><code class="docutils literal notranslate"><span class="pre">ActionHistory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ActionHistory.add_item"><code class="docutils literal notranslate"><span class="pre">ActionHistory.add_item()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ActionHistory.check_top"><code class="docutils literal notranslate"><span class="pre">ActionHistory.check_top()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ActionHistory.get_last_gesture_text"><code class="docutils literal notranslate"><span class="pre">ActionHistory.get_last_gesture_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ActionHistory.pop_item"><code class="docutils literal notranslate"><span class="pre">ActionHistory.pop_item()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.App"><code class="docutils literal notranslate"><span class="pre">App</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.handle_resize"><code class="docutils literal notranslate"><span class="pre">App.handle_resize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.killStartFrame"><code class="docutils literal notranslate"><span class="pre">App.killStartFrame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.open_file"><code class="docutils literal notranslate"><span class="pre">App.open_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.open_help"><code class="docutils literal notranslate"><span class="pre">App.open_help()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.open_image"><code class="docutils literal notranslate"><span class="pre">App.open_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.resizeImport"><code class="docutils literal notranslate"><span class="pre">App.resizeImport()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.save_window"><code class="docutils literal notranslate"><span class="pre">App.save_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.App.startCamera"><code class="docutils literal notranslate"><span class="pre">App.startCamera()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.FunctionFrame"><code class="docutils literal notranslate"><span class="pre">FunctionFrame</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.FunctionFrame.add_item"><code class="docutils literal notranslate"><span class="pre">FunctionFrame.add_item()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.GIFLabel"><code class="docutils literal notranslate"><span class="pre">GIFLabel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.HelpWindow"><code class="docutils literal notranslate"><span class="pre">HelpWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.HelpWindow.set_help_image"><code class="docutils literal notranslate"><span class="pre">HelpWindow.set_help_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.HelpWindow.set_help_text"><code class="docutils literal notranslate"><span class="pre">HelpWindow.set_help_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.HelpWindow.set_title"><code class="docutils literal notranslate"><span class="pre">HelpWindow.set_title()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.ImageLabel"><code class="docutils literal notranslate"><span class="pre">ImageLabel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ImageLabel.load_image"><code class="docutils literal notranslate"><span class="pre">ImageLabel.load_image()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.ImportOptionsPopUp"><code class="docutils literal notranslate"><span class="pre">ImportOptionsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.ImportOptionsPopUp.destroy_window"><code class="docutils literal notranslate"><span class="pre">ImportOptionsPopUp.destroy_window()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Main.SaveWindow"><code class="docutils literal notranslate"><span class="pre">SaveWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main.SaveWindow.cancel"><code class="docutils literal notranslate"><span class="pre">SaveWindow.cancel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Main.SaveWindow.save"><code class="docutils literal notranslate"><span class="pre">SaveWindow.save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Style.html">Style module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CSE3CAP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">CSE3CAP_GBIM</a></li>
+      <li class="breadcrumb-item active">Main module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-Main">
+<span id="main-module"></span><h1>Main module<a class="headerlink" href="#module-Main" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.ActionHistory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">ActionHistory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ActionHistory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ActionHistory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkFrame</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ActionHistory.add_item">
+<span class="sig-name descname"><span class="pre">add_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ActionHistory.add_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ActionHistory.add_item" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ActionHistory.check_top">
+<span class="sig-name descname"><span class="pre">check_top</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ActionHistory.check_top"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ActionHistory.check_top" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ActionHistory.get_last_gesture_text">
+<span class="sig-name descname"><span class="pre">get_last_gesture_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ActionHistory.get_last_gesture_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ActionHistory.get_last_gesture_text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ActionHistory.pop_item">
+<span class="sig-name descname"><span class="pre">pop_item</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ActionHistory.pop_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ActionHistory.pop_item" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.App">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">App</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTk</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.handle_resize">
+<span class="sig-name descname"><span class="pre">handle_resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.handle_resize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.handle_resize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.killStartFrame">
+<span class="sig-name descname"><span class="pre">killStartFrame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.killStartFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.killStartFrame" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.open_file">
+<span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.open_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.open_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.open_help">
+<span class="sig-name descname"><span class="pre">open_help</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">affirmation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.open_help"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.open_help" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.open_image">
+<span class="sig-name descname"><span class="pre">open_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.open_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.open_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.resizeImport">
+<span class="sig-name descname"><span class="pre">resizeImport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas_height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.resizeImport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.resizeImport" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.save_window">
+<span class="sig-name descname"><span class="pre">save_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.save_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.save_window" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.App.startCamera">
+<span class="sig-name descname"><span class="pre">startCamera</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#App.startCamera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.App.startCamera" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.FunctionFrame">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">FunctionFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#FunctionFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.FunctionFrame" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkFrame</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.FunctionFrame.add_item">
+<span class="sig-name descname"><span class="pre">add_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gesture</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#FunctionFrame.add_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.FunctionFrame.add_item" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.GIFLabel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">GIFLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">320</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">220</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_Help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_Open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_Help_Button</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#GIFLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.GIFLabel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkLabel</span></code></p>
+<p>A label that has the content of a GIF image. can animate on hover or loop continuosly.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.HelpWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">HelpWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#HelpWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.HelpWindow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkToplevel</span></code></p>
+<p>Top level window that displays help for a gesture.
+content:
+- animated Help gif showing the gesture in action
+- text tool tip to help explain the gesture</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.HelpWindow.set_help_image">
+<span class="sig-name descname"><span class="pre">set_help_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gesture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#HelpWindow.set_help_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.HelpWindow.set_help_image" title="Link to this definition"></a></dt>
+<dd><p>Sets the Gif displayed in the help window. Takes in a string that must exist as a gesture</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gesture</strong> (<em>string that must exist as a gesture</em>) – string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.HelpWindow.set_help_text">
+<span class="sig-name descname"><span class="pre">set_help_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gesture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#HelpWindow.set_help_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.HelpWindow.set_help_text" title="Link to this definition"></a></dt>
+<dd><p>Sets the help text of the help window. Takes in a string that must exist as a gesture</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gesture</strong> (<em>string that must exist as a gesture</em>) – string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.HelpWindow.set_title">
+<span class="sig-name descname"><span class="pre">set_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#HelpWindow.set_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.HelpWindow.set_title" title="Link to this definition"></a></dt>
+<dd><p>Sets the title of the help window. Takes in a string that must exist as a gesture</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>string that must exist as a gesture</em>) – string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.ImageLabel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">ImageLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_gesture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ImageLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ImageLabel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkLabel</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ImageLabel.load_image">
+<span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ImageLabel.load_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ImageLabel.load_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.ImportOptionsPopUp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">ImportOptionsPopUp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#ImportOptionsPopUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ImportOptionsPopUp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkToplevel</span></code></p>
+<p>Top level window to display options avaiable
+- Pad the image to avoid rotational clipping
+- Overlay CV2 landmarks on webcam</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.ImportOptionsPopUp.destroy_window">
+<span class="sig-name descname"><span class="pre">destroy_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Main.html#ImportOptionsPopUp.destroy_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.ImportOptionsPopUp.destroy_window" title="Link to this definition"></a></dt>
+<dd><p>Destroys the window and calls the Open image function</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Main.SaveWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Main.</span></span><span class="sig-name descname"><span class="pre">SaveWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#SaveWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.SaveWindow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CTkToplevel</span></code></p>
+<p>Top level window to display preview of edited image. 
+also displays Height and Width infomation in text.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.SaveWindow.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#SaveWindow.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.SaveWindow.cancel" title="Link to this definition"></a></dt>
+<dd><p>Destoys the save window</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Main.SaveWindow.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Main.html#SaveWindow.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Main.SaveWindow.save" title="Link to this definition"></a></dt>
+<dd><p>Destroys the save window and opens the save file dialogue</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MPRecognition.html" class="btn btn-neutral float-left" title="MPRecognition module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Style.html" class="btn btn-neutral float-right" title="Style module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Patrick Mika, Jason Styles, Hao Do Nguyen, Liam Bentley.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
