@@ -14,6 +14,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme myst_parser mediapipe tk opencv-python customtkinter
+          sudo apt-get install python3-tk
       - name: Sphinx build
         run: |
           cd Docs/
