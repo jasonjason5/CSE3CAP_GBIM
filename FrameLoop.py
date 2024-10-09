@@ -262,3 +262,4 @@ class GestureVision:
             self.editor.set_start(self.prevEdit)
             if(gesture == "none" or gesture == "open hand"):
                 self.prevEdit = "none"
+

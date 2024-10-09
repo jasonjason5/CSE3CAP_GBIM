@@ -11,11 +11,6 @@ import math
 from collections import deque
 
 
-model_path = 'gesture_recognizer.task'
-with open(model_path,'rb') as file:
-    model_data = file.read()
-
-
 # Ckass for the save preview window
 class SaveWindow(CTk.CTkToplevel):
     """
@@ -641,6 +636,9 @@ class App(CTk.CTk):
                  
 
 if __name__ == "__main__":
+    model_path = 'gesture_recognizer.task'
+    with open(model_path,'rb') as file:
+        model_data = file.read()
     app = App()
     app.mainloop()
     
