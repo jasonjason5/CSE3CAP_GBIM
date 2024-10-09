@@ -14,7 +14,7 @@ import mouse
 class editFunctions:
     def __init__(self):
        
-        ## Application Componentry References 
+        ##Application Componentry References 
 
         self.image: Image = None
         self.canvas = None
