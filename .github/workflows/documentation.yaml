@@ -20,6 +20,9 @@ jobs:
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           pip install sphinx sphinx_rtd_theme myst_parser mediapipe tk opencv-python customtkinter mouse pillow pyautogui
           sudo apt-get install python3-tk
+          touch ~/.Xauthority
+          # Generate the magic cookie with 128 bit hex encoding
+          xauth add ${HOST}:0 . $(xxd -l 16 -p /dev/urandom)
       - name: Sphinx build
         run: |
           cd Docs/
