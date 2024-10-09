@@ -15,6 +15,9 @@ jobs:
         run: |
           pip install sphinx sphinx_rtd_theme myst_parser mediapipe tk opencv-python customtkinter mouse pillow
           sudo apt-get install python3-tk
+          npm install
+          sudo apt-get install xvfb
+          xvfb-run --auto-servernum npm test
       - name: Sphinx build
         run: |
           cd Docs/
