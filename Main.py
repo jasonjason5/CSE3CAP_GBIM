@@ -346,7 +346,7 @@ class ActionHistory(CTk.CTkFrame):
             bgColour = Style.popupBackground
             self.colourCounter = 0
         else:
-            bgColour = Style.workspaceBackground
+            bgColour = Style.alternating
             self.colourCounter += 1
 
         if(len(self.label_list) == 3):
@@ -465,7 +465,7 @@ class App(CTk.CTk):
         self.uiPreimportOpenFileLbl = GIFLabel(master=self.uiPreimportFrame,root= self, image_path='Ui_Images\OpenUI.gif',gif_width=100,gif_height= 100,is_Help=False, is_Open = True, bg_color="transparent", text = "") ## Giffed
         self.uiPreimportOpenFileLbl.grid(column=0, row=0,padx=20, pady=20)
 
-        self.uiPreimportBoilerPlate = CTk.CTkLabel(master=self.uiPreimportFrame, width = 200, height= 100, text_color=Style.whiteText,font=('Inter',16), text="Please ensure you are seated in a well lit room.\nHave your camera facing directly head on.\n\nWhen you are ready to begin: press the open file image or give the gesture!")
+        self.uiPreimportBoilerPlate = CTk.CTkLabel(master=self.uiPreimportFrame, width = 200, height= 100, text_color=Style.whiteText,font=('Inter',16), text="Please ensure you are seated in a well lit room.\nHave your camera facing directly head on\nEnsure you are at least half a metre from the camera.\n\nWhen you are ready to begin: press the open file image or give the gesture!")
         self.uiPreimportBoilerPlate.grid(column=1,row=0,padx=100,pady=20)
 
         ## Pre import UI ##
@@ -526,10 +526,6 @@ class App(CTk.CTk):
         self.after(0, self.looper.updateFrame())
 
     ## INPUT: Nil
-    ## FUNCTION: Creates popup for import options. Sets self variables from checkboxes for later references.
-
-    
-    ## INPUT: Nil
     ## FUNCTION: Opens file explorer dialog, generates editing canvas based on relative coordinates, resizes image. Sets editor and looper states. 
     def open_image(self):
         global editor
@@ -542,7 +538,7 @@ class App(CTk.CTk):
         if file_path:
             img = Image.open(file_path)
 
-            UIoffset = self.uiMenuFrame.winfo_height() + 85 # 85 accounts for gesture detection
+            UIoffset = self.uiMenuFrame.winfo_height() # 85 accounts for gesture detection
             rfHeight = self.winfo_height() - UIoffset
             relPos = 1 - (rfHeight / self.winfo_height())
             
@@ -609,7 +605,7 @@ class App(CTk.CTk):
     ## INPUT: Event
     ## FUNCTION: Resizes canvas based on overall window size.
     def handle_resize(self,event):
-            UIoffset = self.uiMenuFrame.winfo_height() + 32 # 35 accounts for gesture readout's size
+            UIoffset = self.uiMenuFrame.winfo_height() + self.uiDetectedGesture.winfo_height()
             rfHeight = self.winfo_height() - UIoffset
             newWidth = self.winfo_width()
             self.uiRenderFrame.config(width = newWidth, height =rfHeight )

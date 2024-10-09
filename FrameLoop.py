@@ -177,6 +177,7 @@ class GestureVision:
                 print("EXITING")
                 self.prevEdit = "cropexit"
                 self.editor.destroyCropBounds(False)
+                self.editor.resetCropStage()
                 self.cropMode = False
 
         ## Generic Flow Control: Checks gesture if out of crop mode. If in crop mode, exits.
