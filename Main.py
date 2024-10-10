@@ -344,7 +344,7 @@ class ActionHistory(CTk.CTkFrame):
     :type master: The CTK root window
     :param master: CTK.CTK        
     """   
-    def __init__(self, master, **kwargs):
+    def __init__(self, master:CTk.CTk, **kwargs):
         super().__init__(master, **kwargs) 
         self.label_list = deque(maxlen = 3) ## Limiting to 5 History
         self.last_gesture = "none"
@@ -368,7 +368,7 @@ class ActionHistory(CTk.CTkFrame):
 
     ## INPUT: last gesture given
     ## FUNCTION: Appends last gesture to history, alternates UI colours, calls pop if list length == 3
-    def add_item(self, item, image=None) -> None:
+    def add_item(self, item, image:str=None) -> None:
         """
         Appends last gesture to history, alternates UI colours, calls pop if list length == 3
 
@@ -408,7 +408,7 @@ class ActionHistory(CTk.CTkFrame):
 # Class for frame containing editing gifs
 class FunctionFrame(CTk.CTkFrame):
     """
-    Class for frame containing gesture functions in gif formate
+    Class for frame containing gesture functions in gif format
 
     :type master: The CTK root window
     :param master: CTK.CTK 
@@ -574,19 +574,28 @@ class App(CTk.CTk):
 
     ## INPUT: Nil
     ## FUNCITON: Destroys start frame, rearranges UI   
-    def killStartFrame(self):
+    def killStartFrame(self) -> None:
+        """
+        Destroys start frame, rearranges UI     
+        """
         self.uiStartFrame.destroy()
         self.uiMasterFrame.grid(column=0, row=1, columnspan= 3, sticky=CTk.EW + CTk.S)
     
     ## INPUT: Nil
     ## FUNCITON: Calls start frame kill, begins .after() call for looper operation  
-    def startCamera(self):
+    def startCamera(self) -> None:
+        """
+        Calls start frame kill, begins .after() call for looper operation 
+        """
         self.killStartFrame()
         self.after(0, self.looper.updateFrame())
 
     ## INPUT: Nil
     ## FUNCTION: Opens file explorer dialog, generates editing canvas based on relative coordinates, resizes image. Sets editor and looper states. 
-    def open_image(self):
+    def open_image(self) -> None:
+        """
+        Opens file explorer dialog, generates editing canvas based on relative coordinates, resizes image. Sets editor and looper states. 
+        """
         global editor
 
         file_path = filedialog.askopenfilename(
@@ -630,7 +639,17 @@ class App(CTk.CTk):
 
     ## INPUT: image, canvas dimensions
     ## OUTPUT: Resized image based on current canvas dimensions. Also adds a padding box to avert rotation clipping if boolean checked.
-    def resizeImport(self,img,canvas_width,canvas_height): 
+    def resizeImport(self,img,canvas_width,canvas_height) -> Image: 
+        """
+        Returns resized image based on current canvas dimensions. Also adds a padding box to avert rotation clipping if boolean checked.
+        
+        :type img: Image the user selected to edit
+        :param img: ImageFile
+        :type canvas_width: Width of the Main window (root/master)
+        :param canvas_width: Int
+        :type canvas_height: Height of the Main Window (root/master) - the height of the MenuFrame
+        :param canvas_height: Int
+        """
 
         image_width, image_height = img.size
         resizerWidth = image_width/canvas_width
@@ -663,7 +682,10 @@ class App(CTk.CTk):
 
     ## INPUT: Event
     ## FUNCTION: Resizes canvas based on overall window size.
-    def handle_resize(self,event):
+    def handle_resize(self,event) -> None:
+            """
+            Resizes canvas based on overall window size.
+            """
             UIoffset = self.uiMenuFrame.winfo_height() + self.uiDetectedGesture.winfo_height()
             rfHeight = self.winfo_height() - UIoffset
             newWidth = self.winfo_width()
@@ -671,14 +693,26 @@ class App(CTk.CTk):
       
     ## Intermediary called by FrameLoop
     def open_file(self, master):
+        """
+        Opens the ImportOptionsPopUp
+        """
         self.toplevel_window = ImportOptionsPopUp(master= master)
     
     def save_window(self, master):
+        """
+        Opens the SaveWindow
+        """
         master.saveWindow = SaveWindow(master= master)
 
     ## INPUT: previous gesture (affirmation)
     ## FUNCTION: Creates appropriate help window
-    def open_help(self, affirmation):
+    def open_help(self, affirmation) -> None:
+        """
+        Creates appropriate help window
+        
+        :type affirmation: the string of the gesture that the help window will display ie "rotate"
+        :param affirmation: String
+        """
         if affirmation is None or affirmation == "none":
             affirmation = "help"          
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():      
