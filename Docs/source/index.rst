@@ -3,17 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-CSE3CAP documentation
+CSE3CAP - Capstone Project documentation
 =====================
 
-CSE3CAP - Capstone Project
+--------------
+Project Title: 
+--------------
 
---------------
-Project Title: Gesture Based Image Manipulation (GBIM) Software
---------------
+Gesture Based Image Manipulation (GBIM) Software
+
 -------------
-Team members: Jason Styles Hao Do Nguyen Liam Bentley Patrick Mika
+Team members: 
 -------------
+
+Jason Styles Hao Do Nguyen Liam Bentley Patrick Mika
 
 -------------
 DEPENDENCIES:
