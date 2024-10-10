@@ -18,9 +18,6 @@ class SaveWindow(CTk.CTkToplevel):
     also displays Height and Width infomation in text.
     """
     def __init__(self, master, *args, **kwargs):
-        """
-        sets all of the content inside of the Save Window
-        """
         self.master = master
         super().__init__(*args, **kwargs)
         # Window settings
@@ -86,11 +83,9 @@ class ImportOptionsPopUp(CTk.CTkToplevel):
     Top level window to display options avaiable
     - Pad the image to avoid rotational clipping
     - Overlay CV2 landmarks on webcam
+    sets all of the content inside of the import Options pop up
     """
     def __init__(self, master, *args, **kwargs):
-        """
-        sets all of the content inside of the import Options pop up
-        """
         self.master = master
         super().__init__(*args, **kwargs)
         self.geometry("300x110")
@@ -123,9 +118,6 @@ class HelpWindow(CTk.CTkToplevel):
     - text tool tip to help explain the gesture
     """
     def __init__(self, *args, **kwargs):
-        """
-        sets all of the content inside of the Help Window
-        """
         super().__init__(*args, **kwargs)
         # Window settings
         self.geometry("375x400")
@@ -215,29 +207,26 @@ class HelpWindow(CTk.CTkToplevel):
 class GIFLabel(CTk.CTkLabel):
     """
     A label that has the content of a GIF image. can animate on hover or loop continuosly.
+
+    :type master: The CTK root window
+    :param master: CTK.CTK        
+    :type root: The CTK root window
+    :param root: CTK.CTK
+    :type image_path: The file path of the GIF
+    :param image_path: string
+    :type gif_width: The width that you would like to set the GIF image to. Default is 320
+    :param gif_width: int    
+    :type gif_height: The height that you would like to set the GIF image to. Default is 220
+    :param gif_height: int
+    :type is_Help: is the gif for the Help Window? Default True
+    :param is_Help: Boolean
+    :type is_Open: is the gif the Open File label? Default False
+    :param is_Open: Boolean
+    :type is_Help_Button: is the gif the a help label in the function options? Default False
+    :param is_Help_Button: Boolean
     """
     def __init__(self, master, root, image_path, gif_width = 320, gif_height = 220, is_Help = True, is_Open = False, is_Help_Button = False,**kwargs):
-        """
-        sets all of the content inside of the GIF label
-
-        :type master: The CTK root window
-        :param master: CTK.CTK        
-        :type root: The CTK root window
-        :param root: CTK.CTK
-        :type image_path: The file path of the GIF
-        :param image_path: string
-        :type gif_width: The width that you would like to set the GIF image to. Default is 320
-        :param gif_width: int    
-        :type gif_height: The height that you would like to set the GIF image to. Default is 220
-        :param gif_height: int
-        :type is_Help: is the gif for the Help Window? Default True
-        :param is_Help: Boolean
-        :type is_Open: is the gif the Open File label? Default False
-        :param is_Open: Boolean
-        :type is_Help_Button: is the gif the a help label in the function options? Default False
-        :param is_Help_Button: Boolean
-        
-        """
+ 
         self.is_Help = is_Help
         self.is_Help_Button = is_Help_Button
         self.is_Open = is_Open
@@ -281,11 +270,21 @@ class GIFLabel(CTk.CTkLabel):
         self.bind("<Leave>", lambda event:self._killAnimate())
         self.configure(image=self._frames[1])
 
-    def _animate(self, idx=0):
+    def _animate(self, idx=0) -> None:
+        """
+        Starts the animation of a Gif
+
+        :type idx: the number of the index in the Gif frame array. Default = 0
+        :param idx: int
+        """
         self.configure(image=self._frames[idx])
         self.animate_Job = self.after(self._duration, self._animate, (idx+1)%len(self._frames))
     
-    def _killAnimate(self):
+    def _killAnimate(self) -> None:
+        """
+        Kills the animation. and sets the label image to the the frame of the Gif array at position 1 (clearer image)
+
+        """
         if self.animate_Job is not None:
             self.after_cancel(self.animate_Job)
             self.animate_Job = None
@@ -293,6 +292,9 @@ class GIFLabel(CTk.CTkLabel):
         
 # Class for the image labels
 class ImageLabel(CTk.CTkLabel):
+    """
+    A label that has the content of an image.
+    """
     def __init__(self, master, root, image_path, image_size, is_gesture = False, **kwargs):
         self.image_path = image_path
         self.image_size = image_size
@@ -303,7 +305,10 @@ class ImageLabel(CTk.CTkLabel):
 
     ## INPUT: Nil
     ## FUNCTION: loads image, performs tk operations and binds mouse 1 event
-    def load_image(self):
+    def load_image(self) -> None:
+        """
+        Loads image into the label
+        """
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Open the image file
         image = Image.open(os.path.join(current_dir, self.image_path))
@@ -329,7 +334,7 @@ class ActionHistory(CTk.CTkFrame):
     
     ## INPUT: Nil
     ## FUNCTION: destroys label elements and pops from history after 3 items
-    def pop_item(self):
+    def pop_item(self) -> None:
         self.label_list[2].destroy()
         self.label_list.pop()
         for label in self.label_list: # Shuffles everything back to allow for push to Queue
@@ -340,7 +345,7 @@ class ActionHistory(CTk.CTkFrame):
 
     ## INPUT: last gesture given
     ## FUNCTION: Appends last gesture to history, alternates UI colours, calls pop if list length == 3
-    def add_item(self, item, image=None):
+    def add_item(self, item, image=None) -> None:
         self.last_gesture = item
         if(self.colourCounter > 0): # Makes alternating colours
             bgColour = Style.popupBackground
@@ -375,7 +380,7 @@ class FunctionFrame(CTk.CTkFrame):
 
     ## INPUT: gesture
     ## FUNCTION: appends to UI element a list of GIFLables representative of functions
-    def add_item(self, gesture):
+    def add_item(self, gesture) -> None:
         img = Gesture.gesture_image(gesture)
         label = GIFLabel(master=self,root= self.root,image_path=img,gif_width=59, gif_height=50,is_Help=False,bg_color="transparent",text = "")
     
