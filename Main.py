@@ -294,6 +294,18 @@ class GIFLabel(CTk.CTkLabel):
 class ImageLabel(CTk.CTkLabel):
     """
     A label that has the content of an image.
+
+
+    :type master: The CTK root window
+    :param master: CTK.CTK        
+    :type root: The CTK root window
+    :param root: CTK.CTK
+    :type image_path: The file path of the Image
+    :param image_path: string
+    :type image_size: The width and Height of image label. ie (200,130)
+    :param image_size: tuple   
+    :type is_gesture: is the image for the function list? - assigns on press open_help
+    :param is_gesture: Boolean
     """
     def __init__(self, master, root, image_path, image_size, is_gesture = False, **kwargs):
         self.image_path = image_path
@@ -324,6 +336,14 @@ class ImageLabel(CTk.CTkLabel):
 
 # Class for action History
 class ActionHistory(CTk.CTkFrame):
+    """
+    Frame that holds a list and displays the last 3 gestures detected to the viewer. the list is also used 
+    in the function module in the Undo, Redo editor functions
+
+
+    :type master: The CTK root window
+    :param master: CTK.CTK        
+    """   
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs) 
         self.label_list = deque(maxlen = 3) ## Limiting to 5 History
@@ -335,6 +355,9 @@ class ActionHistory(CTk.CTkFrame):
     ## INPUT: Nil
     ## FUNCTION: destroys label elements and pops from history after 3 items
     def pop_item(self) -> None:
+        """
+        destroys label elements and pops from history after 3 items
+        """
         self.label_list[2].destroy()
         self.label_list.pop()
         for label in self.label_list: # Shuffles everything back to allow for push to Queue
@@ -346,6 +369,14 @@ class ActionHistory(CTk.CTkFrame):
     ## INPUT: last gesture given
     ## FUNCTION: Appends last gesture to history, alternates UI colours, calls pop if list length == 3
     def add_item(self, item, image=None) -> None:
+        """
+        Appends last gesture to history, alternates UI colours, calls pop if list length == 3
+
+        :type item: last gesture given as a string ie "rotate".
+        :param item: string
+        :type image: path of image to use in label list - not currently used - default = None.
+        :param image: string
+        """
         self.last_gesture = item
         if(self.colourCounter > 0): # Makes alternating colours
             bgColour = Style.popupBackground
@@ -362,14 +393,28 @@ class ActionHistory(CTk.CTkFrame):
         self.label_list.appendleft(label) # from a list to FIFO
     
     
-    def check_top(self):
+    def check_top(self) -> CTk.CTkLabel:
+        """
+        returns the gesture at the start of the list array
+        """
         return self.label_list[0]
     
-    def get_last_gesture_text(self):
+    def get_last_gesture_text(self) -> str:
+        """
+        returns the gesture at the start of the list array
+        """
         return self.last_gesture
 
 # Class for frame containing editing gifs
 class FunctionFrame(CTk.CTkFrame):
+    """
+    Class for frame containing gesture functions in gif formate
+
+    :type master: The CTK root window
+    :param master: CTK.CTK 
+    :type root: The CTK root window
+    :param root: CTK.CTK 
+    """
     def __init__(self, master, root, **kwargs):
         self.root = root  
         super().__init__(master, **kwargs) 
@@ -380,7 +425,13 @@ class FunctionFrame(CTk.CTkFrame):
 
     ## INPUT: gesture
     ## FUNCTION: appends to UI element a list of GIFLables representative of functions
-    def add_item(self, gesture) -> None:
+    def add_item(self, gesture: Gesture) -> None:
+        """
+        Appends gestures as gifs to the frame.
+
+        :type gesture: Gesture to grab the Gif path from
+        :param gesture: Gesture
+        """
         img = Gesture.gesture_image(gesture)
         label = GIFLabel(master=self,root= self.root,image_path=img,gif_width=59, gif_height=50,is_Help=False,bg_color="transparent",text = "")
     
@@ -396,6 +447,9 @@ class FunctionFrame(CTk.CTkFrame):
     
 # Main App Class         
 class App(CTk.CTk):
+    """
+    Main app class, Holds everything and is the Root/Master window
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
