@@ -256,7 +256,7 @@ class GIFLabel(CTk.CTkLabel):
         # start animation
         gesture_text = Gesture.get_gesture_from_imagepath(Gesture, image_path)
         if(is_Help):
-            self._animate()
+            self.animate()
             return
         if(is_Open):
             self.bind("<Button-1>", lambda event:root.open_file(master = root))
@@ -266,11 +266,11 @@ class GIFLabel(CTk.CTkLabel):
             self.bind("<Button-1>", lambda event:root.open_help(root.uiActionHistory.get_last_gesture_text()))
         else:
             self.bind("<Button-1>", lambda event:root.open_help(gesture_text))
-        self.bind("<Enter>", lambda event:self._animate())
-        self.bind("<Leave>", lambda event:self._killAnimate())
+        self.bind("<Enter>", lambda event:self.animate())
+        self.bind("<Leave>", lambda event:self.killAnimate())
         self.configure(image=self._frames[1])
 
-    def _animate(self, idx=0) -> None:
+    def animate(self, idx=0) -> None:
         """
         Starts the animation of a Gif
 
@@ -278,9 +278,9 @@ class GIFLabel(CTk.CTkLabel):
         :param idx: int
         """
         self.configure(image=self._frames[idx])
-        self.animate_Job = self.after(self._duration, self._animate, (idx+1)%len(self._frames))
+        self.animate_Job = self.after(self._duration, self.animate, (idx+1)%len(self._frames))
     
-    def _killAnimate(self) -> None:
+    def killAnimate(self) -> None:
         """
         Kills the animation. and sets the label image to the the frame of the Gif array at position 1 (clearer image)
 
