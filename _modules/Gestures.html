@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestures &mdash; CSE3CAP 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CSE3CAP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">CSE3CAP_GBIM</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CSE3CAP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Gestures</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Gestures</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<div class="viewcode-block" id="Gesture">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture">[docs]</a>
+<span class="k">class</span> <span class="nc">Gesture</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class of tupe enum that holds all of the available gestures.</span>
+<span class="sd">        includes functions to return the help text and images for all gestures.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ROTATE</span> <span class="o">=</span> <span class="s2">&quot;Rotate&quot;</span>
+        <span class="n">CROP</span> <span class="o">=</span> <span class="s2">&quot;Crop&quot;</span>
+        <span class="n">RESIZE</span> <span class="o">=</span> <span class="s2">&quot;Resize&quot;</span>
+        <span class="n">TRANSLATE</span> <span class="o">=</span> <span class="s2">&quot;Translate&quot;</span>
+        <span class="n">CONTRAST</span> <span class="o">=</span> <span class="s2">&quot;Contrast&quot;</span>
+        <span class="n">BRIGHTNESS</span> <span class="o">=</span> <span class="s2">&quot;Brightness&quot;</span>
+        <span class="n">POINTER</span> <span class="o">=</span> <span class="s2">&quot;Pointer&quot;</span>
+        <span class="n">PEN</span> <span class="o">=</span> <span class="s2">&quot;Pen&quot;</span>
+        <span class="n">HELP</span> <span class="o">=</span> <span class="s2">&quot;Help&quot;</span>
+        <span class="n">UNDO</span> <span class="o">=</span> <span class="s2">&quot;Undo&quot;</span>
+        <span class="n">REDO</span> <span class="o">=</span> <span class="s2">&quot;Redo&quot;</span>
+        <span class="n">SAVEFILE</span> <span class="o">=</span> <span class="s2">&quot;Save File&quot;</span>
+        <span class="n">OPENFILE</span> <span class="o">=</span> <span class="s2">&quot;Open File&quot;</span>
+        
+<div class="viewcode-block" id="Gesture.gesture_help">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.gesture_help">[docs]</a>
+        <span class="k">def</span> <span class="nf">gesture_help</span><span class="p">(</span><span class="bp">cls</span> <span class="p">:</span><span class="n">Enum</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the help text of the gesture inputted to the function</span>
+
+<span class="sd">            :type cls: Gesture that you require the help text for</span>
+<span class="sd">            :param cls: Enum of type Gesture</span>
+<span class="sd">            :return: Returns the help text</span>
+<span class="sd">            :rtype: String</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.gesture_help(Gesture.BRIGHTNESS))</span>
+<span class="sd">            Brightness: Change the brightness of the image by raising or lowering your hand.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">gestureHelp</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">ROTATE</span><span class="p">:</span> <span class="s2">&quot;Rotate: Use this gesture to rotate the image clockwise or counterclockwise.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CROP</span><span class="p">:</span> <span class="s2">&quot;Crop: Used to enter and exit crop mode. Once in crop mode, utilise the resize gesture to position and scale the image under the crop visualisation.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">RESIZE</span><span class="p">:</span> <span class="s2">&quot;Resize: Shift the L shape of your fingers left or right to adjust the size of the image.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">TRANSLATE</span><span class="p">:</span> <span class="s2">&quot;Translate: Move the image around by moving your hand in the desired direction.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CONTRAST</span><span class="p">:</span> <span class="s2">&quot;Contrast: Adjust the contrast of the image by moving your hand up or down.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">BRIGHTNESS</span><span class="p">:</span> <span class="s2">&quot;Brightness: Change the brightness of the image by raising or lowering your hand.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">POINTER</span><span class="p">:</span> <span class="s2">&quot;Pointer: Use this gesture to control the cursor with your hand movements. Activate it to click and interact with elements.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">PEN</span><span class="p">:</span> <span class="s2">&quot;Pen: Draw or write on the image using a finger, simulating a pen effect.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">HELP</span><span class="p">:</span> <span class="s2">&quot;Help: Use this gesture to bring up the help menu or information about gestures.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">UNDO</span><span class="p">:</span> <span class="s2">&quot;Undo: Use this gesture to undo the previous editing step.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">REDO</span><span class="p">:</span> <span class="s2">&quot;Redo: Use this gesture to redo the previous editing step.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">SAVEFILE</span><span class="p">:</span> <span class="s2">&quot;Save File: Use this gesture to save the current image or project.&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">OPENFILE</span><span class="p">:</span> <span class="s2">&quot;Open File: Use this gesture to open a new image file from your device.&quot;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">gestureHelp</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Gesture.gesture_image">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.gesture_image">[docs]</a>
+        <span class="k">def</span> <span class="nf">gesture_image</span><span class="p">(</span><span class="bp">cls</span> <span class="p">:</span><span class="n">Enum</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the path of the image for function menu of the gesture inputted to the function</span>
+
+<span class="sd">            :type cls: Gesture that you require the function menu image of</span>
+<span class="sd">            :param cls: Enum of type Gesture</span>
+<span class="sd">            :return: Returns the path of the the image</span>
+<span class="sd">            :rtype: String</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.gesture_image(Gesture.HELP))</span>
+<span class="sd">            Resources\Helpui.gif</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">gestureImage</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">ROTATE</span><span class="p">:</span> <span class="s2">&quot;Resources\RotateUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CROP</span><span class="p">:</span> <span class="s2">&quot;Resources\CropUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">RESIZE</span><span class="p">:</span> <span class="s2">&quot;Resources\ResizeUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">TRANSLATE</span> <span class="p">:</span><span class="s2">&quot;Resources\TranslateUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CONTRAST</span> <span class="p">:</span><span class="s2">&quot;Resources\ContrastUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">BRIGHTNESS</span><span class="p">:</span> <span class="s2">&quot;Resources\BrightnessUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">POINTER</span><span class="p">:</span> <span class="s2">&quot;Resources\PointerUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">PEN</span><span class="p">:</span> <span class="s2">&quot;Resources\PenUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">HELP</span><span class="p">:</span> <span class="s2">&quot;Resources\Helpui.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">UNDO</span><span class="p">:</span> <span class="s2">&quot;Resources</span><span class="se">\\</span><span class="s2">Undoui.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">REDO</span><span class="p">:</span> <span class="s2">&quot;Resources\Redoui.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">SAVEFILE</span><span class="p">:</span> <span class="s2">&quot;Resources\SaveUI.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">OPENFILE</span><span class="p">:</span> <span class="s2">&quot;Resources\OpenUI.gif&quot;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">gestureImage</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span></div>
+
+        
+<div class="viewcode-block" id="Gesture.gesture_help_image">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.gesture_help_image">[docs]</a>
+        <span class="k">def</span> <span class="nf">gesture_help_image</span><span class="p">(</span><span class="bp">cls</span> <span class="p">:</span><span class="n">Enum</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the path of the the gif for the help window of the gesture inputted to the function</span>
+
+<span class="sd">            :type cls: Gesture that you require the help window gif of</span>
+<span class="sd">            :param cls: Enum of type Gesture</span>
+<span class="sd">            :return: Returns the path of the the gif</span>
+<span class="sd">            :rtype: String</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.gesture_help_image(Gesture.HELP))</span>
+<span class="sd">            Resources\Help.gif</span>
+<span class="sd">            &quot;&quot;&quot;</span>            
+            <span class="n">gestureHelpImage</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">ROTATE</span><span class="p">:</span> <span class="s2">&quot;Resources\Rotate.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CROP</span><span class="p">:</span> <span class="s2">&quot;Resources\Crop.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">RESIZE</span><span class="p">:</span> <span class="s2">&quot;Resources\Resize.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">TRANSLATE</span> <span class="p">:</span><span class="s2">&quot;Resources\Translate.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">CONTRAST</span> <span class="p">:</span><span class="s2">&quot;Resources\Contrast.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">BRIGHTNESS</span><span class="p">:</span> <span class="s2">&quot;Resources\Brightness.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">POINTER</span><span class="p">:</span> <span class="s2">&quot;Resources\Pointer.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">PEN</span><span class="p">:</span> <span class="s2">&quot;Resources\Pen.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">HELP</span><span class="p">:</span> <span class="s2">&quot;Resources\Help.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">UNDO</span><span class="p">:</span> <span class="s2">&quot;Resources</span><span class="se">\\</span><span class="s2">Undo.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">REDO</span><span class="p">:</span> <span class="s2">&quot;Resources\Redo.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">SAVEFILE</span><span class="p">:</span> <span class="s2">&quot;Resources\Save.gif&quot;</span><span class="p">,</span>
+                    <span class="n">Gesture</span><span class="o">.</span><span class="n">OPENFILE</span><span class="p">:</span> <span class="s2">&quot;Resources\Open.gif&quot;</span>
+            <span class="p">}</span> 
+            <span class="k">return</span> <span class="n">gestureHelpImage</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span></div>
+
+       
+<div class="viewcode-block" id="Gesture.return_enums">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.return_enums">[docs]</a>
+        <span class="k">def</span> <span class="nf">return_enums</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the full list of gestures</span>
+
+<span class="sd">            :type cls: The Gesture class</span>
+<span class="sd">            :param cls: The Gesture class</span>
+<span class="sd">            :return: a list of all Gesture:Enums</span>
+<span class="sd">            :rtype: GestureList</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.return_enums(Gesture))</span>
+<span class="sd">            [&lt;Gesture.ROTATE: &#39;Rotate&#39;&gt;, &lt;Gesture.CROP: &#39;Crop&#39;&gt;, ...etc</span>
+<span class="sd">            &quot;&quot;&quot;</span>         
+            <span class="n">enums</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>  
+                <span class="n">enums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">enums</span></div>
+
+        
+<div class="viewcode-block" id="Gesture.string_to_enum">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.string_to_enum">[docs]</a>
+        <span class="k">def</span> <span class="nf">string_to_enum</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span><span class="n">Enum</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Takes in a string eg: &quot;Rotate&quot;,&quot;crop&quot; and returns the Gesture:Enum assosiated</span>
+
+<span class="sd">            :type string: The Gesture string</span>
+<span class="sd">            :param string: str</span>
+<span class="sd">            :return: the Gesture:Enum assosiated with the string</span>
+<span class="sd">            :rtype: GestureEnum</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.string_to_enum(&quot;Help&quot;))</span>
+<span class="sd">            Gesture.HELP</span>
+<span class="sd">            &quot;&quot;&quot;</span>  
+            <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">Gesture</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">string</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Gesture.get_gesture_from_imagepath">
+<a class="viewcode-back" href="../Gestures.html#Gestures.Gesture.get_gesture_from_imagepath">[docs]</a>
+        <span class="k">def</span> <span class="nf">get_gesture_from_imagepath</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">image_path</span><span class="p">)</span> <span class="o">-&gt;</span><span class="n">Enum</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Takes in a image path string eg &quot;Resources\Penui.gif&quot;,&quot;Resources\Redoui.gif&quot; and returns the GestureEnum assosiated</span>
+
+<span class="sd">            :type image_path: The imagepath string</span>
+<span class="sd">            :param image_path: str</span>
+<span class="sd">            :return: the Gesture:Enum assosiated with image_path</span>
+<span class="sd">            :rtype: GestureEnum</span>
+
+<span class="sd">            :Example:</span>
+<span class="sd">            &gt;&gt;&gt; print(Gesture.get_gesture_from_imagepath(Gesture, &quot;Resources\SaveUI.gif&quot;))</span>
+<span class="sd">            Save File</span>
+<span class="sd">            &quot;&quot;&quot;</span>  
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+                 <span class="n">string</span> <span class="o">=</span> <span class="n">Gesture</span><span class="o">.</span><span class="n">gesture_image</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+                 <span class="k">if</span><span class="p">(</span><span class="n">string</span> <span class="o">==</span> <span class="n">image_path</span><span class="p">):</span>
+                      <span class="k">return</span> <span class="n">member</span><span class="o">.</span><span class="n">value</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Patrick Mika, Jason Styles, Hao Do Nguyen, Liam Bentley.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
